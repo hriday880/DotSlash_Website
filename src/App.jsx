@@ -4,7 +4,6 @@ import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-import CustomCursor from './components/CustomCursor';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
@@ -59,9 +58,7 @@ function App() {
  }, []);
 
  return (
- <>
-  <CustomCursor />
-  <Navbar />
+ <>  <Navbar />
 
   <Routes>
   <Route path="/" element={<HomePage />} />
