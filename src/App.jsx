@@ -17,64 +17,60 @@ import Events from './pages/Events';
 gsap.registerPlugin(ScrollTrigger);
 
 function HomePage() {
-  return (
-    <>
-      <Hero />
-      <Footer />
-    </>
-  );
+ return (
+ <>
+  <Hero />
+  <Footer />
+ </>
+ );
 }
 
 function App() {
-  const location = useLocation();
+ const location = useLocation();
 
-  // Reset scroll on route change
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    ScrollTrigger.refresh();
-  }, [location.pathname]);
+ // Reset scroll on route change
+ useEffect(() => {
+ window.scrollTo(0, 0);
+ ScrollTrigger.refresh();
+ }, [location.pathname]);
 
-  // Initialize Lenis smooth scroll
-  useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: 'vertical',
-      gestureOrientation: 'vertical',
-      smoothWheel: true,
-      wheelMultiplier: 1,
-      touchMultiplier: 2,
-    });
+ // Initialize Lenis smooth scroll
+ useEffect(() => {
+ const lenis = new Lenis({
+  duration: 1.2,
+  easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+  orientation: 'vertical',
+  gestureOrientation: 'vertical',
+  smoothWheel: true,
+  wheelMultiplier: 1,
+  touchMultiplier: 2,
+ });
 
-    lenis.on('scroll', ScrollTrigger.update);
-    gsap.ticker.add((time) => {
-      lenis.raf(time * 1000);
-    });
-    gsap.ticker.lagSmoothing(0);
+ lenis.on('scroll', ScrollTrigger.update);
+ gsap.ticker.add((time) => {
+  lenis.raf(time * 1000);
+ });
+ gsap.ticker.lagSmoothing(0);
 
-    return () => {
-      lenis.destroy();
-      gsap.ticker.remove(lenis.raf);
-    };
-  }, []);
+ return () => {
+  lenis.destroy();
+  gsap.ticker.remove(lenis.raf);
+ };
+ }, []);
 
-  return (
-    <>
-      {/* CRT Scanline Overlay */}
-      <div className="crt-overlay" />
-      <div className="noise-overlay" />
+ return (
+ <>
+  <CustomCursor />
+  <Navbar />
 
-      <CustomCursor />
-      <Navbar />
-
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/team" element={<MeetTheTeam />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/events" element={<Events />} />
-      </Routes>
-    </>
-  );
+  <Routes>
+  <Route path="/" element={<HomePage />} />
+  <Route path="/team" element={<MeetTheTeam />} />
+  <Route path="/contact" element={<Contact />} />
+  <Route path="/events" element={<Events />} />
+  </Routes>
+ </>
+ );
 }
 
 export default App;
