@@ -154,7 +154,7 @@ function AsciiOverlay({ isHovered, containerRef }) {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 z-[5] pointer-events-none opacity-60 mix-blend-screen transition-opacity duration-300"
+      className="absolute inset-0 z-0 pointer-events-none opacity-80 transition-opacity duration-300"
     />
   );
 }
@@ -209,16 +209,16 @@ const Hero = () => {
           </div>
           <div 
             ref={imageContainerRef}
-            className="relative aspect-square md:aspect-video border border-[#3300FF] p-2 bg-[#131313] overflow-hidden cursor-pointer"
+            className="relative aspect-square md:aspect-video border border-[#3300FF] p-2 bg-[#0a0a0a] overflow-hidden cursor-pointer"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
+            <AsciiOverlay isHovered={isHovered} containerRef={imageContainerRef} />
             <img 
               src="https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80" 
               alt="Build Space" 
-              className="w-full h-full object-cover opacity-80 mix-blend-luminosity grayscale hover:grayscale-0 transition-all duration-500 hover:scale-105"
+              className="relative z-10 w-full h-full object-cover opacity-80 mix-blend-luminosity grayscale hover:grayscale-0 transition-all duration-500 hover:scale-105"
             />
-            <AsciiOverlay isHovered={isHovered} containerRef={imageContainerRef} />
           </div>
         </div>
       </section>

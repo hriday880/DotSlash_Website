@@ -82,7 +82,7 @@ function AsciiOverlay({ isHovered, containerRef }) {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 z-[5] pointer-events-none opacity-60 mix-blend-screen transition-opacity duration-300"
+      className="absolute inset-0 z-0 pointer-events-none opacity-80 transition-opacity duration-300"
     />
   );
 }
@@ -104,14 +104,15 @@ const TeamCard = ({ member, index }) => {
       onMouseLeave={() => setIsHovered(false)}
       ref2={cardRef}
     >
-      <div ref={cardRef} className="absolute inset-0">
+      <div ref={cardRef} className="absolute inset-0 bg-[#0a0a0a]">
+        {/* ASCII overlay in the background */}
+        <AsciiOverlay isHovered={isHovered} containerRef={cardRef} />
+        
         <img
           src={member.image}
           alt={member.name}
-          className="w-full h-full object-cover filter grayscale contrast-125 group-hover:grayscale-0 group-hover:contrast-100 transition-all duration-700 scale-100 group-hover:scale-110"
+          className="relative z-10 w-full h-full object-cover filter grayscale contrast-125 group-hover:grayscale-0 group-hover:contrast-100 transition-all duration-700 scale-100 group-hover:scale-110"
         />
-        {/* ASCII overlay on hover */}
-        <AsciiOverlay isHovered={isHovered} containerRef={cardRef} />
       </div>
 
       {/* Dark overlay that fades on hover */}

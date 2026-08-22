@@ -106,7 +106,7 @@ function AsciiOverlay({ isHovered, containerRef }) {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 z-[5] pointer-events-none opacity-60 mix-blend-screen transition-opacity duration-300"
+      className="absolute inset-0 z-0 pointer-events-none opacity-80 transition-opacity duration-300"
     />
   );
 }
@@ -141,13 +141,13 @@ const EventCard = ({ event, index }) => {
           <h3 className="font-pixel text-xl mb-2 text-white group-hover/card:text-[#3300FF] transition-colors">{event.title}</h3>
           <p className="font-pixel text-xs text-[#3300FF] mb-4 text-glow-blue">{event.date}</p>
           
-          <div ref={cardRef} className="relative w-full h-48 mb-4 overflow-hidden rounded border border-[#1A1A1A]">
+          <div ref={cardRef} className="relative w-full h-48 mb-4 overflow-hidden rounded border border-[#1A1A1A] bg-[#0a0a0a]">
+            <AsciiOverlay isHovered={isHovered} containerRef={cardRef} />
             <img 
               src={event.image} 
               alt={event.title}
-              className="w-full h-full object-cover filter grayscale contrast-125 group-hover/card:grayscale-0 group-hover/card:contrast-100 transition-all duration-500 hover:scale-105"
+              className="relative z-10 w-full h-full object-cover filter grayscale contrast-125 group-hover/card:grayscale-0 group-hover/card:contrast-100 transition-all duration-500 hover:scale-105"
             />
-            <AsciiOverlay isHovered={isHovered} containerRef={cardRef} />
           </div>
           
           <p className="font-mono text-sm text-[#A0A0A0] leading-relaxed">
