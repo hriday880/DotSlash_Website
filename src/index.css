@@ -1,0 +1,299 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ========================================
+   GLOBAL STYLES — DotSlash ASCII/Pixel
+   ======================================== */
+
+@layer base {
+  * {
+    scrollbar-width: none;
+  }
+  *::-webkit-scrollbar {
+    display: none;
+  }
+
+  ::selection {
+    background: #3300FF;
+    color: #FFFFFF;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: #030303;
+    color: #ffffff;
+    cursor: none;
+  }
+}
+
+@layer components {
+  /* Text Exclusion Blend */
+  .text-exclusion {
+    mix-blend-mode: exclusion;
+    color: white;
+  }
+
+  /* Glassmorphism Panel */
+  .glass-panel {
+    background: rgba(5, 5, 5, 0.4);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(26, 26, 26, 1);
+  }
+
+  /* Overlay Gradient */
+  .overlay-gradient {
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
+  }
+
+  /* ========================================
+     CYBER BUTTON (original style + pixel enhancement)
+     ======================================== */
+  .cyber-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 32px;
+    border: 2px solid #3300FF;
+    color: #ffffff;
+    background: transparent;
+    font-family: 'Press Start 2P', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    font-size: 10px;
+    z-index: 1;
+    overflow: hidden;
+    transition: color 0.4s ease, box-shadow 0.4s ease;
+    box-shadow: 4px 4px 0 0 #3300FF;
+  }
+
+  .cyber-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: #3300FF;
+    transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    z-index: -1;
+  }
+
+  .cyber-button:hover::before {
+    transform: translateX(100%);
+  }
+
+  .cyber-button:hover {
+    color: #ffffff;
+    box-shadow: 0 0 20px rgba(51, 0, 255, 0.4), 0 0 40px rgba(0, 212, 255, 0.2);
+  }
+
+  .cyber-button .arrow {
+    transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+  }
+
+  .cyber-button:hover .arrow {
+    transform: translateX(6px);
+  }
+
+  /* ========================================
+     CRT SCANLINE OVERLAY
+     ======================================== */
+  .crt-overlay {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.03) 0px,
+      rgba(0, 0, 0, 0.03) 1px,
+      transparent 1px,
+      transparent 2px
+    );
+  }
+
+  /* ========================================
+     PIXEL GRID BACKGROUND
+     ======================================== */
+  .pixel-grid-bg {
+    background-image:
+      linear-gradient(rgba(51, 0, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(51, 0, 255, 0.04) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  /* ========================================
+     GLITCH TEXT EFFECT
+     ======================================== */
+  .glitch-text {
+    position: relative;
+  }
+  .glitch-text::before,
+  .glitch-text::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .glitch-text::before {
+    color: #00D4FF;
+    animation: glitch-clip-1 2s infinite linear alternate-reverse;
+    clip-path: inset(0 0 65% 0);
+    transform: translate(-2px, -1px);
+  }
+  .glitch-text::after {
+    color: #FF0066;
+    animation: glitch-clip-2 2s infinite linear alternate-reverse;
+    clip-path: inset(40% 0 0 0);
+    transform: translate(2px, 1px);
+  }
+
+  /* ========================================
+     GLOW EFFECTS
+     ======================================== */
+  .glow-blue {
+    box-shadow: 0 0 15px rgba(51, 0, 255, 0.5), 0 0 30px rgba(51, 0, 255, 0.2);
+  }
+  .glow-cyan {
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.5), 0 0 30px rgba(0, 212, 255, 0.2);
+  }
+  .text-glow-blue {
+    text-shadow: 0 0 10px rgba(51, 0, 255, 0.8), 0 0 20px rgba(51, 0, 255, 0.4);
+  }
+  .text-glow-cyan {
+    text-shadow: 0 0 10px rgba(0, 212, 255, 0.8), 0 0 20px rgba(0, 212, 255, 0.4);
+  }
+
+  /* ========================================
+     PIXEL BORDER
+     ======================================== */
+  .pixel-border {
+    border: 2px solid #3300FF;
+    box-shadow: 4px 0 0 0 #3300FF, -4px 0 0 0 #3300FF, 0 4px 0 0 #3300FF, 0 -4px 0 0 #3300FF;
+  }
+
+  /* ========================================
+     3D CAROUSEL (Contact Page)
+     ======================================== */
+  .scene {
+    perspective: 1200px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    transform: scale(0.65);
+  }
+  @media (min-width: 640px) {
+    .scene { transform: scale(0.85); }
+  }
+  @media (min-width: 768px) {
+    .scene { transform: scale(1); }
+  }
+  .carousel {
+    position: relative;
+    transform-style: preserve-3d;
+    animation: rotateCarousel 15s infinite linear;
+    --tz: 200px;
+  }
+  @media (min-width: 768px) {
+    .carousel { --tz: 350px; }
+  }
+  .carousel:hover {
+    animation-play-state: paused;
+  }
+  .carousel-item {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    backface-visibility: visible;
+  }
+  @keyframes rotateCarousel {
+    from { transform: rotateY(0deg); }
+    to { transform: rotateY(-360deg); }
+  }
+}
+
+/* ========================================
+   LENIS SMOOTH SCROLL
+   ======================================== */
+html.lenis { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+/* ========================================
+   PORTRAIT CARD (Team Page)
+   ======================================== */
+.portrait-card {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.portrait-card:hover {
+  transform: scale(1.02);
+  z-index: 10;
+}
+.portrait-card img {
+  transition: filter 0.5s ease, transform 0.5s ease;
+  filter: grayscale(100%) contrast(1.2);
+}
+.portrait-card:hover img {
+  filter: grayscale(0%) contrast(1.1);
+  transform: scale(1.05);
+}
+
+/* Reveal Stack */
+.reveal-stack {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.portrait-card:hover .reveal-stack {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ========================================
+   NOISE OVERLAY
+   ======================================== */
+.noise-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 9998;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* ========================================
+   GLITCH CLIP KEYFRAMES
+   ======================================== */
+@keyframes glitch-clip-1 {
+  0%   { clip-path: inset(0 0 85% 0); }
+  20%  { clip-path: inset(50% 0 20% 0); }
+  40%  { clip-path: inset(80% 0 5% 0); }
+  60%  { clip-path: inset(10% 0 75% 0); }
+  80%  { clip-path: inset(45% 0 30% 0); }
+  100% { clip-path: inset(35% 0 40% 0); }
+}
+@keyframes glitch-clip-2 {
+  0%   { clip-path: inset(40% 0 30% 0); }
+  20%  { clip-path: inset(10% 0 75% 0); }
+  40%  { clip-path: inset(20% 0 55% 0); }
+  60%  { clip-path: inset(5% 0 80% 0); }
+  80%  { clip-path: inset(65% 0 15% 0); }
+  100% { clip-path: inset(15% 0 60% 0); }
+}
