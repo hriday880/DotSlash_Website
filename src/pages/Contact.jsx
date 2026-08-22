@@ -65,7 +65,7 @@ export default function Contact() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col pt-32 pb-0 bg-[#FFFFFF] pixel-grid-bg">
+    <div className="min-h-screen flex flex-col pt-32 pb-0 bg-[#F3F4F6] pixel-grid-bg">
       <div className="noise-overlay"></div>
 
       <main className="flex-grow px-margin-mobile md:px-margin-desktop w-full max-w-7xl mx-auto flex flex-col justify-center overflow-x-hidden">
@@ -137,7 +137,7 @@ export default function Contact() {
         </div>
       </main>
 
-      <footer className="bg-[#FFFFFF] border-t border-[#E4E4E7] w-full grid grid-cols-12 gap-gutter px-margin-mobile md:px-margin-desktop py-8 md:py-section-gap relative z-20 mt-32">
+      <footer className="bg-[#F3F4F6] border-t border-[#E4E4E7] w-full grid grid-cols-12 gap-gutter px-margin-mobile md:px-margin-desktop py-8 md:py-section-gap relative z-20 mt-32">
         <div className="col-span-12 md:col-span-6 flex flex-col justify-between">
           <div className="font-headline-lg text-headline-lg font-black text-[#030303] mb-8">DotSlash</div>
           <p className="font-mono font-bold tracking-tight text-label-mono text-[#636565]">© 2024 DotSlash. ALL RIGHTS RESERVED. ENGINEERED FOR EXCELLENCE.</p>

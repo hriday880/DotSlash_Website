@@ -41,7 +41,7 @@ const ASCIIBackground = () => {
     window.addEventListener('mousemove', handleMouseMove);
 
     const render = () => {
-      ctx.fillStyle = '#030303';
+      ctx.fillStyle = '#FFF8E7'; // Butter yellow
       ctx.fillRect(0, 0, width, height);
       
       ctx.font = `${charSize}px "Space Mono", monospace`;
@@ -181,12 +181,12 @@ const Hero = () => {
   }, []);
 
   return (
-    <div ref={containerRef} className="w-full bg-[#FFFFFF] text-[#030303]">
+    <div ref={containerRef} className="w-full bg-[#FFF8E7] text-[#030303]">
       {/* 1. Hero Section */}
       <section className="relative h-screen flex flex-col items-center justify-center overflow-hidden">
         <ASCIIBackground />
-        <div className="z-10 text-center mix-blend-difference pointer-events-none">
-          <h1 className="hero-text text-[10vw] md:text-9xl font-headline-display font-bold leading-none tracking-tighter mix-blend-difference text-[#030303]">
+        <div className="z-10 text-center pointer-events-none">
+          <h1 className="hero-text text-[10vw] md:text-9xl font-headline-display font-bold leading-none tracking-tighter text-[#030303]">
             DotSlash
           </h1>
           <p className="hero-text font-mono font-bold tracking-tight text-[#00D4FF] mt-4 text-sm md:text-base tracking-widest uppercase">
@@ -229,11 +229,11 @@ const Hero = () => {
           <p className="font-mono font-bold tracking-tight text-[#00D4FF] mb-12">// DIVISIONS</p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-            <div className="glass-panel pixel-border p-8 bg-[#0D1B3E]/30">
+            <div className="glass-panel pixel-border p-8 bg-white/50">
               <h3 className="font-mono text-xl text-[#030303] mb-4">Software Division</h3>
               <p className="font-body-md text-[#52525B]">Scalable, uncompromising application architecture.</p>
             </div>
-            <div className="glass-panel pixel-border p-8 bg-[#0D1B3E]/30">
+            <div className="glass-panel pixel-border p-8 bg-white/50">
               <h3 className="font-mono text-xl text-[#030303] mb-4">Algorithmic Division</h3>
               <p className="font-body-md text-[#52525B]">Data modeling and low-latency processing pipelines.</p>
             </div>

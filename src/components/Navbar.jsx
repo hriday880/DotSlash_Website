@@ -16,7 +16,7 @@ const Navbar = () => {
   const toggleMenu = () => setIsOpen(!isOpen);
 
   return (
-    <nav className="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-[#E4E4E7] bg-[#FFFFFF]/80 pixel-grid-bg transition-all duration-300">
+    <nav className="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-[#E4E4E7] bg-[#F3F4F6]/80 pixel-grid-bg transition-all duration-300">
       <div className="max-w-7xl mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center space-x-2 group">

@@ -129,7 +129,7 @@ const TeamCard = ({ member, index }) => {
 
 export default function MeetTheTeam() {
   return (
-    <div className="min-h-screen bg-[#FFFFFF] text-[#030303] pixel-grid-bg overflow-x-hidden pt-32 pb-0">
+    <div className="min-h-screen bg-[#F3F4F6] text-[#030303] pixel-grid-bg overflow-x-hidden pt-32 pb-0">
       <div className="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop relative z-10">
         <header className="mb-24 w-full md:w-8/12">
           <h1
@@ -176,7 +176,7 @@ export default function MeetTheTeam() {
         </div>
       </div>
 
-      <footer className="bg-[#FFFFFF] border-t border-[#E4E4E7] w-full grid grid-cols-12 gap-gutter px-margin-mobile md:px-margin-desktop py-8 md:py-section-gap relative z-20 mt-16">
+      <footer className="bg-[#F3F4F6] border-t border-[#E4E4E7] w-full grid grid-cols-12 gap-gutter px-margin-mobile md:px-margin-desktop py-8 md:py-section-gap relative z-20 mt-16">
         <div className="col-span-12 md:col-span-6 flex flex-col justify-between">
           <div className="font-headline-lg text-headline-lg font-black text-[#030303] mb-8">DotSlash</div>
           <p className="font-mono font-bold tracking-tight text-label-mono text-[#636565]">

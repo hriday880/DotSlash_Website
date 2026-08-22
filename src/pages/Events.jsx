@@ -161,7 +161,7 @@ const EventCard = ({ event, index }) => {
 
 export default function Events() {
   return (
-    <div className="min-h-screen bg-[#FFFFFF] text-[#030303] pixel-grid-bg overflow-x-hidden pt-32 pb-0">
+    <div className="min-h-screen bg-[#F3F4F6] text-[#030303] pixel-grid-bg overflow-x-hidden pt-32 pb-0">
       <div className="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop relative z-10">
         
         <div className="text-center mb-24">
