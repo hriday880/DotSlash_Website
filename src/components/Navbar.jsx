@@ -16,12 +16,12 @@ const Navbar = () => {
   const toggleMenu = () => setIsOpen(!isOpen);
 
   return (
-    <nav className="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-[#1A1A1A] bg-[#030303]/80 pixel-grid-bg transition-all duration-300">
+    <nav className="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-[#E4E4E7] bg-[#FFFFFF]/80 pixel-grid-bg transition-all duration-300">
       <div className="max-w-7xl mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center space-x-2 group">
-          <span className="font-pixel text-[#3300FF] text-glow-blue text-xl md:text-2xl transition-all duration-300 group-hover:text-[#00D4FF]">
-            DOTSLASH
+          <span className="font-mono font-bold tracking-tight text-[#3300FF] text-glow-blue text-xl md:text-2xl transition-all duration-300 group-hover:text-[#00D4FF]">
+            DotSlash
           </span>
         </Link>
 
@@ -34,7 +34,7 @@ const Navbar = () => {
               className={`font-label-caps text-sm tracking-widest uppercase transition-colors duration-300 ${
                 location.pathname === link.path
                   ? 'text-[#3300FF] font-bold'
-                  : 'text-[#A0A0A0] hover:text-[#00D4FF]'
+                  : 'text-[#52525B] hover:text-[#00D4FF]'
               }`}
             >
               {link.name}
@@ -44,7 +44,7 @@ const Navbar = () => {
 
         {/* Mobile Toggle */}
         <button
-          className="md:hidden text-white hover:text-[#3300FF] transition-colors"
+          className="md:hidden text-[#030303] hover:text-[#3300FF] transition-colors"
           onClick={toggleMenu}
         >
           {isOpen ? <X size={28} /> : <Menu size={28} />}
@@ -53,7 +53,7 @@ const Navbar = () => {
 
       {/* Mobile Nav */}
       {isOpen && (
-        <div className="md:hidden absolute top-20 left-0 w-full bg-[#131313] border-b border-[#1A1A1A] py-6 px-6 flex flex-col space-y-6">
+        <div className="md:hidden absolute top-20 left-0 w-full bg-[#F4F4F5] border-b border-[#E4E4E7] py-6 px-6 flex flex-col space-y-6">
           {links.map((link) => (
             <Link
               key={link.name}
@@ -62,7 +62,7 @@ const Navbar = () => {
               className={`font-label-caps text-lg tracking-widest uppercase transition-colors duration-300 ${
                 location.pathname === link.path
                   ? 'text-[#3300FF] font-bold'
-                  : 'text-[#A0A0A0] hover:text-[#00D4FF]'
+                  : 'text-[#52525B] hover:text-[#00D4FF]'
               }`}
             >
               {link.name}

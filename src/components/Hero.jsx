@@ -181,35 +181,35 @@ const Hero = () => {
   }, []);
 
   return (
-    <div ref={containerRef} className="w-full bg-[#030303] text-white">
+    <div ref={containerRef} className="w-full bg-[#FFFFFF] text-[#030303]">
       {/* 1. Hero Section */}
       <section className="relative h-screen flex flex-col items-center justify-center overflow-hidden">
         <ASCIIBackground />
         <div className="z-10 text-center mix-blend-difference pointer-events-none">
-          <h1 className="hero-text text-[10vw] md:text-9xl font-headline-display font-bold leading-none tracking-tighter mix-blend-difference text-white">
-            DOTSLASH
+          <h1 className="hero-text text-[10vw] md:text-9xl font-headline-display font-bold leading-none tracking-tighter mix-blend-difference text-[#030303]">
+            DotSlash
           </h1>
-          <p className="hero-text font-pixel text-[#00D4FF] mt-4 text-sm md:text-base tracking-widest uppercase">
+          <p className="hero-text font-mono font-bold tracking-tight text-[#00D4FF] mt-4 text-sm md:text-base tracking-widest uppercase">
             ELITE TECH / ARCHITECTING THE VOID
           </p>
         </div>
       </section>
 
       {/* 2. BUILD SPACE Section */}
-      <section className="pixel-grid-bg relative py-24 px-6 md:px-12 lg:px-24 border-t border-[#1A1A1A]">
+      <section className="pixel-grid-bg relative py-24 px-6 md:px-12 lg:px-24 border-t border-[#E4E4E7]">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div>
-            <h2 className="font-pixel text-[#3300FF] text-2xl md:text-4xl mb-6">Build Space</h2>
-            <p className="font-mono text-[#A0A0A0] text-lg mb-8 leading-relaxed">
+            <h2 className="font-mono font-bold tracking-tight text-[#3300FF] text-2xl md:text-4xl mb-6">Build Space</h2>
+            <p className="font-mono text-[#52525B] text-lg mb-8 leading-relaxed">
               We don't just write code; we forge digital architecture. Scalable, performant, and uncompromising.
             </p>
-            <button className="pixel-border-cyan text-[#00D4FF] hover:bg-[#00D4FF] hover:text-[#030303] transition-colors duration-300 px-6 py-3 font-pixel text-sm uppercase">
+            <button className="pixel-border-cyan text-[#00D4FF] hover:bg-[#00D4FF] hover:text-[#030303] transition-colors duration-300 px-6 py-3 font-mono font-bold tracking-tight text-sm uppercase">
               Explore Hardware
             </button>
           </div>
           <div 
             ref={imageContainerRef}
-            className="relative aspect-square md:aspect-video border border-[#3300FF] p-2 bg-[#0a0a0a] overflow-hidden cursor-pointer"
+            className="relative aspect-square md:aspect-video border border-[#3300FF] p-2 bg-[#F4F4F5] overflow-hidden cursor-pointer"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
@@ -224,18 +224,18 @@ const Hero = () => {
       </section>
 
       {/* 3. DIVISIONS Section */}
-      <section className="py-24 px-6 md:px-12 lg:px-24 bg-[#131313]">
+      <section className="py-24 px-6 md:px-12 lg:px-24 bg-[#F4F4F5]">
         <div className="max-w-7xl mx-auto">
-          <p className="font-pixel text-[#00D4FF] mb-12">// DIVISIONS</p>
+          <p className="font-mono font-bold tracking-tight text-[#00D4FF] mb-12">// DIVISIONS</p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
             <div className="glass-panel pixel-border p-8 bg-[#0D1B3E]/30">
-              <h3 className="font-mono text-xl text-white mb-4">Software Division</h3>
-              <p className="font-body-md text-[#A0A0A0]">Scalable, uncompromising application architecture.</p>
+              <h3 className="font-mono text-xl text-[#030303] mb-4">Software Division</h3>
+              <p className="font-body-md text-[#52525B]">Scalable, uncompromising application architecture.</p>
             </div>
             <div className="glass-panel pixel-border p-8 bg-[#0D1B3E]/30">
-              <h3 className="font-mono text-xl text-white mb-4">Algorithmic Division</h3>
-              <p className="font-body-md text-[#A0A0A0]">Data modeling and low-latency processing pipelines.</p>
+              <h3 className="font-mono text-xl text-[#030303] mb-4">Algorithmic Division</h3>
+              <p className="font-body-md text-[#52525B]">Data modeling and low-latency processing pipelines.</p>
             </div>
           </div>
           

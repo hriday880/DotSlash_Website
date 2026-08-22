@@ -99,12 +99,12 @@ const TeamCard = ({ member, index }) => {
       initial={{ opacity: 0, y: 50 }}
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="group relative overflow-hidden border border-[#1A1A1A] hover:border-[#3300FF] transition-all duration-300 w-full aspect-[3/4] cursor-pointer"
+      className="group relative overflow-hidden border border-[#E4E4E7] hover:border-[#3300FF] transition-all duration-300 w-full aspect-[3/4] cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       ref2={cardRef}
     >
-      <div ref={cardRef} className="absolute inset-0 bg-[#0a0a0a]">
+      <div ref={cardRef} className="absolute inset-0 bg-[#F4F4F5]">
         {/* ASCII overlay in the background */}
         <AsciiOverlay isHovered={isHovered} containerRef={cardRef} />
         
@@ -116,12 +116,12 @@ const TeamCard = ({ member, index }) => {
       </div>
 
       {/* Dark overlay that fades on hover */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#030303]/90 via-[#030303]/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-500 z-10" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#FFFFFF]/90 via-[#FFFFFF]/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-500 z-10" />
 
       {/* Name & Role reveal */}
       <div className="absolute bottom-0 left-0 right-0 p-6 z-20 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 ease-out">
-        <h3 className="font-pixel text-sm text-[#3300FF] mb-1">{member.name}</h3>
-        <p className="font-mono text-xs text-[#A0A0A0]">{member.role}</p>
+        <h3 className="font-mono font-bold tracking-tight text-sm text-[#3300FF] mb-1">{member.name}</h3>
+        <p className="font-mono text-xs text-[#52525B]">{member.role}</p>
       </div>
     </motion.div>
   );
@@ -129,7 +129,7 @@ const TeamCard = ({ member, index }) => {
 
 export default function MeetTheTeam() {
   return (
-    <div className="min-h-screen bg-[#030303] text-white pixel-grid-bg overflow-x-hidden pt-32 pb-0">
+    <div className="min-h-screen bg-[#FFFFFF] text-[#030303] pixel-grid-bg overflow-x-hidden pt-32 pb-0">
       <div className="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop relative z-10">
         <header className="mb-24 w-full md:w-8/12">
           <h1
@@ -138,13 +138,13 @@ export default function MeetTheTeam() {
           >
             The Family
           </h1>
-          <p className="font-body-lg text-body-lg text-[#c4c7c8] border-l border-[#1A1A1A] pl-8 max-w-2xl">
+          <p className="font-body-lg text-body-lg text-[#52525B] border-l border-[#E4E4E7] pl-8 max-w-2xl">
             An elite assembly of digital architects, creative engineers, and logical purists. We reject the mundane, building avant-garde systems that redefine technological sophistication.
           </p>
         </header>
 
         <div className="mb-24">
-          <h2 className="font-pixel text-label-caps text-[#A0A0A0] mb-8 border-b border-[#1A1A1A] pb-2">
+          <h2 className="font-mono font-bold tracking-tight text-label-caps text-[#52525B] mb-8 border-b border-[#E4E4E7] pb-2">
             01 / EXECUTIVE COMMITTEE
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-5 gap-gutter">
@@ -155,7 +155,7 @@ export default function MeetTheTeam() {
         </div>
 
         <div className="mb-24">
-          <h2 className="font-pixel text-label-caps text-[#A0A0A0] mb-8 border-b border-[#1A1A1A] pb-2">
+          <h2 className="font-mono font-bold tracking-tight text-label-caps text-[#52525B] mb-8 border-b border-[#E4E4E7] pb-2">
             02 / CORE COMMITTEES
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-5 gap-gutter">
@@ -167,20 +167,20 @@ export default function MeetTheTeam() {
 
         {/* Hidden CC Members section */}
         <div className="hidden">
-          <h2 className="font-pixel text-label-caps text-[#A0A0A0] mb-12 border-b border-[#1A1A1A] pb-2">03 / CC MEMBERS</h2>
+          <h2 className="font-mono font-bold tracking-tight text-label-caps text-[#52525B] mb-12 border-b border-[#E4E4E7] pb-2">03 / CC MEMBERS</h2>
           {["Logistics", "Social Media", "Content", "Coding Team", "Build Space", "Outreach"].map((dept, idx) => (
             <div key={idx} className="mb-16">
-              <h3 className="font-pixel text-label-mono text-[#3300FF] mb-8 border-l border-[#3300FF] pl-4">{dept.toUpperCase()}</h3>
+              <h3 className="font-mono font-bold tracking-tight text-label-mono text-[#3300FF] mb-8 border-l border-[#3300FF] pl-4">{dept.toUpperCase()}</h3>
             </div>
           ))}
         </div>
       </div>
 
-      <footer className="bg-[#030303] border-t border-[#1A1A1A] w-full grid grid-cols-12 gap-gutter px-margin-mobile md:px-margin-desktop py-8 md:py-section-gap relative z-20 mt-16">
+      <footer className="bg-[#FFFFFF] border-t border-[#E4E4E7] w-full grid grid-cols-12 gap-gutter px-margin-mobile md:px-margin-desktop py-8 md:py-section-gap relative z-20 mt-16">
         <div className="col-span-12 md:col-span-6 flex flex-col justify-between">
-          <div className="font-headline-lg text-headline-lg font-black text-white mb-8">DOTSLASH</div>
-          <p className="font-pixel text-label-mono text-[#636565]">
-            © 2024 DOTSLASH. ALL RIGHTS RESERVED. ENGINEERED FOR EXCELLENCE.
+          <div className="font-headline-lg text-headline-lg font-black text-[#030303] mb-8">DotSlash</div>
+          <p className="font-mono font-bold tracking-tight text-label-mono text-[#636565]">
+            © 2024 DotSlash. ALL RIGHTS RESERVED. ENGINEERED FOR EXCELLENCE.
           </p>
         </div>
         <div className="col-span-12 md:col-span-6 flex justify-end items-end gap-8">

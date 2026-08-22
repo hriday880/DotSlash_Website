@@ -121,7 +121,7 @@ const EventCard = ({ event, index }) => {
   return (
     <div className={`relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group w-full mb-24`}>
       {/* Center dot for desktop timeline */}
-      <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-[#3300FF] z-20 items-center justify-center border-4 border-[#1A1A1A] shadow-[0_0_15px_rgba(51,0,255,0.8)] glow-blue">
+      <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-[#3300FF] z-20 items-center justify-center border-4 border-[#E4E4E7] shadow-[0_0_15px_rgba(51,0,255,0.8)] glow-blue">
         <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
       </div>
 
@@ -134,14 +134,14 @@ const EventCard = ({ event, index }) => {
         className={`w-full md:w-[45%] ${isEven ? 'md:pr-12' : 'md:pl-12'} relative z-10`}
       >
         <div 
-          className="glass-panel p-6 rounded-lg border border-white/5 hover:border-[#3300FF]/50 transition-all duration-300 cursor-pointer group/card"
+          className="glass-panel p-6 rounded-lg border border-black/5 hover:border-[#3300FF]/50 transition-all duration-300 cursor-pointer group/card"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
-          <h3 className="font-pixel text-xl mb-2 text-white group-hover/card:text-[#3300FF] transition-colors">{event.title}</h3>
-          <p className="font-pixel text-xs text-[#3300FF] mb-4 text-glow-blue">{event.date}</p>
+          <h3 className="font-mono font-bold tracking-tight text-xl mb-2 text-[#030303] group-hover/card:text-[#3300FF] transition-colors">{event.title}</h3>
+          <p className="font-mono font-bold tracking-tight text-xs text-[#3300FF] mb-4 text-glow-blue">{event.date}</p>
           
-          <div ref={cardRef} className="relative w-full h-48 mb-4 overflow-hidden rounded border border-[#1A1A1A] bg-[#0a0a0a]">
+          <div ref={cardRef} className="relative w-full h-48 mb-4 overflow-hidden rounded border border-[#E4E4E7] bg-[#F4F4F5]">
             <AsciiOverlay isHovered={isHovered} containerRef={cardRef} />
             <img 
               src={event.image} 
@@ -150,7 +150,7 @@ const EventCard = ({ event, index }) => {
             />
           </div>
           
-          <p className="font-mono text-sm text-[#A0A0A0] leading-relaxed">
+          <p className="font-mono text-sm text-[#52525B] leading-relaxed">
             {event.description}
           </p>
         </div>
@@ -161,17 +161,17 @@ const EventCard = ({ event, index }) => {
 
 export default function Events() {
   return (
-    <div className="min-h-screen bg-[#030303] text-white pixel-grid-bg overflow-x-hidden pt-32 pb-0">
+    <div className="min-h-screen bg-[#FFFFFF] text-[#030303] pixel-grid-bg overflow-x-hidden pt-32 pb-0">
       <div className="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop relative z-10">
         
         <div className="text-center mb-24">
           <h1 
-            className="text-[40px] leading-[48px] sm:text-[60px] sm:leading-[70px] md:text-[80px] lg:text-[120px] lg:leading-[110px] font-pixel mb-6 glitch-text text-[#3300FF] tracking-tighter uppercase"
+            className="text-[40px] leading-[48px] sm:text-[60px] sm:leading-[70px] md:text-[80px] lg:text-[120px] lg:leading-[110px] font-mono font-bold tracking-tight mb-6 glitch-text text-[#3300FF] tracking-tighter uppercase"
             data-text="Timeline"
           >
             Timeline
           </h1>
-          <p className="text-[#c4c7c8] font-mono max-w-2xl mx-auto text-lg">
+          <p className="text-[#52525B] font-mono max-w-2xl mx-auto text-lg">
             FOMO no more. A chronological record of past operations, technological showcases, and competitive engagements.
           </p>
         </div>

@@ -55,7 +55,7 @@ const CustomCursor = () => {
 
   if (!isPC) return null;
 
-  const dotClass = "fixed top-0 left-0 w-2 h-2 rounded-full bg-[#3300FF] pointer-events-none z-[9999] shadow-[0_0_15px_rgba(51,0,255,0.5)] mix-blend-screen";
+  const dotClass = "fixed top-0 left-0 w-2 h-2 rounded-full bg-[#3300FF] pointer-events-none z-[9999] shadow-[0_0_15px_rgba(51,0,255,0.5)] mix-blend-multiply";
 
   return (
     <>

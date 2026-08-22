@@ -65,7 +65,7 @@ export default function Contact() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col pt-32 pb-0 bg-[#030303] pixel-grid-bg">
+    <div className="min-h-screen flex flex-col pt-32 pb-0 bg-[#FFFFFF] pixel-grid-bg">
       <div className="noise-overlay"></div>
 
       <main className="flex-grow px-margin-mobile md:px-margin-desktop w-full max-w-7xl mx-auto flex flex-col justify-center overflow-x-hidden">
@@ -76,7 +76,7 @@ export default function Contact() {
           >
             Initialize Connection
           </h1>
-          <p className="font-body-lg text-body-lg text-[#c4c7c8] max-w-2xl">
+          <p className="font-body-lg text-body-lg text-[#52525B] max-w-2xl">
             Open a secure channel with our operations team. We evaluate inquiries based on technical merit, architectural ambition, and strategic alignment.
           </p>
         </header>
@@ -89,14 +89,14 @@ export default function Contact() {
               href={channel.link}
               target={channel.link.startsWith('mailto') ? undefined : '_blank'}
               rel="noopener noreferrer"
-              className="glass-panel p-6 border border-[#1A1A1A] hover:border-[#3300FF] transition-all duration-300 group flex flex-col items-center gap-4 text-center hover:glow-blue"
+              className="glass-panel p-6 border border-[#E4E4E7] hover:border-[#3300FF] transition-all duration-300 group flex flex-col items-center gap-4 text-center hover:glow-blue"
             >
-              <div className="w-16 h-16 rounded-none bg-[#1b1b1b] flex items-center justify-center text-[#3300FF] group-hover:text-[#00D4FF] group-hover:bg-[#3300FF]/10 transition-colors duration-300 pixel-border">
+              <div className="w-16 h-16 rounded-none bg-[#F4F4F5] flex items-center justify-center text-[#3300FF] group-hover:text-[#00D4FF] group-hover:bg-[#3300FF]/10 transition-colors duration-300 pixel-border">
                 {channel.icon}
               </div>
               <div>
-                <p className="font-pixel text-label-mono text-white group-hover:text-[#3300FF] transition-colors">{channel.name}</p>
-                <p className="font-mono text-xs text-[#A0A0A0] mt-1 break-all">{channel.value}</p>
+                <p className="font-mono font-bold tracking-tight text-label-mono text-[#030303] group-hover:text-[#3300FF] transition-colors">{channel.name}</p>
+                <p className="font-mono text-xs text-[#52525B] mt-1 break-all">{channel.value}</p>
               </div>
             </a>
           ))}
@@ -104,24 +104,24 @@ export default function Contact() {
 
         {/* Direct Messaging Form */}
         <div className="w-full max-w-2xl mx-auto mb-16 px-4">
-          <h2 className="font-pixel text-label-caps text-[#3300FF] uppercase text-center mb-12">Direct Messaging</h2>
-          <form onSubmit={onSubmit} className="glass-panel p-8 md:p-12 flex flex-col gap-8 w-full border border-[#1A1A1A]">
+          <h2 className="font-mono font-bold tracking-tight text-label-caps text-[#3300FF] uppercase text-center mb-12">Direct Messaging</h2>
+          <form onSubmit={onSubmit} className="glass-panel p-8 md:p-12 flex flex-col gap-8 w-full border border-[#E4E4E7]">
             <input type="hidden" name="access_key" value="ca90d616-5818-4454-a1bd-7b6054d300e8" />
             <input type="checkbox" name="botcheck" className="hidden" style={{ display: 'none' }} />
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="name" className="font-pixel text-label-mono text-white uppercase">Name</label>
-              <input type="text" id="name" name="name" required className="bg-[#1b1b1b] border border-[#1A1A1A] text-white px-4 py-3 font-mono text-body-md focus:outline-none focus:border-[#3300FF] transition-colors" />
+              <label htmlFor="name" className="font-mono font-bold tracking-tight text-label-mono text-[#030303] uppercase">Name</label>
+              <input type="text" id="name" name="name" required className="bg-[#F4F4F5] border border-[#E4E4E7] text-[#030303] px-4 py-3 font-mono text-body-md focus:outline-none focus:border-[#3300FF] transition-colors" />
             </div>
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="email" className="font-pixel text-label-mono text-white uppercase">Email</label>
-              <input type="email" id="email" name="email" required className="bg-[#1b1b1b] border border-[#1A1A1A] text-white px-4 py-3 font-mono text-body-md focus:outline-none focus:border-[#3300FF] transition-colors" />
+              <label htmlFor="email" className="font-mono font-bold tracking-tight text-label-mono text-[#030303] uppercase">Email</label>
+              <input type="email" id="email" name="email" required className="bg-[#F4F4F5] border border-[#E4E4E7] text-[#030303] px-4 py-3 font-mono text-body-md focus:outline-none focus:border-[#3300FF] transition-colors" />
             </div>
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="message" className="font-pixel text-label-mono text-white uppercase">Message</label>
-              <textarea id="message" name="message" rows="5" required className="bg-[#1b1b1b] border border-[#1A1A1A] text-white px-4 py-3 font-mono text-body-md focus:outline-none focus:border-[#3300FF] transition-colors resize-none"></textarea>
+              <label htmlFor="message" className="font-mono font-bold tracking-tight text-label-mono text-[#030303] uppercase">Message</label>
+              <textarea id="message" name="message" rows="5" required className="bg-[#F4F4F5] border border-[#E4E4E7] text-[#030303] px-4 py-3 font-mono text-body-md focus:outline-none focus:border-[#3300FF] transition-colors resize-none"></textarea>
             </div>
 
             <div className="flex flex-col gap-2 mt-4">
@@ -137,10 +137,10 @@ export default function Contact() {
         </div>
       </main>
 
-      <footer className="bg-[#030303] border-t border-[#1A1A1A] w-full grid grid-cols-12 gap-gutter px-margin-mobile md:px-margin-desktop py-8 md:py-section-gap relative z-20 mt-32">
+      <footer className="bg-[#FFFFFF] border-t border-[#E4E4E7] w-full grid grid-cols-12 gap-gutter px-margin-mobile md:px-margin-desktop py-8 md:py-section-gap relative z-20 mt-32">
         <div className="col-span-12 md:col-span-6 flex flex-col justify-between">
-          <div className="font-headline-lg text-headline-lg font-black text-white mb-8">DOTSLASH</div>
-          <p className="font-pixel text-label-mono text-[#636565]">© 2024 DOTSLASH. ALL RIGHTS RESERVED. ENGINEERED FOR EXCELLENCE.</p>
+          <div className="font-headline-lg text-headline-lg font-black text-[#030303] mb-8">DotSlash</div>
+          <p className="font-mono font-bold tracking-tight text-label-mono text-[#636565]">© 2024 DotSlash. ALL RIGHTS RESERVED. ENGINEERED FOR EXCELLENCE.</p>
         </div>
         <div className="col-span-12 md:col-span-6 flex justify-end items-end gap-8">
         </div>
