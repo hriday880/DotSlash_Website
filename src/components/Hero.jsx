@@ -185,19 +185,17 @@ const Hero = () => {
   {/* 1. Hero Section */}
   <section className="relative h-screen flex flex-col items-center justify-center overflow-hidden">
   <ASCIIBackground />
-    <div className="z-10 text-center pointer-events-none flex flex-col items-center">
-                    <div className="flex justify-center w-full mb-8">
-            <div className="bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-[#E4E4E7]/50">
-              <img 
-                src="/logo.svg" 
-                alt="Logo" 
-                className="h-16 sm:h-20 md:h-28 lg:h-32 w-auto"
-              />
-            </div>
+      <div className="z-10 text-center pointer-events-none flex flex-col items-center mix-blend-multiply w-full px-4">
+          <div className="flex flex-row items-center justify-center space-x-4 md:space-x-8 w-full mb-6">
+            <img 
+              src="/logo.svg" 
+              alt="Logo" 
+              className="h-16 sm:h-24 md:h-32 lg:h-48 w-auto"
+            />
+            <h1 className="hero-text text-[10vw] md:text-9xl font-headline-display font-bold leading-none tracking-tighter text-[#030303]">
+              DotSlash
+            </h1>
           </div>
-          <h1 className="hero-text text-[10vw] md:text-9xl font-headline-display font-bold leading-none tracking-tighter text-[#030303]">
-            DotSlash
-          </h1>
           <p className="hero-text font-sans text-xs tracking-widest uppercase font-semibold text-[#030303] mt-4 text-sm md:text-base tracking-widest uppercase">
    ELITE TECH / ARCHITECTING THE VOID
    </p>
