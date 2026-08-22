@@ -11,9 +11,6 @@ const Footer = () => {
        DotSlash
        </h2>
    </div>
-       <h2 className="font-headline-display text-5xl md:text-8xl font-black text-[#030303] tracking-tighter">
-       DotSlash
-       </h2>
    </div>
    <p className="font-sans text-xs tracking-widest uppercase font-semibold text-[#4A5568] text-xs md:text-sm leading-loose">
    © 2024 DotSlash. ALL RIGHTS RESERVED. ENGINEERED FOR EXCELLENCE.
