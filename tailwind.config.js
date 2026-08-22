@@ -50,7 +50,7 @@ export default {
         'margin-desktop': '80px',
       },
       fontFamily: {
-        pixel: ['"Press Start 2P"', 'monospace'],
+        pixel: ['"Space Mono"', 'monospace'],
         mono: ['"Space Mono"', '"JetBrains Mono"', 'monospace'],
         // Original fonts
         'headline-display': ['Montserrat', 'sans-serif'],
@@ -58,8 +58,8 @@ export default {
         'headline-md': ['Montserrat', 'sans-serif'],
         'body-lg': ['Inter', 'sans-serif'],
         'body-md': ['Inter', 'sans-serif'],
-        'label-mono': ['"Press Start 2P"', '"JetBrains Mono"', 'monospace'],
-        'label-caps': ['"Press Start 2P"', 'Montserrat', 'sans-serif'],
+        'label-mono': ['"Space Mono"', 'monospace'],
+        'label-caps': ['Inter', 'sans-serif'],
       },
       fontSize: {
         'headline-display': ['120px', { lineHeight: '110px', letterSpacing: '-0.04em', fontWeight: '900' }],
