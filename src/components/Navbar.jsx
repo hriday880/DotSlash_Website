@@ -19,13 +19,15 @@ const Navbar = () => {
  <nav className="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-[#E4E4E7] bg-[#F3F4F6]/80 transition-all duration-300">
   <div className="max-w-7xl mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
   {/* Logo */}
-  <Link to="/" className="flex items-center space-x-2 group">
+    <Link to="/" className="flex items-center space-x-3 group">
    <img 
      src="/logo.svg" 
-     alt="DotSlash" 
-     className="mix-blend-multiply h-10 md:h-12 w-auto transition-transform duration-300 group-hover:scale-105"
-     
+     alt="Logo" 
+     className="mix-blend-multiply h-8 md:h-10 w-auto transition-transform duration-300 group-hover:scale-105"
    />
+   <span className="font-sans text-xs tracking-widest uppercase font-semibold text-[#3300FF] text-xl md:text-2xl transition-all duration-300 group-hover:text-[#00D4FF]">
+   DotSlash
+   </span>
   </Link>
 
   {/* Desktop Nav */}

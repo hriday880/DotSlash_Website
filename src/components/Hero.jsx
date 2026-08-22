@@ -185,16 +185,19 @@ const Hero = () => {
   {/* 1. Hero Section */}
   <section className="relative h-screen flex flex-col items-center justify-center overflow-hidden">
   <ASCIIBackground />
-  <div className="z-10 text-center pointer-events-none">
-          <div className="flex justify-center w-full mb-6">
+    <div className="z-10 text-center pointer-events-none flex flex-col items-center">
+          <div className="flex justify-center w-full mb-4">
             <img 
               src="/logo.svg" 
-              alt="DotSlash" 
-              className="mix-blend-multiply h-24 sm:h-32 md:h-48 lg:h-64 w-auto"
-              
+              alt="Logo" 
+              style={{ mixBlendMode: 'darken' }}
+              className="h-16 sm:h-24 md:h-32 lg:h-40 w-auto"
             />
           </div>
-   <p className="hero-text font-sans text-xs tracking-widest uppercase font-semibold text-[#030303] mt-4 text-sm md:text-base tracking-widest uppercase">
+          <h1 className="hero-text text-[10vw] md:text-9xl font-headline-display font-bold leading-none tracking-tighter text-[#030303]">
+            DotSlash
+          </h1>
+          <p className="hero-text font-sans text-xs tracking-widest uppercase font-semibold text-[#030303] mt-4 text-sm md:text-base tracking-widest uppercase">
    ELITE TECH / ARCHITECTING THE VOID
    </p>
   </div>
