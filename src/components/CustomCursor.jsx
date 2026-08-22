@@ -61,15 +61,15 @@ const CustomCursor = () => {
  <>
   <motion.div
   className={dotClass}
-  style={{ x: cursorX1, y: cursorY1 }}
+  
   />
   <motion.div
   className={`${dotClass} opacity-70 scale-75`}
-  style={{ x: cursorX2, y: cursorY2 }}
+  
   />
   <motion.div
   className={`${dotClass} opacity-40 scale-50`}
-  style={{ x: cursorX3, y: cursorY3 }}
+  
   />
  </>
  );

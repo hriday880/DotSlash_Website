@@ -24,10 +24,7 @@ const Navbar = () => {
      src="/logo.svg" 
      alt="DotSlash" 
      className="h-10 md:h-12 w-auto transition-transform duration-300 group-hover:scale-105"
-     style={{
-       /* Use CSS filter to try matching primary blue #3300FF if it's a black/dark logo */
-       filter: 'brightness(0) saturate(100%) invert(13%) sepia(91%) saturate(7460%) hue-rotate(264deg) brightness(101%) contrast(124%)'
-     }}
+     
    />
   </Link>
 

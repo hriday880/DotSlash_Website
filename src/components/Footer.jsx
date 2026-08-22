@@ -9,9 +9,7 @@ const Footer = () => {
      src="/logo.svg" 
      alt="DotSlash" 
      className="h-16 md:h-24 w-auto mb-4"
-     style={{
-       filter: 'brightness(0) saturate(100%) invert(13%) sepia(91%) saturate(7460%) hue-rotate(264deg) brightness(101%) contrast(124%)'
-     }}
+     
    />
    <p className="font-sans text-xs tracking-widest uppercase font-semibold text-[#4A5568] text-xs md:text-sm leading-loose">
    © 2024 DotSlash. ALL RIGHTS RESERVED. ENGINEERED FOR EXCELLENCE.

@@ -191,9 +191,7 @@ const Hero = () => {
               src="/logo.svg" 
               alt="DotSlash" 
               className="h-24 sm:h-32 md:h-48 lg:h-64 w-auto"
-              style={{
-                filter: 'brightness(0) saturate(100%) invert(13%) sepia(91%) saturate(7460%) hue-rotate(264deg) brightness(101%) contrast(124%)'
-              }}
+              
             />
           </div>
    <p className="hero-text font-sans text-xs tracking-widest uppercase font-semibold text-[#030303] mt-4 text-sm md:text-base tracking-widest uppercase">

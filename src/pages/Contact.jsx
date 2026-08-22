@@ -107,7 +107,7 @@ export default function Contact() {
    <h2 className="font-sans text-xs tracking-widest uppercase font-semibold text-label-caps text-[#3300FF] uppercase text-center mb-12">Direct Messaging</h2>
    <form onSubmit={onSubmit} className="glass-panel p-8 md:p-12 flex flex-col gap-8 w-full border border-[#E4E4E7]">
    <input type="hidden" name="access_key" value="ca90d616-5818-4454-a1bd-7b6054d300e8" />
-   <input type="checkbox" name="botcheck" className="hidden" style={{ display: 'none' }} />
+   <input type="checkbox" name="botcheck" className="hidden"  />
 
    <div className="flex flex-col gap-2">
     <label htmlFor="name" className="font-sans text-xs tracking-widest uppercase font-semibold text-label-mono text-[#030303] uppercase">Name</label>
