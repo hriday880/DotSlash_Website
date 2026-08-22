@@ -190,7 +190,7 @@ const Hero = () => {
             <img 
               src="/logo.svg" 
               alt="DotSlash" 
-              className="h-24 sm:h-32 md:h-48 lg:h-64 w-auto"
+              className="mix-blend-multiply h-24 sm:h-32 md:h-48 lg:h-64 w-auto"
               
             />
           </div>

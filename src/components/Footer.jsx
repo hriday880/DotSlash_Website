@@ -8,7 +8,7 @@ const Footer = () => {
    <img 
      src="/logo.svg" 
      alt="DotSlash" 
-     className="h-16 md:h-24 w-auto mb-4"
+     className="mix-blend-multiply h-16 md:h-24 w-auto mb-4"
      
    />
    <p className="font-sans text-xs tracking-widest uppercase font-semibold text-[#4A5568] text-xs md:text-sm leading-loose">

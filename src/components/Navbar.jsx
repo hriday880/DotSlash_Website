@@ -23,7 +23,7 @@ const Navbar = () => {
    <img 
      src="/logo.svg" 
      alt="DotSlash" 
-     className="h-10 md:h-12 w-auto transition-transform duration-300 group-hover:scale-105"
+     className="mix-blend-multiply h-10 md:h-12 w-auto transition-transform duration-300 group-hover:scale-105"
      
    />
   </Link>
