@@ -20,9 +20,15 @@ const Navbar = () => {
   <div className="max-w-7xl mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
   {/* Logo */}
   <Link to="/" className="flex items-center space-x-2 group">
-   <span className="font-sans text-xs tracking-widest uppercase font-semibold text-[#3300FF] text-xl md:text-2xl transition-all duration-300 group-hover:text-[#00D4FF]">
-   DotSlash
-   </span>
+   <img 
+     src="/logo.svg" 
+     alt="DotSlash" 
+     className="h-10 md:h-12 w-auto transition-transform duration-300 group-hover:scale-105"
+     style={{
+       /* Use CSS filter to try matching primary blue #3300FF if it's a black/dark logo */
+       filter: 'brightness(0) saturate(100%) invert(13%) sepia(91%) saturate(7460%) hue-rotate(264deg) brightness(101%) contrast(124%)'
+     }}
+   />
   </Link>
 
   {/* Desktop Nav */}

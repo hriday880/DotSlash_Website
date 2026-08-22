@@ -186,9 +186,16 @@ const Hero = () => {
   <section className="relative h-screen flex flex-col items-center justify-center overflow-hidden">
   <ASCIIBackground />
   <div className="z-10 text-center pointer-events-none">
-   <h1 className="hero-text text-[10vw] md:text-9xl font-headline-display font-bold leading-none tracking-tighter text-[#030303]">
-   DotSlash
-   </h1>
+          <div className="flex justify-center w-full mb-6">
+            <img 
+              src="/logo.svg" 
+              alt="DotSlash" 
+              className="h-24 sm:h-32 md:h-48 lg:h-64 w-auto"
+              style={{
+                filter: 'brightness(0) saturate(100%) invert(13%) sepia(91%) saturate(7460%) hue-rotate(264deg) brightness(101%) contrast(124%)'
+              }}
+            />
+          </div>
    <p className="hero-text font-sans text-xs tracking-widest uppercase font-semibold text-[#030303] mt-4 text-sm md:text-base tracking-widest uppercase">
    ELITE TECH / ARCHITECTING THE VOID
    </p>
