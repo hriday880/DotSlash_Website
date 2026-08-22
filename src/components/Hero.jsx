@@ -185,11 +185,17 @@ const Hero = () => {
       {/* 1. Hero Section */}
       <section className="relative h-screen flex flex-col items-center justify-center overflow-hidden">
         <ASCIIBackground />
-        <div className="z-10 text-center pointer-events-none">
-          <h1 className="hero-text text-[10vw] md:text-9xl font-headline-display font-bold leading-none tracking-tighter text-[#030303]">
-            DotSlash
-          </h1>
-          <p className="hero-text font-mono font-bold tracking-tight text-[#00D4FF] mt-4 text-sm md:text-base tracking-widest uppercase">
+        <div className="z-10 text-center pointer-events-none flex flex-col items-center">
+          <div className="relative">
+            {/* Soft radial glow behind the main text to separate it from ASCII */}
+            <div className="absolute inset-0 bg-[#FFF8E7] blur-3xl rounded-full opacity-80 scale-150"></div>
+            
+            <h1 className="hero-text relative z-10 text-[10vw] md:text-9xl font-headline-display font-bold leading-none tracking-tighter text-[#030303]">
+              DotSlash
+            </h1>
+          </div>
+          
+          <p className="hero-text relative z-10 font-mono font-bold tracking-tight text-[#00D4FF] mt-8 text-sm md:text-base tracking-widest uppercase bg-[#030303] px-6 py-2 rounded-full border border-[#3300FF]/30 shadow-[0_0_15px_rgba(51,0,255,0.2)]">
             ELITE TECH / ARCHITECTING THE VOID
           </p>
         </div>
