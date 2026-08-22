@@ -186,13 +186,14 @@ const Hero = () => {
   <section className="relative h-screen flex flex-col items-center justify-center overflow-hidden">
   <ASCIIBackground />
     <div className="z-10 text-center pointer-events-none flex flex-col items-center">
-          <div className="flex justify-center w-full mb-4">
-            <img 
-              src="/logo.svg" 
-              alt="Logo" 
-              style={{ mixBlendMode: 'darken' }}
-              className="h-16 sm:h-24 md:h-32 lg:h-40 w-auto"
-            />
+                    <div className="flex justify-center w-full mb-8">
+            <div className="bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-[#E4E4E7]/50">
+              <img 
+                src="/logo.svg" 
+                alt="Logo" 
+                className="h-16 sm:h-20 md:h-28 lg:h-32 w-auto"
+              />
+            </div>
           </div>
           <h1 className="hero-text text-[10vw] md:text-9xl font-headline-display font-bold leading-none tracking-tighter text-[#030303]">
             DotSlash
