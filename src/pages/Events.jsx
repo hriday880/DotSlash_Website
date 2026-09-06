@@ -4,6 +4,12 @@ import Footer from '../components/Footer';
 
 const events = [
  {
+ title: "DotSlash Mixer (DotSlash Arcade)",
+ date: "September 4, 2026",
+ image: "/events/mixer.png?v=1",
+ description: "DotSlash FLAME's inaugural event of the academic year, bringing a futuristic arcade experience to campus at Learning Commons. Featuring student-built interactive games and installations including the DotSlash Mirror, Slash Runner, Pixel Art Guessing Game, Puzzle Camera, and a custom Sticker Claw Machine with tear-away arcade tickets and rewards. With over 70+ attendees and upbeat music, the event connected new students through an immersive celebration of creative technology."
+ },
+ {
  title: "Shuttle Shot",
  date: "November 3, 2025",
  image: "/events/shuttleshot.png?v=1",
