@@ -1,5 +1,5 @@
 import React, { useRef, Suspense, useMemo, useState, useEffect } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useGLTF, ContactShadows, Text, Html } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -92,57 +92,69 @@ function Flock() {
   );
 }
 
+function ResponsiveScene({ title, subtitle, topText }) {
+  const { viewport } = useThree();
+  
+  // Dynamically scale down the scene on mobile/narrow screens.
+  // The max radius of the planes is 5.5 (diameter 11). To fit inside viewport.width with padding,
+  // we divide viewport.width by 14.
+  const scale = Math.min(1, viewport.width / 14);
+
+  return (
+    <group scale={scale}>
+      <Flock />
+      
+      <ContactShadows 
+        position={[0, -4, 0]} 
+        opacity={0.3} 
+        scale={30} 
+        blur={2.5} 
+        far={10} 
+        color="#030303"
+      />
+
+      <group position={[0, 0, 0]}>
+        {topText && (
+          <Html transform center position={[0, 3, 0]} zIndexRange={[100, 0]}>
+            <div className="flex items-center justify-center gap-2 md:gap-3 font-mono text-[10px] md:text-xs text-[#3300FF] tracking-widest uppercase font-bold whitespace-nowrap">
+              <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-[#3300FF] rounded-full animate-pulse"></span>
+              {topText}
+            </div>
+          </Html>
+        )}
+
+        <Text
+          position={[0, 0, 0]}
+          fontSize={title.length > 15 ? 1.5 : 2.5}
+          color="#3300FF"
+          anchorX="center"
+          anchorY="middle"
+          textAlign="center"
+          maxWidth={12}
+          lineHeight={0.9}
+        >
+          {title}
+        </Text>
+
+        {subtitle && (
+          <Html transform center position={[0, -3, 0]} zIndexRange={[100, 0]}>
+            <div className="font-mono text-xs md:text-sm text-[#3300FF] tracking-[0.1em] md:tracking-[0.2em] uppercase font-bold whitespace-nowrap">
+              {subtitle}
+            </div>
+          </Html>
+        )}
+      </group>
+    </group>
+  );
+}
+
 export default function InkAirplane({ title = "", subtitle = "", topText = "" }) {
   return (
     <ErrorBoundary>
-      <div className="absolute inset-0 w-full h-full select-none">
+      <div className="absolute inset-0 w-full h-full select-none overflow-hidden">
         <Canvas camera={{ position: [0, 0, 12], fov: 45 }}>
-          {/* Transparent background so the ASCII scene shows through! */}
-          
           <Suspense fallback={null}>
-            <Flock />
-            
-            <ContactShadows 
-              position={[0, -4, 0]} 
-              opacity={0.3} 
-              scale={30} 
-              blur={2.5} 
-              far={10} 
-              color="#030303"
-            />
-
-            <group position={[0, 0, 0]}>
-              {topText && (
-                <Html center position={[0, 3, 0]} zIndexRange={[100, 0]}>
-                  <div className="flex items-center justify-center gap-3 font-mono text-xs text-[#3300FF] tracking-widest uppercase font-bold whitespace-nowrap">
-                    <span className="w-2 h-2 bg-[#3300FF] rounded-full animate-pulse"></span>
-                    {topText}
-                  </div>
-                </Html>
-              )}
-
-              <Text
-                position={[0, 0, 0]}
-                fontSize={title.length > 15 ? 1.5 : 2.5}
-                color="#3300FF"
-                anchorX="center"
-                anchorY="middle"
-                textAlign="center"
-                maxWidth={12}
-                lineHeight={0.9}
-              >
-                {title}
-              </Text>
-
-              {subtitle && (
-                <Html center position={[0, -3, 0]} zIndexRange={[100, 0]}>
-                  <div className="font-mono text-sm md:text-base text-[#3300FF] tracking-[0.2em] uppercase font-bold whitespace-nowrap">
-                    {subtitle}
-                  </div>
-                </Html>
-              )}
-            </group>
-
+            <ResponsiveScene title={title} subtitle={subtitle} topText={topText} />
           </Suspense>
         </Canvas>
       </div>

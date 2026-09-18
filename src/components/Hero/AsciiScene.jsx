@@ -115,7 +115,9 @@ export default function AsciiScene({ className = '' }) {
    for (let i = 0; i < 3; i++) {
      const pSpeed = 0.8 + i * 0.15;
      const pOffset = i * (Math.PI * 2 / 3);
-     const pRadius = 0.2 + i * 0.05; // Normalized radius
+     // Scale down radius on mobile to match 3D scene scale
+     const scale = Math.min(1, width / 1400); 
+     const pRadius = (0.2 + i * 0.05) * scale;
      
      const px = 0.5 + Math.cos(-elapsed * pSpeed + pOffset) * pRadius * (height / width);
      const py = 0.5 + Math.sin(-elapsed * pSpeed + pOffset) * pRadius;
