@@ -8,7 +8,8 @@ export default function Login() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    if (localStorage.getItem('dotslash_admin_auth') === 'true') {
+    const auth = localStorage.getItem('dotslash_admin_auth');
+    if (auth === 'superadmin' || auth === 'blogadmin' || auth === 'announcementadmin' || auth === 'true') {
       setIsAuthenticated(true);
     }
   }, []);
@@ -22,11 +23,20 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const expectedHash = import.meta.env.VITE_ADMIN_PASSWORD_HASH;
     const inputHash = await hashPassword(password);
     
-    if (inputHash === expectedHash) {
-      localStorage.setItem('dotslash_admin_auth', 'true');
+    const masterHash = import.meta.env.VITE_ADMIN_PASSWORD_HASH;
+    const blogHash = import.meta.env.VITE_BLOG_PASSWORD_HASH;
+    const annHash = import.meta.env.VITE_ANNOUNCEMENT_PASSWORD_HASH;
+    
+    if (inputHash === masterHash) {
+      localStorage.setItem('dotslash_admin_auth', 'superadmin');
+      setIsAuthenticated(true);
+    } else if (blogHash && inputHash === blogHash) {
+      localStorage.setItem('dotslash_admin_auth', 'blogadmin');
+      setIsAuthenticated(true);
+    } else if (annHash && inputHash === annHash) {
+      localStorage.setItem('dotslash_admin_auth', 'announcementadmin');
       setIsAuthenticated(true);
     } else {
       setError('Invalid sequence.');

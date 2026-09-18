@@ -21,10 +21,21 @@ export default function AdminDashboard() {
   const [blogForm, setBlogForm] = useState({ title: '', url: '', thumbnailFile: null, date: '' });
   const [announcementForm, setAnnouncementForm] = useState({ content: '', is_active: 1 });
 
+  const [role, setRole] = useState(null);
+
   useEffect(() => {
-    if (localStorage.getItem('dotslash_admin_auth') !== 'true') {
+    const auth = localStorage.getItem('dotslash_admin_auth');
+    if (!auth) {
       setIsAuthenticated(false);
     } else {
+      setRole(auth);
+      // Fallback for previous 'true' logins -> treat as superadmin
+      const actualRole = auth === 'true' ? 'superadmin' : auth;
+      
+      if (actualRole === 'blogadmin') setActiveTab('blogs');
+      else if (actualRole === 'announcementadmin') setActiveTab('announcements');
+      else setActiveTab('personnel');
+      
       loadData();
     }
   }, []);
@@ -174,15 +185,21 @@ export default function AdminDashboard() {
 
         {/* Tabs */}
         <div className="flex gap-4 mb-8 border-b border-[#353535]">
-          <button onClick={() => setActiveTab('personnel')} className={`flex items-center gap-2 pb-4 px-4 font-mono text-sm uppercase tracking-widest transition-colors ${activeTab === 'personnel' ? 'text-[#00D4FF] border-b-2 border-[#00D4FF]' : 'text-[#A0A0A0] hover:text-white'}`}>
-            <Users size={16} /> Personnel
-          </button>
-          <button onClick={() => setActiveTab('blogs')} className={`flex items-center gap-2 pb-4 px-4 font-mono text-sm uppercase tracking-widest transition-colors ${activeTab === 'blogs' ? 'text-[#00D4FF] border-b-2 border-[#00D4FF]' : 'text-[#A0A0A0] hover:text-white'}`}>
-            <FileText size={16} /> Blogs
-          </button>
-          <button onClick={() => setActiveTab('announcements')} className={`flex items-center gap-2 pb-4 px-4 font-mono text-sm uppercase tracking-widest transition-colors ${activeTab === 'announcements' ? 'text-[#00D4FF] border-b-2 border-[#00D4FF]' : 'text-[#A0A0A0] hover:text-white'}`}>
-            <Megaphone size={16} /> Announcements
-          </button>
+          {(!role || role === 'superadmin' || role === 'true') && (
+            <button onClick={() => setActiveTab('personnel')} className={`flex items-center gap-2 pb-4 px-4 font-mono text-sm uppercase tracking-widest transition-colors ${activeTab === 'personnel' ? 'text-[#00D4FF] border-b-2 border-[#00D4FF]' : 'text-[#A0A0A0] hover:text-white'}`}>
+              <Users size={16} /> Personnel
+            </button>
+          )}
+          {(!role || role === 'superadmin' || role === 'blogadmin' || role === 'true') && (
+            <button onClick={() => setActiveTab('blogs')} className={`flex items-center gap-2 pb-4 px-4 font-mono text-sm uppercase tracking-widest transition-colors ${activeTab === 'blogs' ? 'text-[#00D4FF] border-b-2 border-[#00D4FF]' : 'text-[#A0A0A0] hover:text-white'}`}>
+              <FileText size={16} /> Blogs
+            </button>
+          )}
+          {(!role || role === 'superadmin' || role === 'announcementadmin' || role === 'true') && (
+            <button onClick={() => setActiveTab('announcements')} className={`flex items-center gap-2 pb-4 px-4 font-mono text-sm uppercase tracking-widest transition-colors ${activeTab === 'announcements' ? 'text-[#00D4FF] border-b-2 border-[#00D4FF]' : 'text-[#A0A0A0] hover:text-white'}`}>
+              <Megaphone size={16} /> Announcements
+            </button>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
