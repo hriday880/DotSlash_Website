@@ -6,12 +6,13 @@ const Navbar = () => {
  const [isOpen, setIsOpen] = useState(false);
  const location = useLocation();
 
- const links = [
- { name: 'Home', path: '/' },
- { name: 'Events', path: '/events' },
- { name: 'Team', path: '/team' },
- { name: 'Contact', path: '/contact' }
- ];
+  const links = [
+  { name: 'Home', path: '/' },
+  { name: 'Events', path: '/events' },
+  { name: 'Team', path: '/team' },
+  { name: 'Blog', path: '/blog' },
+  { name: 'Contact', path: '/contact' }
+  ];
 
  const toggleMenu = () => setIsOpen(!isOpen);
 

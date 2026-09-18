@@ -12,6 +12,9 @@ import Hero from './components/Hero';
 import MeetTheTeam from './pages/MeetTheTeam';
 import Contact from './pages/Contact';
 import Events from './pages/Events';
+import Blog from './pages/Blog';
+import Login from './pages/Login';
+import AdminDashboard from './pages/AdminDashboard';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -65,6 +68,9 @@ function App() {
   <Route path="/team" element={<MeetTheTeam />} />
   <Route path="/contact" element={<Contact />} />
   <Route path="/events" element={<Events />} />
+  <Route path="/blog" element={<Blog />} />
+  <Route path="/login" element={<Login />} />
+  <Route path="/admin" element={<AdminDashboard />} />
   </Routes>
  </>
  );

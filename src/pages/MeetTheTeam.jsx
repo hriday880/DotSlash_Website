@@ -2,25 +2,7 @@ import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { motion, useInView } from 'framer-motion';
 import Footer from '../components/Footer';
 
-const teamData = {
- executive: [
- { name: "Hriday", role: "President", image: "/team/hriday.png" },
- { name: "Tejashwini", role: "Vice president", image: "/team/tejashwini.png" },
- { name: "Sadhya", role: "Secretary", image: "/team/sadhya.png" },
- { name: "Dhriti", role: "PR Head", image: "/team/dhriti.png" },
- { name: "Manan", role: "Treasurer", image: "/team/manan.png" },
- ],
- core: [
- { name: "Yashshree", role: "Co-head of Logistics", image: "/team/yashshree.png?v=2" },
- { name: "Anushaa", role: "Co-head of Logistics", image: "/team/anushaa.png?v=2" },
- { name: "Jane", role: "Social Media Head", image: "/team/jane_doe.jpeg" },
- { name: "Sia", role: "Content Head", image: "/team/sia.png?v=2" },
- { name: "Dev", role: "Coding Team Head", image: "/team/jane_doe.jpeg" },
- { name: "Jane", role: "Build Space Head", image: "/team/jane_doe.jpeg" },
- { name: "Aryan", role: "Outreach Head", image: "/team/jane_doe.jpeg" },
- { name: "Heena", role: "Design Head", image: "/team/jane_doe.jpeg" },
- ]
-};
+import { db } from '../lib/db';
 
 /* ASCII overlay that appears on hover over team photos */
 const ASCII_CHARS = ' .:-+*=%@#';
@@ -128,6 +110,32 @@ const TeamCard = ({ member, index }) => {
 };
 
 export default function MeetTheTeam() {
+  const [teamData, setTeamData] = useState({ executive: [], departments: {} });
+
+  useEffect(() => {
+    const fetchTeam = async () => {
+      try {
+        if (!db) return;
+        const res = await db.execute('SELECT * FROM members ORDER BY created_at ASC');
+        
+        const exec = res.rows.filter(m => m.department === 'executive');
+        const depts = {};
+        
+        res.rows.forEach(m => {
+          if (m.department !== 'executive') {
+            if (!depts[m.department]) depts[m.department] = [];
+            depts[m.department].push(m);
+          }
+        });
+        
+        setTeamData({ executive: exec, departments: depts });
+      } catch (e) {
+        console.error("DB Fetch Error:", e);
+      }
+    };
+    fetchTeam();
+  }, []);
+
  return (
  <div className="min-h-screen bg-[#F3F4F6] text-[#030303] overflow-x-hidden pt-32 pb-0">
   <div className="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop relative z-10">
@@ -155,24 +163,26 @@ export default function MeetTheTeam() {
   </div>
 
   <div className="mb-24">
-   <h2 className="font-sans text-xs tracking-widest uppercase font-semibold text-label-caps text-[#52525B] mb-8 border-b border-[#E4E4E7] pb-2">
-   02 / CORE COMMITTEES
-   </h2>
-   <div className="grid grid-cols-1 md:grid-cols-5 gap-gutter">
-   {teamData.core.map((member, idx) => (
-    <TeamCard key={`cc-${idx}`} member={member} index={idx} />
-   ))}
-   </div>
-  </div>
+    <h2 className="font-sans text-xs tracking-widest uppercase font-semibold text-label-caps text-[#52525B] mb-8 border-b border-[#E4E4E7] pb-2">
+    02 / DEPARTMENTS
+    </h2>
+    
+    {Object.keys(teamData.departments).length === 0 && (
+      <p className="text-[#A0A0A0] italic">No department members found.</p>
+    )}
 
-  {/* Hidden CC Members section */}
-  <div className="hidden">
-   <h2 className="font-sans text-xs tracking-widest uppercase font-semibold text-label-caps text-[#52525B] mb-12 border-b border-[#E4E4E7] pb-2">03 / CC MEMBERS</h2>
-   {["Logistics", "Social Media", "Content", "Coding Team", "Build Space", "Outreach"].map((dept, idx) => (
-   <div key={idx} className="mb-16">
-    <h3 className="font-sans text-xs tracking-widest uppercase font-semibold text-label-mono text-[#3300FF] mb-8 border-l border-[#3300FF] pl-4">{dept.toUpperCase()}</h3>
-   </div>
-   ))}
+    {Object.entries(teamData.departments).map(([deptKey, members]) => (
+      <div key={deptKey} className="mb-16">
+        <h3 className="font-sans text-xs tracking-widest uppercase font-semibold text-label-mono text-[#3300FF] mb-8 border-l-2 border-[#3300FF] pl-4">
+          {deptKey.replace('_', ' ')}
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-gutter">
+          {members.map((member, idx) => (
+            <TeamCard key={`${deptKey}-${idx}`} member={member} index={idx} />
+          ))}
+        </div>
+      </div>
+    ))}
   </div>
   </div>
 
