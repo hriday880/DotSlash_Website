@@ -116,12 +116,46 @@ export default function MeetTheTeam() {
     const fetchTeam = async () => {
       try {
         if (!db) return;
-        const res = await db.execute('SELECT * FROM members ORDER BY created_at ASC');
         
-        const exec = res.rows.filter(m => m.department === 'executive');
+        // Ensure table exists
+        await db.execute(`CREATE TABLE IF NOT EXISTS personnel (id TEXT PRIMARY KEY, name TEXT NOT NULL, role TEXT NOT NULL, department TEXT, image TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)`);
+
+        const res = await db.execute('SELECT * FROM personnel ORDER BY created_at ASC');
+        let loadedPersonnel = res.rows || [];
+
+        if (loadedPersonnel.length === 0) {
+          const initialPersonnel = [
+            { name: "Hriday", role: "President", department: "executive", image: "/team/hriday.png" },
+            { name: "Tejashwini", role: "Vice president", department: "executive", image: "/team/tejashwini.png" },
+            { name: "Sadhya", role: "Secretary", department: "executive", image: "/team/sadhya.png" },
+            { name: "Dhriti", role: "PR Head", department: "executive", image: "/team/dhriti.png" },
+            { name: "Manan", role: "Treasurer", department: "executive", image: "/team/manan.png" },
+            
+            { name: "Yashshree", role: "Co-head of Logistics", department: "logistics", image: "/team/yashshree.png?v=2" },
+            { name: "Anushaa", role: "Co-head of Logistics", department: "logistics", image: "/team/anushaa.png?v=2" },
+            { name: "Jane", role: "Social Media Head", department: "social_media", image: "/team/jane_doe.jpeg" },
+            { name: "Sia", role: "Content Head", department: "content", image: "/team/sia.png?v=2" },
+            { name: "Dev", role: "Coding Team Head", department: "coding_robotics", image: "/team/jane_doe.jpeg" },
+            { name: "Jane", role: "Build Space Head", department: "coding_robotics", image: "/team/jane_doe.jpeg" },
+            { name: "Aryan", role: "Outreach Head", department: "outreach", image: "/team/jane_doe.jpeg" },
+            { name: "Heena", role: "Design Head", department: "design", image: "/team/jane_doe.jpeg" },
+          ];
+
+          for (const member of initialPersonnel) {
+            const uuid = window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : Math.random().toString(36).substring(2);
+            await db.execute(
+              'INSERT INTO personnel (id, name, role, department, image) VALUES (?, ?, ?, ?, ?)',
+              [uuid, member.name, member.role, member.department, member.image]
+            );
+          }
+          const freshRes = await db.execute('SELECT * FROM personnel ORDER BY created_at ASC');
+          loadedPersonnel = freshRes.rows || [];
+        }
+
+        const exec = loadedPersonnel.filter(m => m.department === 'executive');
         const depts = {};
         
-        res.rows.forEach(m => {
+        loadedPersonnel.forEach(m => {
           if (m.department !== 'executive') {
             if (!depts[m.department]) depts[m.department] = [];
             depts[m.department].push(m);

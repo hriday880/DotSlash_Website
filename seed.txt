@@ -1,0 +1,63 @@
+  const checkAndSeedEvents = async (existingEvents) => {
+    if (existingEvents.length > 0) return existingEvents;
+    
+    const initialEvents = [
+      {
+        title: "DotSlash Mixer (DotSlash Arcade)",
+        date: "September 4, 2026",
+        image: "/events/mixer.png?v=1",
+        description: "DotSlash FLAME's inaugural event of the academic year, bringing a futuristic arcade experience to campus at Learning Commons. Featuring student-built interactive games and installations including the DotSlash Mirror, Slash Runner, Pixel Art Guessing Game, Puzzle Camera, and a custom Sticker Claw Machine with tear-away arcade tickets and rewards. With over 70+ attendees and upbeat music, the event connected new students through an immersive celebration of creative technology."
+      },
+      {
+        title: "Shuttle Shot",
+        date: "November 3, 2025",
+        image: "/events/shuttleshot.png?v=1",
+        description: "In an exciting collaboration with the Astronomy Club, Shuttle Shot brings together the best of both worlds. An evening dedicated to exploring the cosmos through code, featuring interactive sessions, stargazing, and an immersive digital journey through our solar system. Participants engage in a unique blend of astronomy discussions and technology applications designed to inspire the next generation of space tech enthusiasts."
+      },
+      {
+        title: "Tech AND Sport!",
+        date: "September 12 & 13, 2025",
+        image: "/events/techandsport.png?v=1",
+        description: "A groundbreaking two-day event in partnership with the Squash Club. Bridging the physical and digital realms, this event features sports analytics, tracking technologies, and competitive squash matches. Discover how technology is revolutionizing sports training, performance tracking, and match analysis while breaking a sweat on the courts."
+      },
+      {
+        title: "The Matrix Screening",
+        date: "September 9, 2025",
+        image: "/events/matrix.png?v=1",
+        description: "Enter the Matrix with us for a special screening of the sci-fi classic. Followed by a deep dive discussion into the philosophical and technological themes of the movie. We'll explore concepts of simulated reality, artificial intelligence, and cybernetics, drawing parallels between the film's vision and our current technological trajectory."
+      },
+      {
+        title: "DotSlash Jeopardy Night",
+        date: "February 8, 2024",
+        image: "/events/jeopardy.png?v=1",
+        description: "A battle of wits and technical knowledge! Our custom-built Jeopardy platform tested participants on various categories spanning programming languages, tech history, pop culture, and computational logic. An evening of intense competition, laughter, and learning, with prizes for the ultimate trivia champions."
+      },
+      {
+        title: "Code Along",
+        date: "November 4, 2023",
+        image: "/events/codealong.png?v=1",
+        description: "An interactive coding workshop led by industry veteran Mr. Navneet Karnani. Participants built a full-stack application from scratch, learning modern development practices, debugging techniques, and deployment strategies. A hands-on experience bridging academic concepts with real-world software engineering."
+      },
+      {
+        title: "Orabot",
+        date: "October 6, 2023",
+        image: "/events/orabot.png?v=1",
+        description: "A unique public speaking and technology competition focusing on Large Language Models. Participants were challenged to craft persuasive speeches and arguments with the assistance of AI tools, then deliver them live. Exploring the intersection of human communication and artificial intelligence generation."
+      },
+      {
+        title: "Apple Keynote event",
+        date: "September 12, 2023",
+        image: "/events/applekeynote.png?v=1",
+        description: "Our annual tradition of watching the Apple Keynote together, enhanced with our custom-built Apple Bingo web application. Real-time excitement as we tracked product announcements, design reveals, and classic 'one more thing' moments, with the first to complete their digital bingo card winning exclusive tech swag."
+      }
+    ];
+
+    for (const event of initialEvents.reverse()) {
+      await db.execute(
+        'INSERT INTO events (id, title, date, image, description) VALUES (?, ?, ?, ?, ?)',
+        [crypto.randomUUID(), event.title, event.date, event.image, event.description]
+      );
+    }
+    const freshRes = await db.execute('SELECT * FROM events ORDER BY created_at DESC');
+    return freshRes.rows;
+  };

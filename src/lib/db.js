@@ -9,12 +9,17 @@ class TursoDB {
     this.token = token;
   }
 
-  async execute(query) {
+  async execute(query, argsArray) {
     let sql, args;
 
     if (typeof query === 'string') {
       sql = query;
-      args = [];
+      // Support db.execute('SQL', [arg1, arg2]) calling convention
+      args = (argsArray || []).map(a => {
+        if (a === null || a === undefined) return { type: 'null' };
+        if (typeof a === 'number') return { type: 'integer', value: String(a) };
+        return { type: 'text', value: String(a) };
+      });
     } else {
       sql = query.sql;
       args = (query.args || []).map(a => {
