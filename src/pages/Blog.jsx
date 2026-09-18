@@ -4,6 +4,7 @@ import { ExternalLink } from 'lucide-react';
 import Footer from '../components/Footer';
 import { db } from '../lib/db';
 
+import InkAirplane from '../components/Hero/InkAirplane';
 import AsciiScene from '../components/Hero/AsciiScene';
 
 const GLITCH_CHARS = '01'; // Just binary or clean text
@@ -36,28 +37,18 @@ export default function Blog() {
     return (
       <div className="min-h-screen bg-[#FFF8E7] text-[#030303] overflow-hidden pt-32 pb-0 flex flex-col relative font-sans">
         
-        {/* Background 3D ASCII Effect */}
-        <div className="absolute inset-0 z-0 opacity-50">
-          <AsciiScene />
-        </div>
+        {/* Isometric Paper Airplane Ink Effect */}
+        <div className="absolute inset-0 z-0 opacity-100">
+          
+          <div className="absolute inset-0 z-0 pointer-events-none opacity-40 mix-blend-multiply">
+            <AsciiScene />
+          </div>
 
-        <div className="flex-1 flex flex-col items-center justify-center relative z-10 px-4">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.5, ease: "easeOut" }} className="relative w-full max-w-2xl text-center pointer-events-none">
-            
-            <div className="flex items-center justify-center gap-4 mb-6">
-              <span className="w-2 h-2 bg-[#3300FF] rounded-full animate-pulse"></span>
-              <span className="font-mono text-xs uppercase tracking-[0.3em] text-[#3300FF] font-bold">Node offline</span>
-            </div>
-            
-            <h1 className="font-headline-display text-5xl md:text-8xl text-[#3300FF] uppercase tracking-tighter mix-blend-multiply">
-              Coming Soon
-            </h1>
-            
-            <p className="font-mono text-sm md:text-base text-[#3300FF] tracking-[0.2em] uppercase mt-8 font-bold">
-              Transmissions compiling...
-            </p>
-            
-          </motion.div>
+          <InkAirplane 
+            title="COMING SOON"
+            subtitle="Transmissions compiling..."
+            topText="Node offline"
+          />
         </div>
       </div>
     );

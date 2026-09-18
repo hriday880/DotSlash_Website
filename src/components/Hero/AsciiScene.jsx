@@ -109,8 +109,27 @@ export default function AsciiScene({ className = '' }) {
    const dist = Math.sqrt(dx * dx + dy * dy);
    const mouseRipple = Math.sin(dist * 16.0 - elapsed * 3.5) * Math.exp(-dist * 4.0) * 1.1;
 
+   // Simulated Airplane Vortex Ripples
+   let planeRipple = 0;
+   // We simulate 3 major planes flying in a circle to create an interactive wake
+   for (let i = 0; i < 3; i++) {
+     const pSpeed = 0.8 + i * 0.15;
+     const pOffset = i * (Math.PI * 2 / 3);
+     const pRadius = 0.2 + i * 0.05; // Normalized radius
+     
+     const px = 0.5 + Math.cos(-elapsed * pSpeed + pOffset) * pRadius * (height / width);
+     const py = 0.5 + Math.sin(-elapsed * pSpeed + pOffset) * pRadius;
+     
+     const pdx = (nx - px) * (width / height);
+     const pdy = ny - py;
+     const pDist = Math.sqrt(pdx * pdx + pdy * pdy);
+     
+     // Wake effect trailing the plane
+     planeRipple += Math.sin(pDist * 20.0 - elapsed * 5.0) * Math.exp(-pDist * 6.0) * 0.8;
+   }
+
    // Combine wave heights
-   const elevation = (w1 * 0.35 + w2 * 0.35 + w3 * 0.3 + mouseRipple);
+   const elevation = (w1 * 0.35 + w2 * 0.35 + w3 * 0.3 + mouseRipple + planeRipple);
    
    // Depth factor for 3D horizon feel
    const depth = 0.4 + 0.6 * ny;
@@ -126,7 +145,7 @@ export default function AsciiScene({ className = '' }) {
    const red = Math.round(51 * (1 - normalizedVal));
    const green = Math.round(212 * normalizedVal);
    const blue = 255;
-   const alpha = (0.25 + normalizedVal * 0.75).toFixed(2);
+   const alpha = (0.15 + normalizedVal * 0.4).toFixed(2); // Slightly dimmer to act as bg
 
    ctx.fillStyle = `rgba(${red}, ${green}, ${blue}, ${alpha})`;
    ctx.fillText(char, cx, cy);
