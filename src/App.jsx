@@ -6,6 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import Announcement from './components/Announcement';
 
 // Pages
 import Hero from './components/Hero';
@@ -61,7 +62,9 @@ function App() {
  }, []);
 
  return (
- <>  <Navbar />
+  <>
+   <Announcement />
+   <Navbar />
 
   <Routes>
   <Route path="/" element={<HomePage />} />

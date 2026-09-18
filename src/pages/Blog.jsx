@@ -1,112 +1,117 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { ExternalLink } from 'lucide-react';
 import Footer from '../components/Footer';
+import { db } from '../lib/db';
 
-const GLITCH_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*<>';
+import AsciiScene from '../components/Hero/AsciiScene';
+
+const GLITCH_CHARS = '01'; // Just binary or clean text
 
 export default function Blog() {
-  const [text, setText] = useState('');
-  const targetText = 'TRANSMISSION INCOMING';
-  
-  // Scramble text effect
+  const [blogs, setBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    let iteration = 0;
-    let interval = null;
-    
-    // Start delay
-    const timeout = setTimeout(() => {
-      interval = setInterval(() => {
-        setText(
-          targetText
-            .split('')
-            .map((letter, index) => {
-              if (index < iteration) {
-                return targetText[index];
-              }
-              return GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
-            })
-            .join('')
-        );
-
-        if (iteration >= targetText.length) {
-          clearInterval(interval);
-        }
-        
-        iteration += 1 / 3; // speed of deciphering
-      }, 30);
-    }, 500);
-
-    return () => {
-      clearTimeout(timeout);
-      clearInterval(interval);
+    const fetchBlogs = async () => {
+      try {
+        if (!db) return;
+        const res = await db.execute('SELECT * FROM blogs ORDER BY date DESC, created_at DESC');
+        if (res.rows) setBlogs(res.rows);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
     };
+    fetchBlogs();
   }, []);
 
-  return (
-    <div className="min-h-screen bg-[#030303] text-[#FFFFFF] overflow-hidden pt-32 pb-0 flex flex-col relative font-sans">
-      
-      {/* Background Animated Grid */}
-      <div className="absolute inset-0 z-0 opacity-20">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#3300FF1a_1px,transparent_1px),linear-gradient(to_bottom,#3300FF1a_1px,transparent_1px)] bg-[size:40px_40px]"></div>
-        <motion.div 
-          animate={{ 
-            y: [0, 40, 0],
-            opacity: [0.3, 0.6, 0.3] 
-          }}
-          transition={{ 
-            duration: 5, 
-            repeat: Infinity,
-            ease: "linear"
-          }}
-          className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent,#3300FF_10%,transparent_20%)] bg-[length:100%_200%]"
-        />
-      </div>
+  if (loading) {
+    return <div className="min-h-screen bg-[#030303]"></div>;
+  }
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center justify-center relative z-10 px-4">
+  // Coming Soon State
+  if (blogs.length === 0) {
+    return (
+      <div className="min-h-screen bg-[#FFF8E7] text-[#030303] overflow-hidden pt-32 pb-0 flex flex-col relative font-sans">
         
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1 }}
-          className="relative"
-        >
-          {/* Glowing Accents */}
-          <div className="absolute -inset-10 bg-[#3300FF] opacity-10 blur-3xl rounded-full"></div>
-          
-          <div className="border border-[#353535] bg-[#0a0a0a]/80 backdrop-blur-sm p-12 md:p-24 relative group overflow-hidden">
-            {/* Top left corner accent */}
-            <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-[#3300FF]"></div>
-            {/* Bottom right corner accent */}
-            <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-[#00D4FF]"></div>
+        {/* Background 3D ASCII Effect */}
+        <div className="absolute inset-0 z-0 opacity-50">
+          <AsciiScene />
+        </div>
+
+        <div className="flex-1 flex flex-col items-center justify-center relative z-10 px-4">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.5, ease: "easeOut" }} className="relative w-full max-w-2xl text-center pointer-events-none">
             
-            <div className="flex flex-col items-center gap-6 text-center">
-              <div className="flex items-center gap-4">
-                <span className="w-3 h-3 bg-[#FF3366] rounded-full animate-ping"></span>
-                <span className="font-mono text-xs uppercase tracking-[0.3em] text-[#A0A0A0]">System Status: Standby</span>
-              </div>
-              
-              <h1 className="font-headline-display text-4xl sm:text-6xl md:text-8xl text-transparent bg-clip-text bg-gradient-to-r from-[#3300FF] to-[#00D4FF] uppercase tracking-tighter filter drop-shadow-[0_0_15px_rgba(51,0,255,0.5)]">
-                Coming Soon
-              </h1>
-              
-              <div className="h-8 flex items-center justify-center">
-                <p className="font-mono text-sm sm:text-lg text-[#00D4FF] tracking-[0.2em] md:tracking-[0.5em] uppercase w-full">
-                  {text}
-                </p>
-              </div>
+            <div className="flex items-center justify-center gap-4 mb-6">
+              <span className="w-2 h-2 bg-[#3300FF] rounded-full animate-pulse"></span>
+              <span className="font-mono text-xs uppercase tracking-[0.3em] text-[#3300FF] font-bold">Node offline</span>
             </div>
-
-            {/* Scanning line effect */}
-            <motion.div 
-              animate={{ top: ['0%', '100%'] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-              className="absolute left-0 right-0 h-[1px] bg-[#3300FF]/50 shadow-[0_0_10px_#3300FF] z-20"
-            />
-          </div>
-        </motion.div>
-        
+            
+            <h1 className="font-headline-display text-5xl md:text-8xl text-[#3300FF] uppercase tracking-tighter mix-blend-multiply">
+              Coming Soon
+            </h1>
+            
+            <p className="font-mono text-sm md:text-base text-[#3300FF] tracking-[0.2em] uppercase mt-8 font-bold">
+              Transmissions compiling...
+            </p>
+            
+          </motion.div>
+        </div>
       </div>
+    );
+  }
+
+  // Loaded Blogs State
+  return (
+    <div className="min-h-screen bg-[#F3F4F6] text-[#030303] overflow-x-hidden pt-32 pb-0 flex flex-col">
+      <div className="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop relative z-10 flex-1 w-full">
+        <header className="mb-24 w-full md:w-8/12">
+          <h1 className="font-headline-display text-[40px] leading-[48px] sm:text-[60px] sm:leading-[70px] md:text-[80px] lg:text-headline-display lg:leading-[110px] text-[#3300FF] mb-8 uppercase break-words max-w-full">
+            Insights
+          </h1>
+          <p className="font-body-lg text-body-lg text-[#52525B] border-l border-[#E4E4E7] pl-8 max-w-2xl">
+            Transmissions, tutorials, and deep dives from our engineers and designers.
+          </p>
+        </header>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-24">
+          {blogs.map((post, idx) => (
+            <motion.a
+              key={post.id}
+              href={post.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: idx * 0.1 }}
+              className="group border border-[#E4E4E7] hover:border-[#3300FF] bg-[#FFFFFF] overflow-hidden flex flex-col transition-all duration-300"
+            >
+              {post.thumbnail ? (
+                <div className="w-full h-48 overflow-hidden bg-[#F4F4F5]">
+                  <img src={post.thumbnail} alt={post.title} className="w-full h-full object-cover filter grayscale contrast-125 group-hover:grayscale-0 group-hover:contrast-100 transition-all duration-700 scale-100 group-hover:scale-110" />
+                </div>
+              ) : (
+                <div className="w-full h-48 bg-[#030303] flex items-center justify-center relative overflow-hidden">
+                   <div className="absolute inset-0 opacity-20 bg-[linear-gradient(to_right,#3300FF_1px,transparent_1px),linear-gradient(to_bottom,#3300FF_1px,transparent_1px)] bg-[size:10px_10px]"></div>
+                   <span className="font-mono text-[#3300FF] opacity-50 uppercase text-xs tracking-widest z-10">Data_Fragment</span>
+                </div>
+              )}
+              <div className="p-6 flex flex-col flex-1">
+                <div className="flex justify-between items-start mb-4">
+                  <span className="font-mono text-xs text-[#A0A0A0]">{post.date}</span>
+                  <ExternalLink size={16} className="text-[#3300FF] opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+                <h3 className="font-headline-md text-xl font-bold mb-3 text-[#030303] group-hover:text-[#3300FF] transition-colors line-clamp-3">
+                  {post.title}
+                </h3>
+              </div>
+            </motion.a>
+          ))}
+        </div>
+      </div>
+      <Footer />
     </div>
   );
 }
