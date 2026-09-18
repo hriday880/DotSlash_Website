@@ -13,11 +13,19 @@ export default function Login() {
     }
   }, []);
 
-  const handleLogin = (e) => {
+  async function hashPassword(pw) {
+    const msgUint8 = new TextEncoder().encode(pw);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    const correctPassword = import.meta.env.VITE_ADMIN_PASSWORD;
+    const expectedHash = import.meta.env.VITE_ADMIN_PASSWORD_HASH;
+    const inputHash = await hashPassword(password);
     
-    if (password === correctPassword) {
+    if (inputHash === expectedHash) {
       localStorage.setItem('dotslash_admin_auth', 'true');
       setIsAuthenticated(true);
     } else {
