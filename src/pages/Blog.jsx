@@ -74,6 +74,12 @@ export default function Blog() {
               href={post.url}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => {
+                if (db) {
+                  db.execute('UPDATE blogs SET views = COALESCE(views, 0) + 1 WHERE id = ?', [post.id])
+                    .catch(console.error);
+                }
+              }}
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: idx * 0.1 }}

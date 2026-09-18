@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { db } from '../lib/db';
-import { LogOut, Upload, Trash2, Megaphone, Users, FileText } from 'lucide-react';
+import { LogOut, Upload, Trash2, Megaphone, Users, FileText, Eye } from 'lucide-react';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -307,7 +307,13 @@ export default function AdminDashboard() {
                   <div key={blog.id} className="bg-[#0a0a0a] border border-[#222] hover:border-[#3300FF] p-4 relative group transition-all">
                     {blog.thumbnail && <img src={blog.thumbnail} alt="" className="w-full h-32 object-cover mb-4 opacity-50 group-hover:opacity-100" />}
                     <h3 className="font-headline-md text-white text-md line-clamp-2">{blog.title}</h3>
-                    <p className="text-[10px] text-[#00D4FF] font-mono mt-2">{blog.date}</p>
+                    <div className="flex justify-between items-center mt-2 pr-8">
+                      <p className="text-[10px] text-[#00D4FF] font-mono">{blog.date}</p>
+                      <div className="flex items-center gap-1 text-[10px] text-[#A0A0A0] font-mono bg-[#111] px-2 py-1 rounded">
+                        <Eye size={12} />
+                        {blog.views || 0}
+                      </div>
+                    </div>
                     <button onClick={() => deleteBlog(blog.id)} className="absolute top-4 right-4 bg-[#FF3366]/20 p-2 text-[#FF3366] opacity-0 group-hover:opacity-100"><Trash2 size={14} /></button>
                   </div>
                 ))}
