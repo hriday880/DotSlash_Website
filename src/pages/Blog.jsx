@@ -1,96 +1,112 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ExternalLink } from 'lucide-react';
 import Footer from '../components/Footer';
 
-export default function Blog() {
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
+const GLITCH_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*<>';
 
+export default function Blog() {
+  const [text, setText] = useState('');
+  const targetText = 'TRANSMISSION INCOMING';
+  
+  // Scramble text effect
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const username = import.meta.env.VITE_MEDIUM_USERNAME || "@medium";
-        const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=https://medium.com/feed/${username}`);
-        const data = await res.json();
-        
-        if (data.status === "ok") {
-          setPosts(data.items);
-        }
-      } catch (err) {
-        console.error("Failed to fetch blog posts:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    let iteration = 0;
+    let interval = null;
     
-    fetchPosts();
+    // Start delay
+    const timeout = setTimeout(() => {
+      interval = setInterval(() => {
+        setText(
+          targetText
+            .split('')
+            .map((letter, index) => {
+              if (index < iteration) {
+                return targetText[index];
+              }
+              return GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
+            })
+            .join('')
+        );
+
+        if (iteration >= targetText.length) {
+          clearInterval(interval);
+        }
+        
+        iteration += 1 / 3; // speed of deciphering
+      }, 30);
+    }, 500);
+
+    return () => {
+      clearTimeout(timeout);
+      clearInterval(interval);
+    };
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#F3F4F6] text-[#030303] overflow-x-hidden pt-32 pb-0 flex flex-col">
-      <div className="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop relative z-10 flex-1 w-full">
-        <header className="mb-24 w-full md:w-8/12">
-          <h1 className="font-headline-display text-[40px] leading-[48px] sm:text-[60px] sm:leading-[70px] md:text-[80px] lg:text-headline-display lg:leading-[110px] text-[#3300FF] mb-8 uppercase break-words max-w-full">
-            Insights
-          </h1>
-          <p className="font-body-lg text-body-lg text-[#52525B] border-l border-[#E4E4E7] pl-8 max-w-2xl">
-            Thoughts, tutorials, and deep dives from our engineers and designers.
-          </p>
-        </header>
-
-        {loading ? (
-          <div className="text-[#3300FF] font-mono text-xl animate-pulse">Loading data...</div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-24">
-            {posts.map((post, idx) => (
-              <motion.a
-                key={post.guid}
-                href={post.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
-                className="group border border-[#E4E4E7] hover:border-[#3300FF] bg-[#FFFFFF] overflow-hidden flex flex-col transition-all duration-300"
-              >
-                {post.thumbnail && (
-                  <div className="w-full h-48 overflow-hidden bg-[#F4F4F5]">
-                    <img 
-                      src={post.thumbnail} 
-                      alt="Thumbnail" 
-                      className="w-full h-full object-cover filter grayscale contrast-125 group-hover:grayscale-0 group-hover:contrast-100 transition-all duration-700 scale-100 group-hover:scale-110" 
-                    />
-                  </div>
-                )}
-                <div className="p-6 flex flex-col flex-1">
-                  <div className="flex justify-between items-start mb-4">
-                    <span className="font-mono text-xs text-[#A0A0A0]">
-                      {new Date(post.pubDate).toLocaleDateString()}
-                    </span>
-                    <ExternalLink size={16} className="text-[#3300FF] opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                  <h3 className="font-headline-md text-xl font-bold mb-3 text-[#030303] group-hover:text-[#3300FF] transition-colors">
-                    {post.title}
-                  </h3>
-                  <div className="flex flex-wrap gap-2 mt-auto">
-                    {post.categories.slice(0, 3).map(cat => (
-                      <span key={cat} className="text-[10px] uppercase tracking-widest text-[#52525B] border border-[#E4E4E7] px-2 py-1">
-                        {cat}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </motion.a>
-            ))}
-            
-            {posts.length === 0 && (
-              <p className="font-mono text-[#52525B]">No transmissions found.</p>
-            )}
-          </div>
-        )}
+    <div className="min-h-screen bg-[#030303] text-[#FFFFFF] overflow-hidden pt-32 pb-0 flex flex-col relative font-sans">
+      
+      {/* Background Animated Grid */}
+      <div className="absolute inset-0 z-0 opacity-20">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#3300FF1a_1px,transparent_1px),linear-gradient(to_bottom,#3300FF1a_1px,transparent_1px)] bg-[size:40px_40px]"></div>
+        <motion.div 
+          animate={{ 
+            y: [0, 40, 0],
+            opacity: [0.3, 0.6, 0.3] 
+          }}
+          transition={{ 
+            duration: 5, 
+            repeat: Infinity,
+            ease: "linear"
+          }}
+          className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent,#3300FF_10%,transparent_20%)] bg-[length:100%_200%]"
+        />
       </div>
-      <Footer />
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col items-center justify-center relative z-10 px-4">
+        
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1 }}
+          className="relative"
+        >
+          {/* Glowing Accents */}
+          <div className="absolute -inset-10 bg-[#3300FF] opacity-10 blur-3xl rounded-full"></div>
+          
+          <div className="border border-[#353535] bg-[#0a0a0a]/80 backdrop-blur-sm p-12 md:p-24 relative group overflow-hidden">
+            {/* Top left corner accent */}
+            <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-[#3300FF]"></div>
+            {/* Bottom right corner accent */}
+            <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-[#00D4FF]"></div>
+            
+            <div className="flex flex-col items-center gap-6 text-center">
+              <div className="flex items-center gap-4">
+                <span className="w-3 h-3 bg-[#FF3366] rounded-full animate-ping"></span>
+                <span className="font-mono text-xs uppercase tracking-[0.3em] text-[#A0A0A0]">System Status: Standby</span>
+              </div>
+              
+              <h1 className="font-headline-display text-4xl sm:text-6xl md:text-8xl text-transparent bg-clip-text bg-gradient-to-r from-[#3300FF] to-[#00D4FF] uppercase tracking-tighter filter drop-shadow-[0_0_15px_rgba(51,0,255,0.5)]">
+                Coming Soon
+              </h1>
+              
+              <div className="h-8 flex items-center justify-center">
+                <p className="font-mono text-sm sm:text-lg text-[#00D4FF] tracking-[0.2em] md:tracking-[0.5em] uppercase w-full">
+                  {text}
+                </p>
+              </div>
+            </div>
+
+            {/* Scanning line effect */}
+            <motion.div 
+              animate={{ top: ['0%', '100%'] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              className="absolute left-0 right-0 h-[1px] bg-[#3300FF]/50 shadow-[0_0_10px_#3300FF] z-20"
+            />
+          </div>
+        </motion.div>
+        
+      </div>
     </div>
   );
 }
