@@ -8,6 +8,7 @@ const Navbar = () => {
 
   const links = [
   { name: 'Home', path: '/' },
+  { name: 'Laser Tag', path: '/laser-tag', highlight: true },
   { name: 'Events', path: '/events' },
   { name: 'Team', path: '/team' },
   { name: 'Blog', path: '/blog' },
@@ -34,9 +35,13 @@ const Navbar = () => {
     key={link.name}
     to={link.path}
     className={`font-label-caps text-sm tracking-widest uppercase transition-colors duration-300 ${
-    location.pathname === link.path
-     ? 'text-[#3300FF] font-bold'
-     : 'text-[#52525B] hover:text-[#00D4FF]'
+    link.highlight
+      ? location.pathname === link.path
+        ? 'px-3 py-1 bg-[#3300FF] text-white font-bold rounded-sm shadow-[0_0_10px_rgba(51,0,255,0.5)]'
+        : 'px-3 py-1 bg-[#3300FF]/15 text-[#3300FF] hover:bg-[#3300FF] hover:text-white font-bold border border-[#3300FF]/30 rounded-sm'
+      : location.pathname === link.path
+      ? 'text-[#3300FF] font-bold'
+      : 'text-[#52525B] hover:text-[#00D4FF]'
     }`}
    >
     {link.name}
@@ -62,12 +67,17 @@ const Navbar = () => {
     to={link.path}
     onClick={() => setIsOpen(false)}
     className={`font-label-caps text-lg tracking-widest uppercase transition-colors duration-300 ${
-    location.pathname === link.path
-     ? 'text-[#3300FF] font-bold'
-     : 'text-[#52525B] hover:text-[#00D4FF]'
+    link.highlight
+      ? location.pathname === link.path
+        ? 'text-[#3300FF] font-bold underline'
+        : 'text-[#3300FF] font-semibold flex items-center justify-between'
+      : location.pathname === link.path
+      ? 'text-[#3300FF] font-bold'
+      : 'text-[#52525B] hover:text-[#00D4FF]'
     }`}
    >
-    {link.name}
+    <span>{link.name}</span>
+    {link.highlight && <span className="text-[10px] bg-[#3300FF] text-white px-2 py-0.5 rounded-sm">OCT 22</span>}
    </Link>
    ))}
   </div>

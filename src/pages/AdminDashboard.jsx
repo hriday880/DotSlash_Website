@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate, Link } from 'react-router-dom';
 import { db } from '../lib/db';
-import { LogOut, Upload, Trash2, Megaphone, Users, FileText, Eye, Edit2, Calendar } from 'lucide-react';
+import { LogOut, Upload, Trash2, Megaphone, Users, FileText, Eye, Edit2, Calendar, Shield, Crosshair } from 'lucide-react';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -375,6 +375,12 @@ export default function AdminDashboard() {
                   <Megaphone size={14} /> Broadcast
                 </button>
               )}
+              <Link
+                to="/admin/laser-tag"
+                className="flex items-center gap-2 px-4 py-2 font-mono text-xs uppercase tracking-widest bg-[#3300FF]/20 text-[#00D4FF] border border-[#3300FF] hover:bg-[#3300FF] hover:text-white transition-colors"
+              >
+                <Shield size={14} /> Laser Tag Queue
+              </Link>
             </div>
 
             {/* Personnel Form */}

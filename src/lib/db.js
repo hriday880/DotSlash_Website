@@ -73,6 +73,56 @@ class TursoDB {
       lastInsertRowid: result.response.result.last_insert_rowid,
     };
   }
+
+  async batch(statements) {
+    const requests = statements.map(item => {
+      const sql = typeof item === 'string' ? item : item.sql;
+      const rawArgs = typeof item === 'string' ? [] : (item.args || []);
+      const args = rawArgs.map(a => {
+        if (a === null || a === undefined) return { type: 'null' };
+        if (typeof a === 'number') return { type: 'integer', value: String(a) };
+        return { type: 'text', value: String(a) };
+      });
+      return { type: 'execute', stmt: { sql, args } };
+    });
+
+    const res = await fetch(this.pipelineUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ requests })
+    });
+
+    if (!res.ok) {
+      throw new Error(`Turso HTTP error: ${res.status}`);
+    }
+
+    const data = await res.json();
+    return data.results.map(result => {
+      if (result.type === 'error') {
+        throw new Error(result.error.message);
+      }
+      const cols = result.response.result.cols;
+      const rawRows = result.response.result.rows;
+      const rows = rawRows.map(row => {
+        const obj = {};
+        cols.forEach((col, i) => {
+          const cell = row[i];
+          obj[col.name] = cell.type === 'null' ? null : cell.value;
+        });
+        return obj;
+      });
+      return {
+        rows,
+        columns: cols.map(c => c.name),
+        rowsAffected: result.response.result.affected_row_count,
+        lastInsertRowid: result.response.result.last_insert_rowid,
+      };
+    });
+  }
 }
 
+export { TursoDB };
 export const db = (url && authToken) ? new TursoDB(url, authToken) : null;

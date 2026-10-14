@@ -1,114 +1,138 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { ExternalLink } from 'lucide-react';
-import Footer from '../components/Footer';
-import { db } from '../lib/db';
-
-import InkAirplane from '../components/Hero/InkAirplane';
-import AsciiScene from '../components/Hero/AsciiScene';
-
-const GLITCH_CHARS = '01'; // Just binary or clean text
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import Newsstand from '../components/blog/Newsstand';
+import ReaderOverlay from '../components/blog/ReaderOverlay';
+import { getBlogs } from '../lib/blogs';
 
 export default function Blog() {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  const { slug } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchBlogs = async () => {
+    async function load() {
       try {
-        if (!db) return;
-        const res = await db.execute('SELECT * FROM blogs ORDER BY date DESC, created_at DESC');
-        if (res.rows) setBlogs(res.rows);
+        const data = await getBlogs();
+        setBlogs(data);
       } catch (err) {
-        console.error(err);
+        setError(err.message);
       } finally {
         setLoading(false);
       }
-    };
-    fetchBlogs();
+    }
+    load();
   }, []);
 
-  if (loading) {
-    return <div className="min-h-screen bg-[#030303]"></div>;
-  }
+  const selectedBlog = slug ? blogs.find(b => b.slug === slug) : null;
+  const selectedIndex = slug ? blogs.findIndex(b => b.slug === slug) : -1;
 
-  // Coming Soon State
-  if (blogs.length === 0) {
-    return (
-      <div className="min-h-screen bg-[#FFF8E7] text-[#030303] overflow-hidden pt-32 pb-0 flex flex-col relative font-sans">
-        
-        {/* Isometric Paper Airplane Ink Effect */}
-        <div className="absolute inset-0 z-0 opacity-100">
-          
-          <div className="absolute inset-0 z-0 pointer-events-none opacity-40 mix-blend-multiply">
-            <AsciiScene />
-          </div>
+  const handleOpen = (blogSlug) => {
+    navigate(`/blog/${blogSlug}`);
+  };
 
-          <InkAirplane 
-            title="COMING SOON"
-            subtitle="Transmissions compiling..."
-            topText="Node offline"
-          />
-        </div>
-      </div>
-    );
-  }
+  const handleClose = () => {
+    navigate('/blog');
+  };
 
-  // Loaded Blogs State
+  const navigateTo = (direction) => {
+    if (selectedIndex === -1) return;
+    const nextIndex = selectedIndex + direction;
+    if (nextIndex >= 0 && nextIndex < blogs.length) {
+      navigate(`/blog/${blogs[nextIndex].slug}`);
+    }
+  };
+
+  const [rotationTarget, setRotationTarget] = useState(0);
+
+  const handleRotate = (dir) => {
+    const angle = (Math.PI * 2) / 4; // 4 items per tier
+    setRotationTarget(prev => prev + dir * angle);
+  };
+
   return (
-    <div className="min-h-screen bg-[#F3F4F6] text-[#030303] overflow-x-hidden pt-32 pb-0 flex flex-col">
-      <div className="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop relative z-10 flex-1 w-full">
-        <header className="mb-24 w-full md:w-8/12">
-          <h1 className="font-headline-display text-[40px] leading-[48px] sm:text-[60px] sm:leading-[70px] md:text-[80px] lg:text-headline-display lg:leading-[110px] text-[#3300FF] mb-8 uppercase break-words max-w-full">
-            Insights
-          </h1>
-          <p className="font-body-lg text-body-lg text-[#52525B] border-l border-[#E4E4E7] pl-8 max-w-2xl">
-            Transmissions, tutorials, and deep dives from our engineers and designers.
-          </p>
-        </header>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-24">
-          {blogs.map((post, idx) => (
-            <motion.a
-              key={post.id}
-              href={post.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => {
-                if (db) {
-                  db.execute('UPDATE blogs SET views = COALESCE(views, 0) + 1 WHERE id = ?', [post.id])
-                    .catch(console.error);
-                }
-              }}
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: idx * 0.1 }}
-              className="group border border-[#E4E4E7] hover:border-[#3300FF] bg-[#FFFFFF] overflow-hidden flex flex-col transition-all duration-300"
-            >
-              {post.thumbnail ? (
-                <div className="w-full h-48 overflow-hidden bg-[#F4F4F5]">
-                  <img src={post.thumbnail} alt={post.title} className="w-full h-full object-cover filter grayscale contrast-125 group-hover:grayscale-0 group-hover:contrast-100 transition-all duration-700 scale-100 group-hover:scale-110" />
+    <div className="relative w-full h-screen bg-[#EBEDF5] overflow-hidden pt-20">
+      {/* 3D Newsstand Scene */}
+      <div className="absolute inset-0 z-0 pt-20">
+        {loading && (
+          <div className="absolute inset-0 flex items-center justify-center font-mono text-[#3300FF]">
+            <span className="animate-blink">LOADING [====      ]</span>
+          </div>
+        )}
+        {error && (
+          <div className="absolute inset-0 flex items-center justify-center font-mono text-[#01040B]">
+            <span className="flex items-center gap-2">
+              <span className="text-red-500 text-2xl">⚠️</span> 
+              ERROR: {error}
+            </span>
+          </div>
+        )}
+        {!loading && !error && blogs.length === 0 && (
+          <div className="absolute inset-0 flex items-center justify-center font-mono text-[#717784] text-xl">
+            NO ISSUES YET.
+          </div>
+        )}
+        {!loading && blogs.length > 0 && (
+          <>
+            <Newsstand 
+              blogs={blogs} 
+              activeSlug={slug}
+              onOpen={handleOpen} 
+              rotationTarget={rotationTarget}
+            />
+            {/* 2D Overlay UI */}
+            <div className="absolute inset-0 pointer-events-none z-10">
+              
+              {/* Top Title (Matches reference image) */}
+              <div className="absolute top-4 left-0 w-full text-center">
+                <h1 className="text-4xl md:text-5xl font-serif text-[#01040B] font-medium tracking-tight">
+                  dotslash monthly
+                </h1>
+                <div className="flex justify-center gap-8 mt-6">
+                  <span className="flex items-center gap-2 font-mono text-sm uppercase text-[#01040B] font-bold"><span className="w-3 h-3 rounded-full bg-[#3300FF]"></span> software</span>
+                  <span className="flex items-center gap-2 font-mono text-sm uppercase text-[#01040B] font-bold"><span className="w-3 h-3 rounded-full bg-red-500"></span> hardware</span>
+                  <span className="flex items-center gap-2 font-mono text-sm uppercase text-[#01040B] font-bold"><span className="w-3 h-3 rounded-full bg-yellow-400"></span> culture</span>
                 </div>
-              ) : (
-                <div className="w-full h-48 bg-[#030303] flex items-center justify-center relative overflow-hidden">
-                   <div className="absolute inset-0 opacity-20 bg-[linear-gradient(to_right,#3300FF_1px,transparent_1px),linear-gradient(to_bottom,#3300FF_1px,transparent_1px)] bg-[size:10px_10px]"></div>
-                   <span className="font-mono text-[#3300FF] opacity-50 uppercase text-xs tracking-widest z-10">Data_Fragment</span>
-                </div>
-              )}
-              <div className="p-6 flex flex-col flex-1">
-                <div className="flex justify-between items-start mb-4">
-                  <span className="font-mono text-xs text-[#A0A0A0]">{post.date}</span>
-                  <ExternalLink size={16} className="text-[#3300FF] opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
-                <h3 className="font-headline-md text-xl font-bold mb-3 text-[#030303] group-hover:text-[#3300FF] transition-colors line-clamp-3">
-                  {post.title}
-                </h3>
               </div>
-            </motion.a>
-          ))}
-        </div>
+
+              {/* Left Side Text */}
+              <div className="absolute top-1/2 left-8 md:left-16 lg:left-32 -translate-y-1/2 w-64 md:w-72">
+                <h2 className="text-xl md:text-2xl font-serif text-[#01040B] mb-4 leading-snug font-medium">
+                  Digital experiences designed to be explored, enjoyed, and remembered.
+                </h2>
+                <p className="text-xs font-mono text-[#717784] uppercase tracking-widest">Side 1 of {Math.ceil(blogs.length / 4) || 1}</p>
+              </div>
+
+              {/* Navigation Arrows */}
+              <div className="absolute top-1/2 left-0 w-full flex justify-between px-8 md:px-24 lg:px-64 -translate-y-1/2 pointer-events-none">
+                <button 
+                  onClick={() => handleRotate(1)}
+                  className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#01040B] text-white flex items-center justify-center hover:bg-[#3300FF] transition-colors shadow-lg cursor-pointer pointer-events-auto"
+                >
+                  &lt;
+                </button>
+                <button 
+                  onClick={() => handleRotate(-1)}
+                  className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#01040B] text-white flex items-center justify-center hover:bg-[#3300FF] transition-colors shadow-lg cursor-pointer pointer-events-auto"
+                >
+                  &gt;
+                </button>
+              </div>
+            </div>
+          </>
+        )}
       </div>
-      <Footer />
+
+      {/* Reader Overlay */}
+      <ReaderOverlay 
+        blog={selectedBlog} 
+        onClose={handleClose} 
+        onNavigate={navigateTo}
+        hasNext={selectedIndex < blogs.length - 1}
+        hasPrev={selectedIndex > 0}
+      />
     </div>
   );
 }
