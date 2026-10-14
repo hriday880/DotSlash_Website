@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Navigate, useNavigate, Link } from 'react-router-dom';
+import { Navigate, useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { db } from '../lib/db';
 import { LogOut, Upload, Trash2, Megaphone, Users, FileText, Eye, Edit2, Calendar, Shield, Crosshair } from 'lucide-react';
+import LaserTagAdminSection from '../components/LaserTagAdminSection';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   
   // RBAC checks
   const role = localStorage.getItem('dotslash_admin_auth');
@@ -16,8 +18,9 @@ export default function AdminDashboard() {
     return <Navigate to="/login" replace />;
   }
 
-  // Determine initial tab based on role
-  const defaultTab = isSuperAdmin ? 'personnel' : (isBlogAdmin ? 'blogs' : 'announcements');
+  // Determine initial tab based on URL param or role
+  const paramTab = searchParams.get('tab');
+  const defaultTab = paramTab || (isSuperAdmin ? 'laser-tag' : (isBlogAdmin ? 'blogs' : 'announcements'));
   const [activeTab, setActiveTab] = useState(defaultTab);
   
   const [members, setMembers] = useState([]);
@@ -351,37 +354,83 @@ export default function AdminDashboard() {
           </button>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          
-          <div className="lg:col-span-4 flex flex-col gap-8">
-            <div className="flex flex-wrap gap-2">
-              {isSuperAdmin && (
-                <>
-                  <button onClick={() => {setActiveTab('personnel'); setEditMemberId(null); setMemberForm({ name: '', role: '', department: 'executive', imageFile: null })}} className={`flex items-center gap-2 px-4 py-2 font-mono text-xs uppercase tracking-widest transition-colors ${activeTab === 'personnel' ? 'bg-[#3300FF] text-white' : 'border border-[#353535] text-[#A0A0A0] hover:border-[#3300FF]'}`}>
-                    <Users size={14} /> Personnel
-                  </button>
-                  <button onClick={() => setActiveTab('events')} className={`flex items-center gap-2 px-4 py-2 font-mono text-xs uppercase tracking-widest transition-colors ${activeTab === 'events' ? 'bg-[#3300FF] text-white' : 'border border-[#353535] text-[#A0A0A0] hover:border-[#3300FF]'}`}>
-                    <Calendar size={14} /> Events
-                  </button>
-                </>
-              )}
-              {(isSuperAdmin || isBlogAdmin) && (
-                <button onClick={() => setActiveTab('blogs')} className={`flex items-center gap-2 px-4 py-2 font-mono text-xs uppercase tracking-widest transition-colors ${activeTab === 'blogs' ? 'bg-[#3300FF] text-white' : 'border border-[#353535] text-[#A0A0A0] hover:border-[#3300FF]'}`}>
-                  <FileText size={14} /> Blogs
-                </button>
-              )}
-              {(isSuperAdmin || isAnnouncementAdmin) && (
-                <button onClick={() => setActiveTab('announcements')} className={`flex items-center gap-2 px-4 py-2 font-mono text-xs uppercase tracking-widest transition-colors ${activeTab === 'announcements' ? 'bg-[#3300FF] text-white' : 'border border-[#353535] text-[#A0A0A0] hover:border-[#3300FF]'}`}>
-                  <Megaphone size={14} /> Broadcast
-                </button>
-              )}
-              <Link
-                to="/admin/laser-tag"
-                className="flex items-center gap-2 px-4 py-2 font-mono text-xs uppercase tracking-widest bg-[#3300FF]/20 text-[#00D4FF] border border-[#3300FF] hover:bg-[#3300FF] hover:text-white transition-colors"
+        {/* Navigation Tabs Bar */}
+        <div className="flex flex-wrap items-center gap-2 mb-8 border-b border-[#353535] pb-4">
+          <button
+            onClick={() => setActiveTab('laser-tag')}
+            className={`flex items-center gap-2 px-4 py-2 font-mono text-xs uppercase tracking-widest transition-colors ${
+              activeTab === 'laser-tag'
+                ? 'bg-[#3300FF] text-white shadow-[0_0_15px_rgba(51,0,255,0.4)]'
+                : 'border border-[#353535] text-[#A0A0A0] hover:border-[#3300FF]'
+            }`}
+          >
+            <Crosshair size={14} className={activeTab === 'laser-tag' ? 'text-[#00D4FF]' : ''} />
+            <span>Laser Tag Queue</span>
+          </button>
+
+          {isSuperAdmin && (
+            <>
+              <button
+                onClick={() => {
+                  setActiveTab('personnel');
+                  setEditMemberId(null);
+                  setMemberForm({ name: '', role: '', department: 'executive', imageFile: null });
+                }}
+                className={`flex items-center gap-2 px-4 py-2 font-mono text-xs uppercase tracking-widest transition-colors ${
+                  activeTab === 'personnel'
+                    ? 'bg-[#3300FF] text-white'
+                    : 'border border-[#353535] text-[#A0A0A0] hover:border-[#3300FF]'
+                }`}
               >
-                <Shield size={14} /> Laser Tag Queue
-              </Link>
-            </div>
+                <Users size={14} /> Personnel
+              </button>
+              <button
+                onClick={() => setActiveTab('events')}
+                className={`flex items-center gap-2 px-4 py-2 font-mono text-xs uppercase tracking-widest transition-colors ${
+                  activeTab === 'events'
+                    ? 'bg-[#3300FF] text-white'
+                    : 'border border-[#353535] text-[#A0A0A0] hover:border-[#3300FF]'
+                }`}
+              >
+                <Calendar size={14} /> Events
+              </button>
+            </>
+          )}
+
+          {(isSuperAdmin || isBlogAdmin) && (
+            <button
+              onClick={() => setActiveTab('blogs')}
+              className={`flex items-center gap-2 px-4 py-2 font-mono text-xs uppercase tracking-widest transition-colors ${
+                activeTab === 'blogs'
+                  ? 'bg-[#3300FF] text-white'
+                  : 'border border-[#353535] text-[#A0A0A0] hover:border-[#3300FF]'
+              }`}
+            >
+              <FileText size={14} /> Blogs
+            </button>
+          )}
+
+          {(isSuperAdmin || isAnnouncementAdmin) && (
+            <button
+              onClick={() => setActiveTab('announcements')}
+              className={`flex items-center gap-2 px-4 py-2 font-mono text-xs uppercase tracking-widest transition-colors ${
+                activeTab === 'announcements'
+                  ? 'bg-[#3300FF] text-white'
+                  : 'border border-[#353535] text-[#A0A0A0] hover:border-[#3300FF]'
+              }`}
+            >
+              <Megaphone size={14} /> Broadcast
+            </button>
+          )}
+        </div>
+
+        {activeTab === 'laser-tag' ? (
+          <div className="pt-2">
+            <LaserTagAdminSection />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            <div className="lg:col-span-4 flex flex-col gap-8">
 
             {/* Personnel Form */}
             {activeTab === 'personnel' && (
@@ -550,6 +599,7 @@ export default function AdminDashboard() {
             )}
           </div>
         </div>
+        )}
       </div>
     </div>
   );
