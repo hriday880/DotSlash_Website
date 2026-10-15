@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { db } from '../lib/db';
@@ -6,8 +7,14 @@ import InkAirplane from './Hero/InkAirplane';
 import AsciiScene from './Hero/AsciiScene';
 
 export default function Announcement() {
+  const location = useLocation();
   const [announcement, setAnnouncement] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
+
+  // Strictly only show on home page ('/')
+  if (location.pathname !== '/') {
+    return null;
+  }
 
   useEffect(() => {
     const fetchAnnouncement = async () => {

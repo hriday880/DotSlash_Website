@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import LaserTagIntroModal from '../components/LaserTagIntroModal';
 import { laserTagApi } from '../lib/laserTagApi';
 import {
   DEFAULT_UPI_ID,
@@ -56,18 +57,26 @@ export default function LaserTag() {
   const [selectedHour, setSelectedHour] = useState('ALL');
   const [refreshing, setRefreshing] = useState(false);
 
-  // CINEMATIC INTRO VIDEO STATE
+  // CINEMATIC INTRO VIDEO STATE (1st visit per session, or manually triggered)
   const [isPlayingIntro, setIsPlayingIntro] = useState(() => {
     if (typeof window !== 'undefined') {
       return !sessionStorage.getItem('dotslash_lasertag_intro_seen');
     }
     return true;
   });
-  const [introMuted, setIntroMuted] = useState(true);
-  const [introProgress, setIntroProgress] = useState(0);
-  const [introCurrentTime, setIntroCurrentTime] = useState('00:00');
-  const [introDuration, setIntroDuration] = useState('00:10');
-  const introVideoRef = useRef(null);
+
+  const handleIntroComplete = () => {
+    setIsPlayingIntro(false);
+    try {
+      sessionStorage.setItem('dotslash_lasertag_intro_seen', 'true');
+    } catch {
+      // Ignore storage restrictions
+    }
+  };
+
+  const handleReplayIntro = () => {
+    setIsPlayingIntro(true);
+  };
 
   // Top registration mode: 'GROUP' | 'SOLO'
   const [registrationMode, setRegistrationMode] = useState('GROUP');
@@ -134,62 +143,6 @@ export default function LaserTag() {
     const interval = setInterval(() => fetchSlots(), 15000); // 15s live polling
     return () => clearInterval(interval);
   }, []);
-
-  // Keyboard shortcut: ESC to skip intro video
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (isPlayingIntro && e.key === 'Escape') {
-        handleIntroComplete();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isPlayingIntro]);
-
-  // Video time tracker
-  const handleVideoTimeUpdate = () => {
-    if (!introVideoRef.current) return;
-    const current = introVideoRef.current.currentTime || 0;
-    const total = introVideoRef.current.duration || 10;
-    const pct = Math.min(100, (current / total) * 100);
-    setIntroProgress(pct);
-
-    const curSec = Math.floor(current);
-    const totSec = Math.floor(total);
-    setIntroCurrentTime(`00:${curSec < 10 ? '0' : ''}${curSec}`);
-    setIntroDuration(`00:${totSec < 10 ? '0' : ''}${totSec}`);
-  };
-
-  // Video complete or skip
-  const handleIntroComplete = () => {
-    setIsPlayingIntro(false);
-    try {
-      sessionStorage.setItem('dotslash_lasertag_intro_seen', 'true');
-    } catch {
-      // Ignore storage restrictions
-    }
-  };
-
-  // Sound toggle during video
-  const handleToggleSound = () => {
-    if (introVideoRef.current) {
-      const nextMuted = !introMuted;
-      introVideoRef.current.muted = nextMuted;
-      setIntroMuted(nextMuted);
-    }
-  };
-
-  // Replay intro video on demand
-  const handleReplayIntro = () => {
-    setIsPlayingIntro(true);
-    setIntroProgress(0);
-    setTimeout(() => {
-      if (introVideoRef.current) {
-        introVideoRef.current.currentTime = 0;
-        introVideoRef.current.play().catch(() => {});
-      }
-    }, 50);
-  };
 
   // Update group squad size: strictly 3 or 4
   const handlePlayerCountChange = (count) => {
@@ -414,116 +367,25 @@ export default function LaserTag() {
   return (
     <div className="min-h-screen bg-[#050608] text-white selection:bg-[#3300FF] selection:text-white pb-32 relative overflow-x-hidden">
       {/* ============================================================== */}
-      {/* 1. CINEMATIC VIDEO INTRO OVERLAY                               */}
+      {/* 1. CINEMATIC VIDEO INTRO MODAL (ISOLATED ZERO-RERENDER)        */}
       {/* ============================================================== */}
-      <AnimatePresence>
-        {isPlayingIntro && (
-          <motion.div
-            key="cinematic-intro-modal"
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-0 z-[100] bg-black flex items-center justify-center overflow-hidden"
-          >
-            {/* The Video Element */}
-            <video
-              ref={introVideoRef}
-              src="/laser_intro/intro.mp4"
-              poster="/laser_intro/bg_last_frame.png"
-              autoPlay
-              playsInline
-              muted={introMuted}
-              onEnded={handleIntroComplete}
-              onTimeUpdate={handleVideoTimeUpdate}
-              className="w-full h-full object-cover select-none"
-            />
-
-            {/* Tactical Scanlines & Grid Vignette */}
-            <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/80 via-transparent to-black/80" />
-            <div className="absolute inset-0 pointer-events-none opacity-15 pixel-grid-bg" />
-
-            {/* HUD Top Bar */}
-            <div className="absolute top-0 left-0 right-0 p-4 sm:p-6 flex items-center justify-between pointer-events-auto">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1.5 px-3 py-1 bg-black/60 backdrop-blur-md border border-white/20 font-mono text-[11px] uppercase tracking-widest text-white shadow-lg">
-                  <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
-                  <span className="text-red-400 font-bold">REC</span>
-                  <span className="text-white/40">|</span>
-                  <span className="text-[#00D4FF] font-bold">DOTSLASH × GLITCH</span>
-                  <span className="hidden sm:inline text-[#A0A0A0]">// TACTICAL BRIEFING</span>
-                </div>
-              </div>
-
-              {/* Top Controls: Sound Toggle & Skip */}
-              <div className="flex items-center gap-2 sm:gap-3">
-                <button
-                  type="button"
-                  onClick={handleToggleSound}
-                  className="px-3.5 py-1.5 bg-black/60 hover:bg-black/90 backdrop-blur-md border border-white/20 hover:border-[#00D4FF] text-white font-mono text-xs uppercase tracking-wider flex items-center gap-2 transition-all shadow-lg group"
-                >
-                  {introMuted ? (
-                    <>
-                      <VolumeX size={14} className="text-amber-400" />
-                      <span className="text-amber-300 font-bold">Sound: OFF</span>
-                    </>
-                  ) : (
-                    <>
-                      <Volume2 size={14} className="text-emerald-400 animate-pulse" />
-                      <span className="text-emerald-300 font-bold">Sound: ON</span>
-                    </>
-                  )}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleIntroComplete}
-                  className="px-4 py-1.5 bg-[#3300FF] hover:bg-[#00D4FF] text-white hover:text-black font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all shadow-[0_0_20px_rgba(51,0,255,0.6)] group"
-                >
-                  <span>Skip Intro</span>
-                  <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" />
-                  <span className="hidden md:inline text-[9px] opacity-70 ml-1">(ESC)</span>
-                </button>
-              </div>
-            </div>
-
-            {/* HUD Bottom Bar with Multi-Laser Progress Bar */}
-            <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 bg-gradient-to-t from-black via-black/70 to-transparent pointer-events-auto">
-              <div className="max-w-4xl mx-auto space-y-2">
-                <div className="flex items-center justify-between text-xs font-mono text-white/80">
-                  <div className="flex items-center gap-2">
-                    <Crosshair size={13} className="text-[#00D4FF] animate-spin" />
-                    <span className="uppercase tracking-widest text-[#00D4FF] font-semibold">
-                      Arena Synchronization Feed
-                    </span>
-                  </div>
-                  <span className="font-mono text-white tracking-widest">
-                    {introCurrentTime} / {introDuration}
-                  </span>
-                </div>
-
-                {/* Multi-Laser Color Progress Track */}
-                <div className="w-full h-1.5 bg-white/20 rounded-full overflow-hidden backdrop-blur-sm">
-                  <div
-                    className="h-full bg-gradient-to-r from-[#FF2A55] via-[#00E5FF] via-[#00FF66] to-[#FFB800] transition-all duration-100 shadow-[0_0_12px_rgba(0,229,255,0.8)]"
-                    style={{ width: `${introProgress}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <LaserTagIntroModal
+        isOpen={isPlayingIntro}
+        onClose={handleIntroComplete}
+      />
 
       {/* ============================================================== */}
       {/* 2. SEAMLESS BACKGROUND (LAST FRAME: frame_010.png)             */}
       {/* ============================================================== */}
-      <div
-        className="fixed inset-0 pointer-events-none z-0 bg-cover bg-center bg-no-repeat transition-opacity duration-1000"
-        style={{
-          backgroundImage: "url('/laser_intro/bg_last_frame.png')",
-        }}
-      >
-        {/* Dark Vignette & Frosted Glass Layer */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none">
+        {/* Exact same base image matching the video's last frame */}
+        <img
+          src="/laser_intro/bg_last_frame.png"
+          alt="Arena Background"
+          className="w-full h-full object-cover object-center pointer-events-none"
+        />
+
+        {/* Tactical Dark Vignette & Frosted Glass Layer */}
         <div className="absolute inset-0 bg-[#06070a]/65 backdrop-blur-[1.5px]" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#050608] via-transparent to-[#050608]/85" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#050608]/80 via-transparent to-[#050608]/80" />

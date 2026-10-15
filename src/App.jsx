@@ -24,6 +24,7 @@ gsap.registerPlugin(ScrollTrigger);
 function HomePage() {
  return (
  <>
+  <Announcement />
   <Hero />
   <Footer />
  </>
@@ -65,7 +66,6 @@ function App() {
 
  return (
   <>
-   <Announcement />
    <Navbar />
 
   <Routes>
