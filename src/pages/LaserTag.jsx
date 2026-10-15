@@ -428,6 +428,9 @@ export default function LaserTag() {
               </h1>
               <p className="mt-4 text-[#C0C0C8] max-w-2xl font-mono text-sm leading-relaxed">
                 15 continuous 20-minute skirmishes • 8:00 PM to 1:00 AM • ₹100 / Player.
+                <span className="block mt-2 text-white font-semibold">
+                  ⏱️ Match Breakdown (Every Slot): <span className="text-emerald-400">10 min playing time</span> • <span className="text-[#00D4FF]">5 min gear setup & calibration</span> • <span className="text-[#FFB800]">5 min scoring wrap-up</span>.
+                </span>
                 Book a squad of <strong className="text-white">strictly 3 or 4 players</strong>, or enter the <strong className="text-[#00D4FF]">Solo Matchmaking Pool</strong> to be drafted into a balanced tactical team.
               </p>
             </div>
@@ -438,6 +441,7 @@ export default function LaserTag() {
                 <span className="block text-[10px] text-white/60 uppercase tracking-wider">Combat Window</span>
                 <span className="text-[#00D4FF] font-bold text-sm">October 22, 2026</span>
                 <span className="block text-[11px] text-white font-semibold mt-0.5">8:00 PM – 1:00 AM (15 Slots)</span>
+                <span className="block text-[10px] text-emerald-400 font-bold mt-1">10m Play • 5m Setup • 5m Wrap-up</span>
               </div>
 
               <div className="flex flex-col gap-2.5">
@@ -476,9 +480,12 @@ export default function LaserTag() {
               </span>
             </div>
             <div className="p-4 bg-white/[0.04] backdrop-blur-xl border border-white/15 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]">
-              <span className="text-[10px] font-mono uppercase text-white/60 block">Match Length</span>
-              <span className="text-white font-mono font-bold text-base flex items-center gap-2 mt-1">
-                <Clock size={15} className="text-[#00FF66]" /> 20 Min Continuous
+              <span className="text-[10px] font-mono uppercase text-white/60 block">Slot Schedule (20m)</span>
+              <span className="text-emerald-400 font-mono font-bold text-sm flex items-center gap-1.5 mt-1">
+                <Clock size={15} /> 10m Play Time
+              </span>
+              <span className="text-[10px] text-white/60 font-mono block mt-0.5">
+                5m Setup • 5m Wrap-up
               </span>
             </div>
             <div className="p-4 bg-white/[0.04] backdrop-blur-xl border border-white/15 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]">
@@ -533,17 +540,19 @@ export default function LaserTag() {
           </button>
         </div>
 
-        {/* Informational Rule Pill */}
-        <div className="mt-4 p-4 bg-black/45 border border-white/15 backdrop-blur-2xl font-mono text-xs text-white/70 flex items-center justify-between shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]">
-          <div className="flex items-center gap-3">
-            <HelpCircle size={15} className="text-[#00D4FF] shrink-0" />
-            <span>
+        {/* Informational Rule Pill with Timing & Email Notice */}
+        <div className="mt-4 p-4 bg-black/45 border border-white/15 backdrop-blur-2xl font-mono text-xs text-white/70 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]">
+          <div className="flex items-start md:items-center gap-3">
+            <HelpCircle size={15} className="text-[#00D4FF] shrink-0 mt-0.5 md:mt-0" />
+            <span className="leading-relaxed">
               {registrationMode === 'GROUP'
                 ? 'Tactical Group rule: To prevent partial slot fragmentation, groups must register with strictly 3 or 4 confirmed players. Solo players must use the Solo Registration tab.'
                 : 'Solo Matchmaking rule: Register solo for ₹100 and pick your preferred slot. Arena marshals combine solo players into tactical 4-player teams.'}
+              {' '}
+              <strong className="text-white">Every 20-min slot strictly includes 10 min playing time, 5 min gear setup, and 5 min scoring wrap-up. Confirmation receipt is dispatched to your registered email upon approval.</strong>
             </span>
           </div>
-          <span className="hidden md:inline font-bold text-white text-[10px] uppercase tracking-wider bg-white/10 px-2.5 py-1 border border-white/20">
+          <span className="self-start md:self-auto font-bold text-white text-[10px] uppercase tracking-wider bg-white/10 px-2.5 py-1 border border-white/20 whitespace-nowrap">
             Active
           </span>
         </div>
@@ -582,6 +591,40 @@ export default function LaserTag() {
                       ? `Your solo entry has been queued in the matchmaking pool. Preferred slot: ${completedBooking.preferred_slot_id || 'Flexible'}. Once verified, you will be assigned to a team.`
                       : `Your ${completedBooking.player_count} spots for ${completedBooking.team} (${completedBooking.slot_id}) are held awaiting admin screenshot approval. Once verified, your slot will transition to CONFIRMED.`}
                   </p>
+
+                  {/* Explicit Timing Schedule & Registered Email Notice */}
+                  <div className="mt-4 p-4 bg-black/60 border border-emerald-400/30 backdrop-blur-xl space-y-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <span className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                        <Clock size={14} /> Slot Timing Schedule (20 Min Total)
+                      </span>
+                      <span className="text-[11px] font-mono text-white/60">
+                        Please arrive 10 minutes prior for sensor fitting
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs font-mono">
+                      <div className="p-2.5 bg-white/[0.04] border border-white/10 text-center">
+                        <span className="text-[10px] text-white/60 block uppercase font-medium">1. Gear-up & Calibration</span>
+                        <span className="text-[#00D4FF] font-extrabold text-sm block mt-0.5">5 Minutes Setup</span>
+                      </div>
+                      <div className="p-2.5 bg-white/[0.04] border border-white/10 text-center">
+                        <span className="text-[10px] text-white/60 block uppercase font-medium">2. Active Arena Combat</span>
+                        <span className="text-emerald-400 font-extrabold text-sm block mt-0.5">10 Minutes Playing</span>
+                      </div>
+                      <div className="p-2.5 bg-white/[0.04] border border-white/10 text-center">
+                        <span className="text-[10px] text-white/60 block uppercase font-medium">3. Debrief & Tally</span>
+                        <span className="text-[#FFB800] font-extrabold text-sm block mt-0.5">5 Minutes Wrap-up</span>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-white/10 flex items-center gap-2 text-xs font-mono text-emerald-200/90">
+                      <Mail size={14} className="text-emerald-400 shrink-0" />
+                      <span>
+                        Official confirmation pass & receipt will be sent to registered email: <strong className="text-white underline">{completedBooking.captain_email || 'your registered email'}</strong> upon marshal approval.
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-4">
@@ -694,8 +737,8 @@ export default function LaserTag() {
                           <span className="text-[11px] font-mono uppercase tracking-widest text-[#00D4FF] font-bold">
                             Slot #{slot.slot_number} of 15
                           </span>
-                          <span className="text-[10px] font-mono px-2.5 py-1 bg-black/50 border border-white/20 text-white/70 backdrop-blur-md">
-                            20 MIN MATCH
+                          <span className="text-[10px] font-mono px-2.5 py-1 bg-black/50 border border-emerald-500/30 text-emerald-300 backdrop-blur-md font-semibold">
+                            20 MIN SLOT
                           </span>
                         </div>
 
@@ -703,6 +746,11 @@ export default function LaserTag() {
                           <Clock size={18} className="text-[#00D4FF]" />
                           <span>{slot.time_window}</span>
                         </h4>
+
+                        <div className="mt-2 text-[10px] font-mono text-emerald-400 flex items-center gap-1.5 bg-black/40 px-2.5 py-1 border border-white/10 backdrop-blur-md">
+                          <Clock size={11} className="shrink-0" />
+                          <span>10m play • 5m setup • 5m wrap-up</span>
+                        </div>
 
                         {/* Designated UPI Account Tag */}
                         <div className="mt-3 text-[11px] font-mono text-white/70 flex items-center gap-2 bg-black/50 px-3 py-1.5 border border-white/15 backdrop-blur-md">
@@ -763,6 +811,16 @@ export default function LaserTag() {
                       <h2 className="text-2xl sm:text-3xl font-bold uppercase tracking-tight text-white font-headline-md mt-1.5">
                         {selectedSlot.time_window} • <span className="text-[#00D4FF]">{selectedTeam}</span>
                       </h2>
+                      <div className="mt-2.5 flex flex-wrap items-center gap-2.5 text-xs font-mono">
+                        <span className="px-2.5 py-1 bg-emerald-950/50 border border-emerald-500/30 text-emerald-300 font-semibold flex items-center gap-1.5">
+                          <Clock size={12} className="text-emerald-400" />
+                          <span>20 Min Total: 10m Play + 5m Setup + 5m Wrap-up</span>
+                        </span>
+                        <span className="text-white/60 text-[11px] flex items-center gap-1">
+                          <Mail size={12} className="text-[#00D4FF]" />
+                          <span>Receipt & pass dispatched to captain email upon verification</span>
+                        </span>
+                      </div>
                     </div>
 
                     <button
@@ -1022,6 +1080,20 @@ export default function LaserTag() {
                             />
                           </div>
 
+                          {/* Official Receipt & Timing Dispatch Notice */}
+                          <div className="p-4 bg-black/60 border border-white/20 font-mono text-xs text-white/80 space-y-2 backdrop-blur-md">
+                            <div className="flex items-center gap-2 text-emerald-400 font-semibold text-[11px]">
+                              <Clock size={13} className="shrink-0" />
+                              <span>20-Min Match: 10m Playing Time • 5m Setup & Calibration • 5m Wrap-up</span>
+                            </div>
+                            <div className="flex items-start gap-2 text-white/70 text-[11px] pt-1.5 border-t border-white/10">
+                              <Mail size={13} className="text-[#00D4FF] shrink-0 mt-0.5" />
+                              <span>
+                                Official verification pass and receipt will be dispatched to squad captain email: <strong className="text-white underline">{players[0]?.email || 'Squad Captain Email'}</strong>.
+                              </span>
+                            </div>
+                          </div>
+
                           {submitError && (
                             <div className="p-4 bg-red-950/50 border border-red-600/60 text-red-300 font-mono text-xs flex items-center gap-2.5 backdrop-blur-md">
                               <AlertCircle size={18} className="shrink-0" />
@@ -1082,7 +1154,41 @@ export default function LaserTag() {
                 Don't have a 3 or 4 player squad? Register solo, select your preferred 20-minute window, and our tournament marshals will draft you into a balanced 4-player team with other solo participants.
               </p>
 
-              <form onSubmit={handleSubmitSoloRegistration} className="mt-10 space-y-8">
+              {/* Explicit Timing Schedule Card & Registered Email Receipt Notice */}
+              <div className="mt-6 p-4 sm:p-5 bg-black/60 border border-white/20 backdrop-blur-2xl space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                    <Clock size={14} /> Match Schedule Breakdown (20 Min Total)
+                  </span>
+                  <span className="text-[11px] font-mono text-white/60">
+                    Arrive 10 minutes prior for sensor fitting
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs font-mono">
+                  <div className="p-3 bg-white/[0.04] border border-white/10 text-center">
+                    <span className="text-[10px] text-white/60 block uppercase font-medium">1. Gear-up & Calibration</span>
+                    <span className="text-[#00D4FF] font-extrabold text-sm block mt-0.5">5 Minutes Setup</span>
+                  </div>
+                  <div className="p-3 bg-white/[0.04] border border-white/10 text-center">
+                    <span className="text-[10px] text-white/60 block uppercase font-medium">2. Active Arena Combat</span>
+                    <span className="text-emerald-400 font-extrabold text-sm block mt-0.5">10 Minutes Playing</span>
+                  </div>
+                  <div className="p-3 bg-white/[0.04] border border-white/10 text-center">
+                    <span className="text-[10px] text-white/60 block uppercase font-medium">3. Debrief & Tally</span>
+                    <span className="text-[#FFB800] font-extrabold text-sm block mt-0.5">5 Minutes Wrap-up</span>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-white/10 flex items-center gap-2 text-xs font-mono text-white/80">
+                  <Mail size={13} className="text-[#FFB800] shrink-0" />
+                  <span>
+                    Official verified booking receipt will be dispatched to your registered email: <strong className="text-white underline">{soloEmail || 'your registered email'}</strong> upon approval.
+                  </span>
+                </div>
+              </div>
+
+              <form onSubmit={handleSubmitSoloRegistration} className="mt-8 space-y-8">
                 {/* Contact Fields */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
@@ -1261,6 +1367,20 @@ export default function LaserTag() {
                   </div>
                 </div>
 
+                {/* Official Receipt & Timing Dispatch Notice */}
+                <div className="p-4 bg-black/60 border border-white/20 font-mono text-xs text-white/80 space-y-2 backdrop-blur-md">
+                  <div className="flex items-center gap-2 text-emerald-400 font-semibold text-[11px]">
+                    <Clock size={13} className="shrink-0" />
+                    <span>20-Min Match: 10m Playing Time • 5m Setup & Calibration • 5m Wrap-up</span>
+                  </div>
+                  <div className="flex items-start gap-2 text-white/70 text-[11px] pt-1.5 border-t border-white/10">
+                    <Mail size={13} className="text-[#FFB800] shrink-0 mt-0.5" />
+                    <span>
+                      Official verification pass and receipt will be dispatched to registered solo combatant email: <strong className="text-white underline">{soloEmail || 'registered solo email'}</strong>.
+                    </span>
+                  </div>
+                </div>
+
                 {soloSubmitError && (
                   <div className="p-4 bg-red-950/50 border border-red-600/60 text-red-300 font-mono text-xs flex items-center gap-2.5 backdrop-blur-md">
                     <AlertCircle size={18} className="shrink-0" />
@@ -1394,6 +1514,23 @@ export default function LaserTag() {
                             Preferred Time Slot requested: {booking.preferred_slot_id}
                           </div>
                         )}
+
+                        {/* Match Timing Breakdown & Email Receipt Notice */}
+                        <div className="p-3.5 bg-black/60 border border-white/15 font-mono text-xs space-y-2 backdrop-blur-md">
+                          <div className="flex flex-wrap items-center justify-between gap-2 text-emerald-400 font-semibold text-[11px]">
+                            <span className="flex items-center gap-1.5">
+                              <Clock size={13} />
+                              <span>Match Schedule: 10m Playing Time • 5m Setup & Calibration • 5m Scoring Wrap-up</span>
+                            </span>
+                            <span className="text-[10px] text-white/60 uppercase">Arrive 10m Prior</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-white/70 text-[11px] pt-1.5 border-t border-white/10">
+                            <Mail size={13} className="text-[#00D4FF] shrink-0" />
+                            <span>
+                              Official receipt & verification pass dispatched to: <strong className="text-white underline">{booking.captain_email}</strong>
+                            </span>
+                          </div>
+                        </div>
 
                         {/* Captain Details */}
                         <div className="pt-3 text-xs font-mono text-white/70 border-t border-white/10 flex flex-wrap gap-x-8 gap-y-1.5">

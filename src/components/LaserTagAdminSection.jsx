@@ -44,28 +44,42 @@ export function generateLaserTagEmail(registration, type = 'APPROVE', adminNote 
 
   if (isApprove) {
     if (isSolo) {
-      const subject = `[DotSlash × Glitch] Solo Laser Tag Booking CONFIRMED – ${slotWindow} (${team})`;
+      const subject = `[DotSlash × Glitch] Solo Laser Tag Booking CONFIRMED & RECEIPT – ${slotWindow} (${team})`;
       const body = `Hi ${captain},
 
-Great news! Your payment screenshot for the DotSlash × Glitch Laser Tag Arena (October 22, 2026) has been VERIFIED and your solo registration is officially CONFIRMED!
+Great news! Your payment of ₹100 for the DotSlash × Glitch Laser Tag Arena (October 22, 2026) has been VERIFIED and your solo registration is officially CONFIRMED!
 
-=== SOLO COMBAT RECEIPT ===
-Registration ID : ${regId}
-Combat Window   : ${slotWindow}
-Assigned Team   : ${team}
-Format          : Solo Matchmaking Pool (Drafted into a 4-player team)
-Fee Paid        : ₹100 (VERIFIED & APPROVED)
+Here is your official booking pass and receipt:
 
-=== PARTICIPANT DETAILS ===
-Name  : ${captain}
-Email : ${email}
-Phone : ${registration.captain_phone || ''}
+========================================
+       OFFICIAL BOOKING RECEIPT
+========================================
+Registration ID    : ${regId}
+Slot Time Window   : ${slotWindow}
+Assigned Team      : ${team}
+Format             : Solo Matchmaking Pool (Drafted into a 4-player team)
+Registered Email   : ${email}
+Phone / WhatsApp   : ${registration.captain_phone || 'N/A'}
+Fee Paid           : ₹100 (VERIFIED & APPROVED)
+Payment Status     : COMPLETED
+Booking Status     : CONFIRMED
 
-=== IMPORTANT EVENT INSTRUCTIONS ===
+========================================
+ MATCH SCHEDULE & TIMING BREAKDOWN (20 MIN)
+========================================
+Total Slot Window  : 20 Minutes
+• Playing Time     : 10 Minutes (Live Arena Combat Skirmish)
+• Setup & Briefing : 5 Minutes (Gear-up, vest & sensor calibration)
+• Scoring & Wrap-up: 5 Minutes (Score tally, debrief & vest return)
+
+========================================
+      IMPORTANT EVENT INSTRUCTIONS
+========================================
 • Venue: DotSlash Laser Tag Arena, FLAME University Campus.
-• Arrival: Please report 10 minutes prior to ${slotWindow} for vest fitting, sensor calibration, and meeting your assigned teammates.
-• Format: 4v4 continuous 20-minute skirmish.
-• Live Status Receipt: You can verify your live booking anytime at ${window.location.origin}/laser-tag using your Registration ID: ${regId}.
+• Arrival Time: Please report AT LEAST 10 minutes prior to ${slotWindow} for vest fitting, sensor calibration, and meeting your assigned teammates.
+• Equipment: Combat vests and laser rifles are provided on site.
+• Live Status & Verification: You can view or verify your live booking receipt anytime at:
+  ${window.location.origin}/laser-tag (Search Registration ID: ${regId})
 
 If you have any questions, simply reply directly to this email.
 
@@ -78,26 +92,47 @@ FLAME University`;
       return { subject, body, recipient: email };
     }
 
-    const subject = `[DotSlash × Glitch] Laser Tag Booking CONFIRMED – ${slotWindow} (${team})`;
+    const subject = `[DotSlash × Glitch] Laser Tag Squad Booking CONFIRMED & RECEIPT – ${slotWindow} (${team})`;
     const body = `Hi ${captain},
 
-Great news! Your payment screenshot for the DotSlash × Glitch Laser Tag Arena (October 22, 2026) has been VERIFIED and your squad booking is officially CONFIRMED!
+Great news! Your payment of ₹${total} for the DotSlash × Glitch Laser Tag Arena (October 22, 2026) has been VERIFIED and your squad booking is officially CONFIRMED!
 
-=== SQUAD BOOKING RECEIPT ===
-Registration ID : ${regId}
-Slot Time       : ${slotWindow}
-Team Side       : ${team}
-Squad Size      : ${count} Players
-Total Fee Paid  : ₹${total} (VERIFIED & APPROVED)
+Here is your official booking pass and receipt:
 
-=== SQUAD ROSTER ===
+========================================
+       OFFICIAL BOOKING RECEIPT
+========================================
+Registration ID    : ${regId}
+Slot Time Window   : ${slotWindow}
+Team Side          : ${team}
+Squad Size         : ${count} Players
+Registered Email   : ${email}
+Phone / WhatsApp   : ${registration.captain_phone || 'N/A'}
+Total Fee Paid     : ₹${total} (VERIFIED & APPROVED)
+Payment Status     : COMPLETED
+Booking Status     : CONFIRMED
+
+========================================
+ MATCH SCHEDULE & TIMING BREAKDOWN (20 MIN)
+========================================
+Total Slot Window  : 20 Minutes
+• Playing Time     : 10 Minutes (Live Arena Combat Skirmish)
+• Setup & Briefing : 5 Minutes (Gear-up, vest & sensor calibration)
+• Scoring & Wrap-up: 5 Minutes (Score tally, debrief & vest return)
+
+========================================
+             SQUAD ROSTER
+========================================
 ${playersList}
 
-=== IMPORTANT EVENT INSTRUCTIONS ===
+========================================
+      IMPORTANT EVENT INSTRUCTIONS
+========================================
 • Venue: DotSlash Laser Tag Arena, FLAME University Campus.
-• Arrival: Please report at least 10 minutes prior to your slot time (${slotWindow}) for sensor calibration, vest fitting, and tactical briefing.
-• Format: 4v4 continuous 20-minute skirmish.
-• Live Status Receipt: You can check or verify your booking anytime at ${window.location.origin}/laser-tag using your Registration ID: ${regId}.
+• Arrival Time: Please ensure ALL squad members arrive AT LEAST 10 minutes prior to ${slotWindow} for sensor calibration, vest fitting, and tactical briefing.
+• Equipment: Combat vests and laser rifles are provided on site.
+• Live Status & Verification: You can view or verify your live booking receipt anytime at:
+  ${window.location.origin}/laser-tag (Search Registration ID: ${regId})
 
 If you have any questions or require squad adjustments, simply reply directly to this email.
 
@@ -118,6 +153,9 @@ Thank you for registering for the DotSlash × Glitch Laser Tag Arena (October 22
 Unfortunately, our verification team was unable to approve your booking for Registration ID: ${regId} (${slotWindow}, ${team}).
 ${noteText}
 As a result, your provisionally held spots have been released.
+
+Match Timing Reminder:
+Each slot consists strictly of 10 min playing time, 5 min setup, and 5 min scoring wrap-up.
 
 Next Steps:
 1. If you would like to re-register with a clear payment screenshot or pick a different slot, please visit:
@@ -838,15 +876,29 @@ export default function LaserTagAdminSection() {
                   </button>
                 </div>
 
-                <a
-                  href={`mailto:${encodeURIComponent(emailModal.recipient)}?subject=${encodeURIComponent(
-                    emailModal.subject
-                  )}&body=${encodeURIComponent(emailModal.body)}`}
-                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold uppercase tracking-wider transition-colors flex items-center gap-1.5"
-                >
-                  <Send size={13} />
-                  <span>Open in Mail App</span>
-                </a>
+                <div className="flex items-center gap-2">
+                  <a
+                    href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(
+                      emailModal.recipient
+                    )}&su=${encodeURIComponent(emailModal.subject)}&body=${encodeURIComponent(emailModal.body)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 bg-[#EA4335] hover:bg-[#d93025] text-white text-xs font-bold uppercase tracking-wider transition-colors flex items-center gap-1.5 shadow-md"
+                  >
+                    <Mail size={13} />
+                    <span>Open in Gmail Web</span>
+                  </a>
+
+                  <a
+                    href={`mailto:${encodeURIComponent(emailModal.recipient)}?subject=${encodeURIComponent(
+                      emailModal.subject
+                    )}&body=${encodeURIComponent(emailModal.body)}`}
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold uppercase tracking-wider transition-colors flex items-center gap-1.5"
+                  >
+                    <Send size={13} />
+                    <span>Open in Mail App</span>
+                  </a>
+                </div>
               </div>
             </div>
           </div>
