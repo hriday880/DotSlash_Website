@@ -472,7 +472,7 @@ export default function LaserTag() {
           </div>
 
           {/* Quick Stat Bar (Bento Metrics) */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mt-10 pt-10 border-t border-white/15">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mt-10 pt-10 border-t border-white/15">
             <div className="p-4 bg-white/[0.04] backdrop-blur-xl border border-white/15 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]">
               <span className="text-[10px] font-mono uppercase text-white/60 block">Combat Format</span>
               <span className="text-white font-mono font-bold text-base flex items-center gap-2 mt-1">
@@ -492,12 +492,6 @@ export default function LaserTag() {
               <span className="text-[10px] font-mono uppercase text-white/60 block">Entry Fee</span>
               <span className="text-white font-mono font-bold text-base flex items-center gap-2 mt-1">
                 <Zap size={15} className="text-[#FFB800]" /> ₹100 / Person
-              </span>
-            </div>
-            <div className="p-4 bg-white/[0.04] backdrop-blur-xl border border-white/15 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]">
-              <span className="text-[10px] font-mono uppercase text-white/60 block">Rotating Accounts</span>
-              <span className="text-white font-mono font-bold text-base flex items-center gap-2 mt-1">
-                <Sparkles size={15} className="text-[#FF2A55]" /> 3 UPI Nodes
               </span>
             </div>
           </div>
