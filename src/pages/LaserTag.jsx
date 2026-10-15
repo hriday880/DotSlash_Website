@@ -23,7 +23,6 @@ import {
   ArrowRight,
   Zap,
   HelpCircle,
-  QrCode,
   Volume2,
   VolumeX,
   Play,
@@ -64,6 +63,7 @@ export default function LaserTag() {
     }
     return true;
   });
+  const [replayKey, setReplayKey] = useState(0);
 
   const handleIntroComplete = () => {
     setIsPlayingIntro(false);
@@ -75,6 +75,7 @@ export default function LaserTag() {
   };
 
   const handleReplayIntro = () => {
+    setReplayKey((k) => k + 1);
     setIsPlayingIntro(true);
   };
 
@@ -370,17 +371,18 @@ export default function LaserTag() {
       {/* 1. CINEMATIC VIDEO INTRO MODAL (ISOLATED ZERO-RERENDER)        */}
       {/* ============================================================== */}
       <LaserTagIntroModal
+        key={replayKey}
         isOpen={isPlayingIntro}
         onClose={handleIntroComplete}
       />
 
       {/* ============================================================== */}
-      {/* 2. SEAMLESS BACKGROUND (LAST FRAME: frame_010.png)             */}
+      {/* 2. SEAMLESS BACKGROUND (LAST FRAME: frame_010)                 */}
       {/* ============================================================== */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none">
-        {/* Exact same base image matching the video's last frame */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none transform-gpu will-change-transform">
+        {/* Fast 155KB optimized base image matching the video's last frame */}
         <img
-          src="/laser_intro/bg_last_frame.png"
+          src="/laser_intro/bg_last_frame.jpg"
           alt="Arena Background"
           className="w-full h-full object-cover object-center pointer-events-none"
         />
@@ -404,7 +406,7 @@ export default function LaserTag() {
       {/* 3. HERO SECTION (ELITE UI GLASSMORPHISM)                       */}
       {/* ============================================================== */}
       <section className="relative z-10 pt-36 pb-20 px-6 sm:px-8 lg:px-12 max-w-7xl mx-auto">
-        <div className="border border-white/20 bg-black/45 backdrop-blur-2xl p-8 sm:p-12 md:p-14 relative overflow-hidden shadow-[inset_0_1px_0_0_rgba(255,255,255,0.18),0_20px_50px_rgba(0,0,0,0.7)]">
+        <div className="border border-white/20 bg-black/45 backdrop-blur-md p-8 sm:p-12 md:p-14 relative overflow-hidden shadow-[inset_0_1px_0_0_rgba(255,255,255,0.18),0_20px_50px_rgba(0,0,0,0.7)]">
           {/* Solid neon accent line on top - NO GRADIENT */}
           <div className="absolute top-0 left-0 right-0 h-[2px] bg-[#00D4FF] shadow-[0_0_12px_#00D4FF]" />
 
@@ -437,7 +439,7 @@ export default function LaserTag() {
 
             {/* Event Time Pill, Cinematic Replay, and Status Check */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-              <div className="px-5 py-4 bg-black/50 border border-white/20 backdrop-blur-2xl text-center font-mono shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)]">
+              <div className="px-5 py-4 bg-black/50 border border-white/20 backdrop-blur-md text-center font-mono shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)]">
                 <span className="block text-[10px] text-white/60 uppercase tracking-wider">Combat Window</span>
                 <span className="text-[#00D4FF] font-bold text-sm">October 22, 2026</span>
                 <span className="block text-[11px] text-white font-semibold mt-0.5">8:00 PM – 1:00 AM (15 Slots)</span>
@@ -502,12 +504,12 @@ export default function LaserTag() {
       {/* 4. MODE SWITCHER: GROUP SQUAD (3-4) VS SOLO POOL               */}
       {/* ============================================================== */}
       <section className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 mb-14">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3 bg-black/45 backdrop-blur-2xl border border-white/20 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.18),0_12px_32px_rgba(0,0,0,0.6)]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3 bg-black/45 backdrop-blur-md border border-white/20 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.18),0_12px_32px_rgba(0,0,0,0.6)]">
           <button
             onClick={() => setRegistrationMode('GROUP')}
             className={`py-5 px-6 font-mono text-xs uppercase tracking-wider flex items-center justify-center gap-4 transition-all border ${
               registrationMode === 'GROUP'
-                ? 'bg-black/60 border-2 border-[#00D4FF] text-white shadow-[inset_0_1px_0_0_rgba(0,212,255,0.3),0_0_25px_rgba(0,212,255,0.25)] backdrop-blur-2xl'
+                ? 'bg-black/60 border-2 border-[#00D4FF] text-white shadow-[inset_0_1px_0_0_rgba(0,212,255,0.3),0_0_25px_rgba(0,212,255,0.25)] backdrop-blur-md'
                 : 'border-transparent text-white/60 hover:text-white hover:bg-white/[0.04]'
             }`}
           >
@@ -522,7 +524,7 @@ export default function LaserTag() {
             onClick={() => setRegistrationMode('SOLO')}
             className={`py-5 px-6 font-mono text-xs uppercase tracking-wider flex items-center justify-center gap-4 transition-all border ${
               registrationMode === 'SOLO'
-                ? 'bg-black/60 border-2 border-[#FFB800] text-white shadow-[inset_0_1px_0_0_rgba(255,184,0,0.3),0_0_25px_rgba(255,184,0,0.25)] backdrop-blur-2xl'
+                ? 'bg-black/60 border-2 border-[#FFB800] text-white shadow-[inset_0_1px_0_0_rgba(255,184,0,0.3),0_0_25px_rgba(255,184,0,0.25)] backdrop-blur-md'
                 : 'border-transparent text-white/60 hover:text-white hover:bg-white/[0.04]'
             }`}
           >
@@ -535,7 +537,7 @@ export default function LaserTag() {
         </div>
 
         {/* Informational Rule Pill with Timing & Email Notice */}
-        <div className="mt-4 p-4 bg-black/45 border border-white/15 backdrop-blur-2xl font-mono text-xs text-white/70 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]">
+        <div className="mt-4 p-4 bg-black/45 border border-white/15 backdrop-blur-md font-mono text-xs text-white/70 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]">
           <div className="flex items-start md:items-center gap-3">
             <HelpCircle size={15} className="text-[#00D4FF] shrink-0 mt-0.5 md:mt-0" />
             <span className="leading-relaxed">
@@ -563,7 +565,7 @@ export default function LaserTag() {
             exit={{ opacity: 0, y: -20 }}
             className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 mb-16 relative z-20"
           >
-            <div className="p-8 sm:p-10 bg-emerald-950/40 backdrop-blur-3xl border-2 border-emerald-400/80 shadow-[inset_0_1px_0_0_rgba(52,211,153,0.3),0_20px_50px_rgba(0,0,0,0.8),0_0_35px_rgba(16,185,129,0.2)] relative">
+            <div className="p-8 sm:p-10 bg-emerald-950/40 backdrop-blur-lg border-2 border-emerald-400/80 shadow-[inset_0_1px_0_0_rgba(52,211,153,0.3),0_20px_50px_rgba(0,0,0,0.8),0_0_35px_rgba(16,185,129,0.2)] relative">
               <button
                 onClick={() => setCompletedBooking(null)}
                 className="absolute top-5 right-5 text-emerald-400 hover:text-white p-2 transition-colors cursor-pointer"
@@ -669,7 +671,7 @@ export default function LaserTag() {
                     className={`px-5 py-3 font-mono text-xs uppercase tracking-wider whitespace-nowrap border transition-all duration-200 flex items-center gap-2.5 cursor-pointer ${
                       selectedHour === tab.id
                         ? 'bg-[#00D4FF] border-2 border-[#00D4FF] text-black font-extrabold shadow-[0_0_20px_rgba(0,212,255,0.45)]'
-                        : 'bg-black/45 border border-white/20 text-white/70 hover:text-white hover:border-white/40 backdrop-blur-2xl shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]'
+                        : 'bg-black/45 border border-white/20 text-white/70 hover:text-white hover:border-white/40 backdrop-blur-md shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]'
                     }`}
                   >
                     <span>{tab.label}</span>
@@ -686,14 +688,14 @@ export default function LaserTag() {
 
               {/* Live Indicator */}
               <div className="flex items-center justify-end gap-3 font-mono text-xs text-white/70">
-                <span className="flex items-center gap-2 bg-black/45 px-4 py-2.5 border border-white/20 backdrop-blur-2xl shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]">
+                <span className="flex items-center gap-2 bg-black/45 px-4 py-2.5 border border-white/20 backdrop-blur-md shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                   <span className="text-white/80 font-medium">Live Capacity Sync</span>
                 </span>
                 <button
                   onClick={() => fetchSlots(true)}
                   disabled={refreshing}
-                  className="p-2.5 bg-black/45 border border-white/20 hover:border-[#00D4FF] text-white/70 hover:text-white transition-colors backdrop-blur-2xl shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)] cursor-pointer"
+                  className="p-2.5 bg-black/45 border border-white/20 hover:border-[#00D4FF] text-white/70 hover:text-white transition-colors backdrop-blur-md shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)] cursor-pointer"
                   title="Refresh availability"
                 >
                   <RefreshCw size={15} className={refreshing ? 'animate-spin text-[#00D4FF]' : ''} />
@@ -705,7 +707,7 @@ export default function LaserTag() {
             {loading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="h-72 bg-black/40 border border-white/15 animate-pulse backdrop-blur-2xl" />
+                  <div key={i} className="h-72 bg-black/40 border border-white/15 animate-pulse backdrop-blur-md" />
                 ))}
               </div>
             ) : (
@@ -713,16 +715,14 @@ export default function LaserTag() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {filteredSlots.map((slot) => {
                   const isSlotSelected = selectedSlot?.slot_id === slot.slot_id;
-                  const slotNum = Number(slot.slot_number) || 1;
-                  const merchant = getUpiConfigForSlot(slotNum);
 
                   return (
                     <div
                       key={slot.slot_id}
-                      className={`bg-black/45 backdrop-blur-2xl border transition-all duration-300 flex flex-col justify-between ${
+                      className={`bg-black/60 backdrop-blur-md transform-gpu border transition-all duration-200 flex flex-col justify-between ${
                         isSlotSelected
                           ? 'border-2 border-[#00D4FF] shadow-[inset_0_1px_0_0_rgba(0,212,255,0.3),0_16px_40px_rgba(0,0,0,0.7),0_0_30px_rgba(0,212,255,0.25)]'
-                          : 'border-white/20 hover:border-white/40 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15),0_12px_32px_rgba(0,0,0,0.6)]'
+                          : 'border-white/20 hover:border-white/40 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12),0_12px_32px_rgba(0,0,0,0.6)]'
                       }`}
                     >
                       {/* Slot Header */}
@@ -744,14 +744,6 @@ export default function LaserTag() {
                         <div className="mt-2 text-[10px] font-mono text-emerald-400 flex items-center gap-1.5 bg-black/40 px-2.5 py-1 border border-white/10 backdrop-blur-md">
                           <Clock size={11} className="shrink-0" />
                           <span>10m play • 5m setup • 5m wrap-up</span>
-                        </div>
-
-                        {/* Designated UPI Account Tag */}
-                        <div className="mt-3 text-[11px] font-mono text-white/70 flex items-center gap-2 bg-black/50 px-3 py-1.5 border border-white/15 backdrop-blur-md">
-                          <QrCode size={13} className="text-[#FFB800] shrink-0" />
-                          <span className="truncate">
-                            UPI Recipient: <strong className="text-white">{merchant.name}</strong>
-                          </span>
                         </div>
                       </div>
 
@@ -793,10 +785,10 @@ export default function LaserTag() {
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 20 }}
-                  className="mt-20 border-2 border-[#00D4FF] bg-black/50 backdrop-blur-3xl shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_25px_60px_rgba(0,0,0,0.85),0_0_35px_rgba(0,212,255,0.2)] relative overflow-hidden"
+                  className="mt-20 border-2 border-[#00D4FF] bg-black/50 backdrop-blur-lg shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_25px_60px_rgba(0,0,0,0.85),0_0_35px_rgba(0,212,255,0.2)] relative overflow-hidden"
                 >
                   {/* Header Bar */}
-                  <div className="bg-black/60 px-8 py-6 border-b border-white/15 backdrop-blur-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="bg-black/60 px-8 py-6 border-b border-white/15 backdrop-blur-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                       <div className="flex items-center gap-2 text-xs font-mono text-[#00D4FF] uppercase tracking-wider font-semibold">
                         <Crosshair size={15} />
@@ -881,7 +873,7 @@ export default function LaserTag() {
                         {players.map((p, idx) => (
                           <div
                             key={idx}
-                            className={`p-6 border backdrop-blur-2xl transition-all ${
+                            className={`p-6 border backdrop-blur-md transition-all ${
                               idx === 0
                                 ? 'border-[#00D4FF]/70 bg-black/55 shadow-[inset_0_1px_0_0_rgba(0,212,255,0.2),0_0_25px_rgba(0,212,255,0.15)]'
                                 : 'border-white/20 bg-black/45 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]'
@@ -937,19 +929,19 @@ export default function LaserTag() {
                     </div>
 
                     {/* 3. Slot-Specific Rotating UPI QR & Payment Screenshot Upload */}
-                    <div className="p-8 sm:p-10 border border-white/20 bg-black/45 backdrop-blur-2xl shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15)]">
+                    <div className="p-8 sm:p-10 border border-white/20 bg-black/45 backdrop-blur-md shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15)]">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-8">
                         <h3 className="text-xs font-mono uppercase tracking-wider text-white/80 flex items-center gap-2 font-semibold">
                           <span>3. UPI Settlement & Verification Screenshot</span>
                         </h3>
                         <span className="text-[11px] font-mono text-[#FFB800] bg-black/60 px-3 py-1 border border-amber-500/40 backdrop-blur-md font-bold">
-                          {selectedSlotMerchant.slotRange} Assigned to {selectedSlotMerchant.name}
+                          Official Arena Gateway • {selectedSlotMerchant.slotRange}
                         </span>
                       </div>
 
                       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
                         {/* Left: Dynamic QR Code Card */}
-                        <div className="lg:col-span-5 bg-black/60 border border-white/20 p-8 text-center flex flex-col items-center backdrop-blur-2xl shadow-2xl">
+                        <div className="lg:col-span-5 bg-black/60 border border-white/20 p-8 text-center flex flex-col items-center backdrop-blur-md shadow-2xl">
                           <div className="text-xs font-mono uppercase text-white/70 mb-1">
                             Payable Amount ({playerCount} Players)
                           </div>
@@ -966,11 +958,10 @@ export default function LaserTag() {
                             />
                           </div>
 
-                          {/* Merchant Account Details */}
+                          {/* Designated UPI Account Details */}
                           <div className="w-full bg-black/50 border border-white/15 p-3.5 mb-4 text-left font-mono text-xs backdrop-blur-md">
-                            <span className="text-[10px] text-white/60 uppercase block font-semibold">Designated Merchant Node</span>
-                            <span className="text-white font-bold block mt-0.5">{selectedSlotMerchant.name}</span>
-                            <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/10">
+                            <span className="text-[10px] text-white/60 uppercase block font-semibold">Designated UPI ID</span>
+                            <div className="flex items-center justify-between mt-1.5 pt-1">
                               <span className="text-[#00D4FF] text-xs font-semibold truncate pr-2">
                                 {selectedSlotMerchant.upiId}
                               </span>
@@ -1010,7 +1001,7 @@ export default function LaserTag() {
                             </p>
 
                             {!screenshotPreview ? (
-                              <label className="border-2 border-dashed border-white/20 hover:border-[#00D4FF] bg-black/40 backdrop-blur-2xl p-10 flex flex-col items-center justify-center cursor-pointer transition-colors group">
+                              <label className="border-2 border-dashed border-white/20 hover:border-[#00D4FF] bg-black/40 backdrop-blur-md p-10 flex flex-col items-center justify-center cursor-pointer transition-colors group">
                                 <UploadCloud
                                   size={40}
                                   className="text-white/50 group-hover:text-[#00D4FF] transition-colors mb-3"
@@ -1029,7 +1020,7 @@ export default function LaserTag() {
                                 />
                               </label>
                             ) : (
-                              <div className="relative border border-white/20 bg-black/60 backdrop-blur-2xl p-4 flex items-center gap-5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]">
+                              <div className="relative border border-white/20 bg-black/60 backdrop-blur-md p-4 flex items-center gap-5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]">
                                 <img
                                   src={screenshotPreview}
                                   alt="Payment Proof Preview"
@@ -1132,7 +1123,7 @@ export default function LaserTag() {
         {/* MODE 2: SOLO MATCHMAKING POOL */}
         {registrationMode === 'SOLO' && (
           <div ref={soloFormRef} className="max-w-4xl mx-auto my-12">
-            <div className="border border-white/20 bg-black/50 backdrop-blur-3xl p-8 sm:p-12 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_25px_60px_rgba(0,0,0,0.85)] relative overflow-hidden">
+            <div className="border border-white/20 bg-black/50 backdrop-blur-lg p-8 sm:p-12 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_25px_60px_rgba(0,0,0,0.85)] relative overflow-hidden">
               {/* Solid amber neon accent line - ZERO GRADIENTS */}
               <div className="absolute top-0 left-0 right-0 h-[2px] bg-[#FFB800] shadow-[0_0_12px_#FFB800]" />
 
@@ -1149,7 +1140,7 @@ export default function LaserTag() {
               </p>
 
               {/* Explicit Timing Schedule Card & Registered Email Receipt Notice */}
-              <div className="mt-6 p-4 sm:p-5 bg-black/60 border border-white/20 backdrop-blur-2xl space-y-3">
+              <div className="mt-6 p-4 sm:p-5 bg-black/60 border border-white/20 backdrop-blur-md space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
                     <Clock size={14} /> Match Schedule Breakdown (20 Min Total)
@@ -1250,7 +1241,7 @@ export default function LaserTag() {
                 </div>
 
                 {/* Settlement Card for Solo (Hriday Goyal QR) */}
-                <div className="p-8 sm:p-10 bg-black/45 border border-white/20 backdrop-blur-2xl shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)]">
+                <div className="p-8 sm:p-10 bg-black/45 border border-white/20 backdrop-blur-md shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)]">
                   <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
                     <div className="md:col-span-5 flex flex-col items-center text-center">
                       <div className="text-xs font-mono uppercase text-white/70 mb-1">
@@ -1298,7 +1289,7 @@ export default function LaserTag() {
                         </label>
 
                         {!soloScreenshotPreview ? (
-                          <label className="border-2 border-dashed border-white/20 hover:border-[#00D4FF] bg-black/40 backdrop-blur-2xl p-8 flex flex-col items-center justify-center cursor-pointer transition-colors group">
+                          <label className="border-2 border-dashed border-white/20 hover:border-[#00D4FF] bg-black/40 backdrop-blur-md p-8 flex flex-col items-center justify-center cursor-pointer transition-colors group">
                             <UploadCloud
                               size={36}
                               className="text-white/50 group-hover:text-[#00D4FF] transition-colors mb-2.5"
@@ -1317,7 +1308,7 @@ export default function LaserTag() {
                             />
                           </label>
                         ) : (
-                          <div className="relative border border-white/20 bg-black/60 backdrop-blur-2xl p-4 flex items-center gap-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]">
+                          <div className="relative border border-white/20 bg-black/60 backdrop-blur-md p-4 flex items-center gap-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]">
                             <img
                               src={soloScreenshotPreview}
                               alt="Payment Proof"
@@ -1415,15 +1406,15 @@ export default function LaserTag() {
       {/* ============================================================== */}
       <AnimatePresence>
         {showLookupModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-2xl">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-2xl bg-black/60 backdrop-blur-3xl border border-white/20 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_30px_70px_rgba(0,0,0,0.9)] overflow-hidden"
+              className="w-full max-w-2xl bg-black/60 backdrop-blur-lg border border-white/20 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_30px_70px_rgba(0,0,0,0.9)] overflow-hidden"
             >
               {/* Modal Header */}
-              <div className="px-8 py-5 bg-black/70 border-b border-white/15 backdrop-blur-2xl flex items-center justify-between">
+              <div className="px-8 py-5 bg-black/70 border-b border-white/15 backdrop-blur-md flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <Search size={18} className="text-[#00D4FF]" />
                   <span className="font-mono text-xs font-bold uppercase tracking-wider text-white">
@@ -1469,7 +1460,7 @@ export default function LaserTag() {
                     {lookupResults.map((booking) => (
                       <div
                         key={booking.registration_id}
-                        className="p-6 border border-white/15 bg-black/50 backdrop-blur-2xl space-y-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]"
+                        className="p-6 border border-white/15 bg-black/50 backdrop-blur-md space-y-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]"
                       >
                         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/15 pb-4">
                           <div className="flex items-center gap-2.5">
@@ -1565,10 +1556,10 @@ function TeamSideSelector({ team, teamName, isSelected, onSelect }) {
 
   return (
     <div
-      className={`p-4 border transition-all backdrop-blur-xl ${
+      className={`p-4 border transition-all ${
         isSelected
-          ? 'border-2 border-[#00D4FF] bg-[#00D4FF]/15 shadow-[inset_0_1px_0_0_rgba(0,212,255,0.3),0_0_20px_rgba(0,212,255,0.25)]'
-          : 'border-white/15 bg-black/45 hover:border-white/35 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]'
+          ? 'border-2 border-[#00D4FF] bg-[#00D4FF]/20 shadow-[inset_0_1px_0_0_rgba(0,212,255,0.3),0_0_20px_rgba(0,212,255,0.25)]'
+          : 'border-white/15 bg-white/[0.03] hover:border-white/35 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]'
       }`}
     >
       <div className="flex items-center justify-between mb-2.5">
