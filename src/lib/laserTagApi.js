@@ -1,6 +1,9 @@
 import {
   getLaserTagSlots as serviceGetSlots,
+  registerLaserTagGroup as serviceRegisterGroup,
   registerLaserTagSlot as serviceRegister,
+  registerLaserTagSolo as serviceRegisterSolo,
+  assignSoloPlayerToSlot as serviceAssignSolo,
   getLaserTagRegistrations as serviceGetRegistrations,
   updateLaserTagRegistrationAdmin as serviceUpdateAdmin,
   lookupLaserTagRegistration as serviceLookup,
@@ -21,7 +24,7 @@ async function parseJsonResponse(res) {
 export const laserTagApi = {
   /**
    * GET /api/laser-tag/slots
-   * Returns all 36 slots with live computed capacities and statuses.
+   * Returns all 15 slots with live computed capacities and statuses.
    */
   async getSlots() {
     try {
@@ -81,6 +84,76 @@ export const laserTagApi = {
       ...payload,
       screenshotUrl,
     });
+  },
+
+  /**
+   * POST /api/laser-tag/register-solo
+   * Registers a solo player for ₹100 into the matchmaking pool.
+   */
+  async registerSoloSlot(payload) {
+    let screenshotUrl = payload.screenshotUrl;
+
+    if (!screenshotUrl && payload.screenshotFile) {
+      screenshotUrl = await uploadPaymentScreenshot(payload.screenshotFile);
+    }
+
+    const body = {
+      name: payload.name,
+      email: payload.email,
+      phone: payload.phone,
+      preferredSlotId: payload.preferredSlotId,
+      utrReference: payload.utrReference,
+      screenshotUrl,
+    };
+
+    try {
+      const res = await fetch('/api/laser-tag/register-solo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      const data = await parseJsonResponse(res);
+      if (data) {
+        if (!res.ok) {
+          throw new Error(data.error || 'Solo registration failed');
+        }
+        return data.registration;
+      }
+    } catch (err) {
+      if (err.message && !err.message.includes('fetch')) {
+        throw err;
+      }
+    }
+
+    return await serviceRegisterSolo({
+      ...payload,
+      screenshotUrl,
+    });
+  },
+
+  /**
+   * PATCH /api/laser-tag/admin/assign-solo
+   * Admin moves a solo player from the pool to a specific slot and team.
+   */
+  async assignSoloSlot(registrationId, { targetSlotId, targetTeam }) {
+    try {
+      const res = await fetch('/api/laser-tag/admin/assign-solo', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ registrationId, targetSlotId, targetTeam }),
+      });
+
+      const data = await parseJsonResponse(res);
+      if (data) {
+        if (!res.ok) throw new Error(data.error || 'Slot assignment failed');
+        return data.registration;
+      }
+    } catch (err) {
+      if (err.message && !err.message.includes('fetch')) throw err;
+    }
+
+    return await serviceAssignSolo(registrationId, { targetSlotId, targetTeam });
   },
 
   /**

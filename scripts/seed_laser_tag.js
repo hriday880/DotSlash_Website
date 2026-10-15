@@ -54,43 +54,74 @@ async function execute(sql, args = []) {
   return result.response.result;
 }
 
+export const UPI_CONFIG = {
+  HRIDAY: {
+    name: 'Hriday Goyal',
+    upiId: 'hridaygoyal2000@oksbi',
+    slotRange: 'Slots 1–5 (8:00 PM – 9:40 PM)',
+  },
+  SRISHTI: {
+    name: 'Srishti Sarkar',
+    upiId: 'srishti.sarkar007@okhdfcbank',
+    slotRange: 'Slots 6–10 (9:40 PM – 11:20 PM)',
+  },
+  TANVEE: {
+    name: 'Tanvee Goenka',
+    upiId: 'goenka.tanvee@okaxis',
+    slotRange: 'Slots 11–15 (11:20 PM – 1:00 AM)',
+  },
+  SOLO: {
+    name: 'Hriday Goyal',
+    upiId: 'hridaygoyal2000@oksbi',
+    slotRange: 'Solo Matchmaking Pool',
+  },
+};
+
+export const SLOT_SCHEDULE = [
+  // 1-5: Hriday
+  { num: 1, start: '20:00', end: '20:20', ...UPI_CONFIG.HRIDAY },
+  { num: 2, start: '20:20', end: '20:40', ...UPI_CONFIG.HRIDAY },
+  { num: 3, start: '20:40', end: '21:00', ...UPI_CONFIG.HRIDAY },
+  { num: 4, start: '21:00', end: '21:20', ...UPI_CONFIG.HRIDAY },
+  { num: 5, start: '21:20', end: '21:40', ...UPI_CONFIG.HRIDAY },
+
+  // 6-10: Srishti
+  { num: 6, start: '21:40', end: '22:00', ...UPI_CONFIG.SRISHTI },
+  { num: 7, start: '22:00', end: '22:20', ...UPI_CONFIG.SRISHTI },
+  { num: 8, start: '22:20', end: '22:40', ...UPI_CONFIG.SRISHTI },
+  { num: 9, start: '22:40', end: '23:00', ...UPI_CONFIG.SRISHTI },
+  { num: 10, start: '23:00', end: '23:20', ...UPI_CONFIG.SRISHTI },
+
+  // 11-15: Tanvee
+  { num: 11, start: '23:20', end: '23:40', ...UPI_CONFIG.TANVEE },
+  { num: 12, start: '23:40', end: '00:00', ...UPI_CONFIG.TANVEE },
+  { num: 13, start: '00:00', end: '00:20', ...UPI_CONFIG.TANVEE },
+  { num: 14, start: '00:20', end: '00:40', ...UPI_CONFIG.TANVEE },
+  { num: 15, start: '00:40', end: '01:00', ...UPI_CONFIG.TANVEE },
+];
+
 export function generateSlots() {
-  const slots = [];
-  let currentHour = 18;
-  let currentMin = 0;
-
-  for (let i = 0; i < 36; i++) {
-    const startH = String(currentHour).padStart(2, '0');
-    const startM = String(currentMin).padStart(2, '0');
-    const startTime = `${startH}:${startM}`;
-
-    let nextMin = currentMin + 10;
-    let nextHour = currentHour;
-    if (nextMin === 60) {
-      nextMin = 0;
-      nextHour = (nextHour + 1) % 24;
-    }
-    const endH = String(nextHour).padStart(2, '0');
-    const endM = String(nextMin).padStart(2, '0');
-    const endTime = `${endH}:${endM}`;
-
-    const slotId = `2026-10-22|${startTime}`;
-    slots.push({ slot_id: slotId, start_time: startTime, end_time: endTime });
-
-    currentHour = nextHour;
-    currentMin = nextMin;
-  }
-  return slots;
+  return SLOT_SCHEDULE.map(s => ({
+    slot_id: `2026-10-22|${s.start}`,
+    start_time: s.start,
+    end_time: s.end,
+    slot_number: s.num,
+    merchant_name: s.name,
+    merchant_upi: s.upiId,
+  }));
 }
 
 async function main() {
-  console.log('--- Seeding Laser Tag Slots ---');
-  // Ensure tables exist
+  console.log('--- Seeding Laser Tag 15 Continuous Slots (8 PM - 1 AM) with Rotating UPI Accounts ---');
+
   await execute(`
     CREATE TABLE IF NOT EXISTS laser_tag_slots (
       slot_id TEXT PRIMARY KEY,
       start_time TEXT NOT NULL,
       end_time TEXT NOT NULL,
+      slot_number INTEGER NOT NULL,
+      merchant_name TEXT NOT NULL,
+      merchant_upi TEXT NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
@@ -99,7 +130,7 @@ async function main() {
     CREATE TABLE IF NOT EXISTS laser_tag_registrations (
       registration_id TEXT PRIMARY KEY,
       slot_id TEXT NOT NULL REFERENCES laser_tag_slots(slot_id),
-      team TEXT NOT NULL CHECK (team IN ('Team A', 'Team B')),
+      team TEXT NOT NULL CHECK (team IN ('Team A', 'Team B', 'Solo Pool')),
       captain_name TEXT NOT NULL,
       captain_email TEXT NOT NULL,
       captain_phone TEXT NOT NULL,
@@ -112,7 +143,9 @@ async function main() {
       booking_status TEXT NOT NULL DEFAULT 'PENDING_APPROVAL' CHECK (booking_status IN ('PENDING_APPROVAL', 'CONFIRMED', 'REJECTED')),
       admin_note TEXT,
       reviewed_at DATETIME,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      registration_type TEXT DEFAULT 'GROUP' CHECK (registration_type IN ('GROUP', 'SOLO')),
+      preferred_slot_id TEXT
     )
   `);
 
@@ -127,15 +160,25 @@ async function main() {
     )
   `);
 
+  await execute(`CREATE INDEX IF NOT EXISTS idx_laser_tag_reg_slot_team ON laser_tag_registrations(slot_id, team, booking_status)`);
+  await execute(`CREATE INDEX IF NOT EXISTS idx_laser_tag_reg_type ON laser_tag_registrations(registration_type, booking_status)`);
+  await execute(`CREATE INDEX IF NOT EXISTS idx_laser_tag_players_reg ON laser_tag_players(registration_id)`);
+
   const slots = generateSlots();
   for (const s of slots) {
     await execute(
-      'INSERT OR IGNORE INTO laser_tag_slots (slot_id, start_time, end_time) VALUES (?, ?, ?)',
-      [s.slot_id, s.start_time, s.end_time]
+      'INSERT OR REPLACE INTO laser_tag_slots (slot_id, start_time, end_time, slot_number, merchant_name, merchant_upi) VALUES (?, ?, ?, ?, ?, ?)',
+      [s.slot_id, s.start_time, s.end_time, s.slot_number, s.merchant_name, s.merchant_upi]
     );
   }
 
-  const countRes = await execute('SELECT COUNT(*) as count FROM laser_tag_slots');
+  // Insert solo placeholder slot
+  await execute(
+    'INSERT OR REPLACE INTO laser_tag_slots (slot_id, start_time, end_time, slot_number, merchant_name, merchant_upi) VALUES (?, ?, ?, ?, ?, ?)',
+    ['2026-10-22|SOLO_POOL', '20:00', '01:00', 0, 'Hriday Goyal', 'hridaygoyal2000@oksbi']
+  );
+
+  const countRes = await execute('SELECT COUNT(*) as count FROM laser_tag_slots WHERE slot_number > 0');
   console.log(`Success! Total slots in laser_tag_slots: ${countRes.rows[0][0].value}`);
 }
 
