@@ -385,10 +385,8 @@ export default function LaserTag() {
           className="w-full h-full object-cover object-center pointer-events-none"
         />
 
-        {/* Tactical Dark Vignette & Frosted Glass Layer */}
-        <div className="absolute inset-0 bg-[#06070a]/65 backdrop-blur-[1.5px]" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#050608] via-transparent to-[#050608]/85" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#050608]/80 via-transparent to-[#050608]/80" />
+        {/* Clean solid dark overlay without any gradients, allowing arena lighting to frost through glass cards */}
+        <div className="absolute inset-0 bg-[#050608]/45" />
 
         {/* 4 Multi-Laser Ambient Glows (Red, Cyan, Green, Amber matching frame_010) */}
         <div className="absolute top-1/4 -left-20 w-80 h-80 bg-[#FF2A55]/15 rounded-full blur-[130px] pointer-events-none" />
@@ -405,51 +403,51 @@ export default function LaserTag() {
       {/* ============================================================== */}
       {/* 3. HERO SECTION (ELITE UI GLASSMORPHISM)                       */}
       {/* ============================================================== */}
-      <section className="relative z-10 pt-32 pb-14 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto">
-        <div className="border border-white/10 bg-[#0a0c14]/75 backdrop-blur-xl p-8 md:p-12 relative overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.8)]">
-          {/* Neon laser line on top with 4 laser spectrum */}
-          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#FF2A55] via-[#00E5FF] via-[#00FF66] to-[#FFB800]" />
+      <section className="relative z-10 pt-36 pb-20 px-6 sm:px-8 lg:px-12 max-w-7xl mx-auto">
+        <div className="border border-white/20 bg-black/45 backdrop-blur-2xl p-8 sm:p-12 md:p-14 relative overflow-hidden shadow-[inset_0_1px_0_0_rgba(255,255,255,0.18),0_20px_50px_rgba(0,0,0,0.7)]">
+          {/* Solid neon accent line on top - NO GRADIENT */}
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-[#00D4FF] shadow-[0_0_12px_#00D4FF]" />
 
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div>
               {/* Brand Tag with 4 Laser Dots */}
-              <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 mb-4 bg-white/5 border border-white/15 backdrop-blur-md text-xs font-mono uppercase tracking-widest shadow-inner">
-                <span className="flex items-center gap-1">
+              <div className="inline-flex items-center gap-2.5 px-4 py-2 mb-6 bg-black/40 border border-white/20 backdrop-blur-xl text-xs font-mono uppercase tracking-widest shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]">
+                <span className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-[#FF2A55] shadow-[0_0_8px_#FF2A55]" />
-                  <span className="w-2 h-2 rounded-full bg-[#00E5FF] shadow-[0_0_8px_#00E5FF]" />
+                  <span className="w-2 h-2 rounded-full bg-[#00D4FF] shadow-[0_0_8px_#00D4FF]" />
                   <span className="w-2 h-2 rounded-full bg-[#00FF66] shadow-[0_0_8px_#00FF66]" />
                   <span className="w-2 h-2 rounded-full bg-[#FFB800] shadow-[0_0_8px_#FFB800]" />
                 </span>
                 <span className="font-bold text-white tracking-widest">DOTSLASH × GLITCH</span>
-                <span className="text-[#71717A]">•</span>
-                <span className="text-[#00E5FF]">4v4 ARENA</span>
+                <span className="text-white/40">•</span>
+                <span className="text-[#00D4FF]">4v4 ARENA</span>
               </div>
 
               <h1 className="text-4xl sm:text-6xl font-extrabold uppercase tracking-tight text-white font-headline-display">
-                LASER TAG <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00E5FF] to-[#3300FF]">4v4</span> ARENA
+                LASER TAG <span className="text-[#00D4FF]">4v4</span> ARENA
               </h1>
-              <p className="mt-3 text-[#A0A0A0] max-w-2xl font-mono text-sm leading-relaxed">
+              <p className="mt-4 text-[#C0C0C8] max-w-2xl font-mono text-sm leading-relaxed">
                 15 continuous 20-minute skirmishes • 8:00 PM to 1:00 AM • ₹100 / Player.
                 Book a squad of <strong className="text-white">strictly 3 or 4 players</strong>, or enter the <strong className="text-[#00D4FF]">Solo Matchmaking Pool</strong> to be drafted into a balanced tactical team.
               </p>
             </div>
 
             {/* Event Time Pill, Cinematic Replay, and Status Check */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <div className="px-4 py-3 bg-[#11131c]/80 border border-white/10 backdrop-blur-md text-center font-mono shadow-md">
-                <span className="block text-[10px] text-[#A0A0A0] uppercase tracking-wider">Combat Window</span>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+              <div className="px-5 py-4 bg-black/50 border border-white/20 backdrop-blur-2xl text-center font-mono shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)]">
+                <span className="block text-[10px] text-white/60 uppercase tracking-wider">Combat Window</span>
                 <span className="text-[#00D4FF] font-bold text-sm">October 22, 2026</span>
-                <span className="block text-[11px] text-white font-semibold">8:00 PM – 1:00 AM (15 Slots)</span>
+                <span className="block text-[11px] text-white font-semibold mt-0.5">8:00 PM – 1:00 AM (15 Slots)</span>
               </div>
 
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2.5">
                 <button
                   type="button"
                   onClick={handleReplayIntro}
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-white/10 hover:bg-[#3300FF] border border-white/20 hover:border-[#3300FF] text-white text-xs font-mono uppercase tracking-wider transition-all duration-300 shadow-md group"
+                  className="inline-flex items-center justify-center gap-2.5 px-5 py-2.5 bg-black/50 hover:bg-[#00D4FF] hover:text-black border border-white/20 hover:border-[#00D4FF] text-white text-xs font-mono uppercase tracking-wider transition-all duration-300 backdrop-blur-xl shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)] group cursor-pointer"
                   title="Replay Cinematic Briefing Video"
                 >
-                  <Play size={13} className="text-[#00D4FF] group-hover:text-white" />
+                  <Play size={13} className="text-[#00D4FF] group-hover:text-black" />
                   <span>Replay Briefing</span>
                 </button>
 
@@ -460,7 +458,7 @@ export default function LaserTag() {
                     setLookupResults(null);
                     setLookupError('');
                   }}
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#171a26]/90 hover:bg-[#00D4FF] hover:text-black border border-white/15 text-white text-xs font-mono uppercase tracking-wider transition-all duration-300 shadow-md"
+                  className="inline-flex items-center justify-center gap-2.5 px-5 py-2.5 bg-black/50 hover:bg-white hover:text-black border border-white/20 text-white text-xs font-mono uppercase tracking-wider transition-all duration-300 backdrop-blur-xl shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)] cursor-pointer"
                 >
                   <Search size={13} />
                   <span>Check Status</span>
@@ -470,29 +468,29 @@ export default function LaserTag() {
           </div>
 
           {/* Quick Stat Bar (Bento Metrics) */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 pt-8 border-t border-white/10">
-            <div>
-              <span className="text-[10px] font-mono uppercase text-[#A0A0A0] block">Combat Format</span>
-              <span className="text-white font-mono font-bold text-base flex items-center gap-1.5 mt-0.5">
-                <Shield size={14} className="text-[#00D4FF]" /> 4 vs 4 Tactical
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mt-10 pt-10 border-t border-white/15">
+            <div className="p-4 bg-white/[0.04] backdrop-blur-xl border border-white/15 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]">
+              <span className="text-[10px] font-mono uppercase text-white/60 block">Combat Format</span>
+              <span className="text-white font-mono font-bold text-base flex items-center gap-2 mt-1">
+                <Shield size={15} className="text-[#00D4FF]" /> 4 vs 4 Tactical
               </span>
             </div>
-            <div>
-              <span className="text-[10px] font-mono uppercase text-[#A0A0A0] block">Match Length</span>
-              <span className="text-white font-mono font-bold text-base flex items-center gap-1.5 mt-0.5">
-                <Clock size={14} className="text-[#00FF66]" /> 20 Min Continuous
+            <div className="p-4 bg-white/[0.04] backdrop-blur-xl border border-white/15 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]">
+              <span className="text-[10px] font-mono uppercase text-white/60 block">Match Length</span>
+              <span className="text-white font-mono font-bold text-base flex items-center gap-2 mt-1">
+                <Clock size={15} className="text-[#00FF66]" /> 20 Min Continuous
               </span>
             </div>
-            <div>
-              <span className="text-[10px] font-mono uppercase text-[#A0A0A0] block">Entry Fee</span>
-              <span className="text-white font-mono font-bold text-base flex items-center gap-1.5 mt-0.5">
-                <Zap size={14} className="text-[#FFB800]" /> ₹100 / Person
+            <div className="p-4 bg-white/[0.04] backdrop-blur-xl border border-white/15 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]">
+              <span className="text-[10px] font-mono uppercase text-white/60 block">Entry Fee</span>
+              <span className="text-white font-mono font-bold text-base flex items-center gap-2 mt-1">
+                <Zap size={15} className="text-[#FFB800]" /> ₹100 / Person
               </span>
             </div>
-            <div>
-              <span className="text-[10px] font-mono uppercase text-[#A0A0A0] block">Rotating Accounts</span>
-              <span className="text-white font-mono font-bold text-base flex items-center gap-1.5 mt-0.5">
-                <Sparkles size={14} className="text-[#FF2A55]" /> 3 UPI Nodes
+            <div className="p-4 bg-white/[0.04] backdrop-blur-xl border border-white/15 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]">
+              <span className="text-[10px] font-mono uppercase text-white/60 block">Rotating Accounts</span>
+              <span className="text-white font-mono font-bold text-base flex items-center gap-2 mt-1">
+                <Sparkles size={15} className="text-[#FF2A55]" /> 3 UPI Nodes
               </span>
             </div>
           </div>
@@ -502,50 +500,50 @@ export default function LaserTag() {
       {/* ============================================================== */}
       {/* 4. MODE SWITCHER: GROUP SQUAD (3-4) VS SOLO POOL               */}
       {/* ============================================================== */}
-      <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 mb-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-2 bg-[#0a0c14]/80 backdrop-blur-xl border border-white/10 shadow-lg">
+      <section className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 mb-14">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3 bg-black/45 backdrop-blur-2xl border border-white/20 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.18),0_12px_32px_rgba(0,0,0,0.6)]">
           <button
             onClick={() => setRegistrationMode('GROUP')}
-            className={`py-4 px-6 font-mono text-xs uppercase tracking-wider flex items-center justify-center gap-3 transition-all border ${
+            className={`py-5 px-6 font-mono text-xs uppercase tracking-wider flex items-center justify-center gap-4 transition-all border ${
               registrationMode === 'GROUP'
-                ? 'bg-[#181a2e]/90 border-[#00D4FF] text-white shadow-[0_0_20px_rgba(0,212,255,0.25)]'
-                : 'border-transparent text-[#71717A] hover:text-white hover:bg-white/5'
+                ? 'bg-black/60 border-2 border-[#00D4FF] text-white shadow-[inset_0_1px_0_0_rgba(0,212,255,0.3),0_0_25px_rgba(0,212,255,0.25)] backdrop-blur-2xl'
+                : 'border-transparent text-white/60 hover:text-white hover:bg-white/[0.04]'
             }`}
           >
-            <Users size={18} className={registrationMode === 'GROUP' ? 'text-[#00D4FF]' : ''} />
+            <Users size={20} className={registrationMode === 'GROUP' ? 'text-[#00D4FF]' : ''} />
             <div className="text-left">
               <span className="block font-bold text-sm">Group Registration</span>
-              <span className="text-[11px] text-[#A0A0A0]">Strictly 3 or 4 Players (₹300 or ₹400)</span>
+              <span className="text-[11px] text-white/60">Strictly 3 or 4 Players (₹300 or ₹400)</span>
             </div>
           </button>
 
           <button
             onClick={() => setRegistrationMode('SOLO')}
-            className={`py-4 px-6 font-mono text-xs uppercase tracking-wider flex items-center justify-center gap-3 transition-all border ${
+            className={`py-5 px-6 font-mono text-xs uppercase tracking-wider flex items-center justify-center gap-4 transition-all border ${
               registrationMode === 'SOLO'
-                ? 'bg-[#181a2e]/90 border-[#FFB800] text-white shadow-[0_0_20px_rgba(255,184,0,0.25)]'
-                : 'border-transparent text-[#71717A] hover:text-white hover:bg-white/5'
+                ? 'bg-black/60 border-2 border-[#FFB800] text-white shadow-[inset_0_1px_0_0_rgba(255,184,0,0.3),0_0_25px_rgba(255,184,0,0.25)] backdrop-blur-2xl'
+                : 'border-transparent text-white/60 hover:text-white hover:bg-white/[0.04]'
             }`}
           >
-            <User size={18} className={registrationMode === 'SOLO' ? 'text-[#FFB800]' : ''} />
+            <User size={20} className={registrationMode === 'SOLO' ? 'text-[#FFB800]' : ''} />
             <div className="text-left">
               <span className="block font-bold text-sm">Solo Registration (Pool)</span>
-              <span className="text-[11px] text-[#A0A0A0]">1 Player (₹100) • Drafted into a balanced squad</span>
+              <span className="text-[11px] text-white/60">1 Player (₹100) • Drafted into a balanced squad</span>
             </div>
           </button>
         </div>
 
         {/* Informational Rule Pill */}
-        <div className="mt-3 p-3 bg-[#0a0c14]/70 border border-white/10 backdrop-blur-md font-mono text-xs text-[#A0A0A0] flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <HelpCircle size={14} className="text-[#00D4FF] shrink-0" />
+        <div className="mt-4 p-4 bg-black/45 border border-white/15 backdrop-blur-2xl font-mono text-xs text-white/70 flex items-center justify-between shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]">
+          <div className="flex items-center gap-3">
+            <HelpCircle size={15} className="text-[#00D4FF] shrink-0" />
             <span>
               {registrationMode === 'GROUP'
                 ? 'Tactical Group rule: To prevent partial slot fragmentation, groups must register with strictly 3 or 4 confirmed players. Solo players must use the Solo Registration tab.'
                 : 'Solo Matchmaking rule: Register solo for ₹100 and pick your preferred slot. Arena marshals combine solo players into tactical 4-player teams.'}
             </span>
           </div>
-          <span className="hidden md:inline font-bold text-white text-[10px] uppercase tracking-wider bg-white/10 px-2 py-0.5 border border-white/15">
+          <span className="hidden md:inline font-bold text-white text-[10px] uppercase tracking-wider bg-white/10 px-2.5 py-1 border border-white/20">
             Active
           </span>
         </div>
@@ -560,40 +558,40 @@ export default function LaserTag() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 mb-12 relative z-20"
+            className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 mb-16 relative z-20"
           >
-            <div className="p-8 bg-[#0a1811]/90 backdrop-blur-xl border-2 border-emerald-500/60 shadow-[0_0_35px_rgba(16,185,129,0.25)] relative">
+            <div className="p-8 sm:p-10 bg-emerald-950/40 backdrop-blur-3xl border-2 border-emerald-400/80 shadow-[inset_0_1px_0_0_rgba(52,211,153,0.3),0_20px_50px_rgba(0,0,0,0.8),0_0_35px_rgba(16,185,129,0.2)] relative">
               <button
                 onClick={() => setCompletedBooking(null)}
-                className="absolute top-4 right-4 text-emerald-400 hover:text-white"
+                className="absolute top-5 right-5 text-emerald-400 hover:text-white p-2 transition-colors cursor-pointer"
               >
                 <X size={20} />
               </button>
 
-              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                <div>
-                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/20 text-emerald-300 text-xs font-mono uppercase tracking-widest mb-3">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+                <div className="space-y-3">
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-emerald-500/20 text-emerald-300 text-xs font-mono uppercase tracking-widest border border-emerald-500/30">
                     <CheckCircle2 size={16} />
                     <span>Booking Submitted • Screenshot Held for Verification</span>
                   </div>
-                  <h3 className="text-2xl font-bold uppercase tracking-tight text-white font-headline-md">
+                  <h3 className="text-2xl sm:text-3xl font-bold uppercase tracking-tight text-white font-headline-md">
                     Registration Receipt: {completedBooking.registration_id}
                   </h3>
-                  <p className="text-emerald-200/80 font-mono text-xs mt-1 max-w-2xl leading-relaxed">
+                  <p className="text-emerald-200/90 font-mono text-xs max-w-2xl leading-relaxed">
                     {completedBooking.registration_type === 'SOLO'
                       ? `Your solo entry has been queued in the matchmaking pool. Preferred slot: ${completedBooking.preferred_slot_id || 'Flexible'}. Once verified, you will be assigned to a team.`
                       : `Your ${completedBooking.player_count} spots for ${completedBooking.team} (${completedBooking.slot_id}) are held awaiting admin screenshot approval. Once verified, your slot will transition to CONFIRMED.`}
                   </p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3">
+                <div className="flex flex-wrap items-center gap-4">
                   <button
                     onClick={() => {
                       navigator.clipboard.writeText(completedBooking.registration_id);
                       setCopiedRegId(true);
                       setTimeout(() => setCopiedRegId(false), 2000);
                     }}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-black font-mono font-bold text-xs uppercase tracking-wider transition-colors"
+                    className="inline-flex items-center gap-2 px-5 py-3 bg-emerald-400 hover:bg-emerald-300 text-black font-mono font-bold text-xs uppercase tracking-wider transition-colors shadow-lg cursor-pointer"
                   >
                     {copiedRegId ? <Check size={14} /> : <Copy size={14} />}
                     <span>{copiedRegId ? 'Copied ID' : 'Copy Registration ID'}</span>
@@ -605,7 +603,7 @@ export default function LaserTag() {
                       setShowLookupModal(true);
                       handleLookup({ preventDefault: () => {} });
                     }}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-black/60 border border-emerald-500/50 hover:border-emerald-400 text-emerald-300 font-mono text-xs uppercase tracking-wider transition-colors"
+                    className="inline-flex items-center gap-2 px-5 py-3 bg-black/60 border border-emerald-500/50 hover:border-emerald-300 text-emerald-300 font-mono text-xs uppercase tracking-wider transition-colors backdrop-blur-xl cursor-pointer"
                   >
                     <Search size={14} />
                     <span>View Live Receipt</span>
@@ -620,27 +618,27 @@ export default function LaserTag() {
       {/* ============================================================== */}
       {/* 6. MAIN CONTENT AREA                                           */}
       {/* ============================================================== */}
-      <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
+      <main className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
         {/* MODE 1: GROUP REGISTRATION */}
         {registrationMode === 'GROUP' && (
           <div>
-            {/* Hour Tabs & Controls */}
-            <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-8">
-              <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-none">
+            {/* Hour Tabs & Controls - Spacious & Frosted */}
+            <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-6 mb-12">
+              <div className="flex items-center gap-3 overflow-x-auto pb-2 md:pb-0 scrollbar-none">
                 {HOUR_TABS.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setSelectedHour(tab.id)}
-                    className={`px-4 py-2.5 font-mono text-xs uppercase tracking-wider whitespace-nowrap border transition-all duration-200 flex items-center gap-2 ${
+                    className={`px-5 py-3 font-mono text-xs uppercase tracking-wider whitespace-nowrap border transition-all duration-200 flex items-center gap-2.5 cursor-pointer ${
                       selectedHour === tab.id
-                        ? 'bg-[#3300FF] border-[#00D4FF] text-white font-bold shadow-[0_0_15px_rgba(0,212,255,0.4)]'
-                        : 'bg-[#0a0c14]/75 border-white/10 text-[#A0A0A0] hover:text-white hover:border-white/30 backdrop-blur-md'
+                        ? 'bg-[#00D4FF] border-2 border-[#00D4FF] text-black font-extrabold shadow-[0_0_20px_rgba(0,212,255,0.45)]'
+                        : 'bg-black/45 border border-white/20 text-white/70 hover:text-white hover:border-white/40 backdrop-blur-2xl shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]'
                     }`}
                   >
                     <span>{tab.label}</span>
                     <span
-                      className={`text-[10px] px-1.5 py-0.2 rounded ${
-                        selectedHour === tab.id ? 'bg-white/20 text-white' : 'bg-white/5 text-[#71717A]'
+                      className={`text-[10px] px-2 py-0.5 rounded font-bold ${
+                        selectedHour === tab.id ? 'bg-black/20 text-black' : 'bg-white/10 text-white/80'
                       }`}
                     >
                       {tab.count}
@@ -650,32 +648,32 @@ export default function LaserTag() {
               </div>
 
               {/* Live Indicator */}
-              <div className="flex items-center justify-end gap-3 font-mono text-xs text-[#A0A0A0]">
-                <span className="flex items-center gap-1.5 bg-[#0a0c14]/75 px-3 py-1.5 border border-white/10 backdrop-blur-md">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span>Live Capacity Sync</span>
+              <div className="flex items-center justify-end gap-3 font-mono text-xs text-white/70">
+                <span className="flex items-center gap-2 bg-black/45 px-4 py-2.5 border border-white/20 backdrop-blur-2xl shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-white/80 font-medium">Live Capacity Sync</span>
                 </span>
                 <button
                   onClick={() => fetchSlots(true)}
                   disabled={refreshing}
-                  className="p-2 bg-[#0a0c14]/75 border border-white/10 hover:border-[#00D4FF] text-[#A0A0A0] hover:text-white transition-colors backdrop-blur-md"
+                  className="p-2.5 bg-black/45 border border-white/20 hover:border-[#00D4FF] text-white/70 hover:text-white transition-colors backdrop-blur-2xl shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)] cursor-pointer"
                   title="Refresh availability"
                 >
-                  <RefreshCw size={14} className={refreshing ? 'animate-spin text-[#00D4FF]' : ''} />
+                  <RefreshCw size={15} className={refreshing ? 'animate-spin text-[#00D4FF]' : ''} />
                 </button>
               </div>
             </div>
 
             {/* Loading Skeleton */}
             {loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="h-64 bg-[#0a0c14]/70 border border-white/10 animate-pulse backdrop-blur-md" />
+                  <div key={i} className="h-72 bg-black/40 border border-white/15 animate-pulse backdrop-blur-2xl" />
                 ))}
               </div>
             ) : (
-              /* 15-Slot Interactive Grid */
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              /* 15-Slot Interactive Grid - 32px Breathing Room */
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {filteredSlots.map((slot) => {
                   const isSlotSelected = selectedSlot?.slot_id === slot.slot_id;
                   const slotNum = Number(slot.slot_number) || 1;
@@ -684,31 +682,31 @@ export default function LaserTag() {
                   return (
                     <div
                       key={slot.slot_id}
-                      className={`bg-[#0a0c14]/80 backdrop-blur-xl border transition-all duration-300 flex flex-col justify-between shadow-[0_8px_24px_rgba(0,0,0,0.6)] ${
+                      className={`bg-black/45 backdrop-blur-2xl border transition-all duration-300 flex flex-col justify-between ${
                         isSlotSelected
-                          ? 'border-[#00D4FF] shadow-[0_0_25px_rgba(0,212,255,0.3)]'
-                          : 'border-white/10 hover:border-[#00D4FF]/50'
+                          ? 'border-2 border-[#00D4FF] shadow-[inset_0_1px_0_0_rgba(0,212,255,0.3),0_16px_40px_rgba(0,0,0,0.7),0_0_30px_rgba(0,212,255,0.25)]'
+                          : 'border-white/20 hover:border-white/40 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15),0_12px_32px_rgba(0,0,0,0.6)]'
                       }`}
                     >
                       {/* Slot Header */}
-                      <div className="p-5 border-b border-white/10 bg-white/[0.02]">
-                        <div className="flex items-center justify-between mb-1.5">
-                          <span className="text-[10px] font-mono uppercase tracking-widest text-[#00D4FF] font-bold">
+                      <div className="p-6 border-b border-white/15 bg-white/[0.03]">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[11px] font-mono uppercase tracking-widest text-[#00D4FF] font-bold">
                             Slot #{slot.slot_number} of 15
                           </span>
-                          <span className="text-[10px] font-mono px-2 py-0.5 bg-white/5 border border-white/15 text-[#A0A0A0]">
+                          <span className="text-[10px] font-mono px-2.5 py-1 bg-black/50 border border-white/20 text-white/70 backdrop-blur-md">
                             20 MIN MATCH
                           </span>
                         </div>
 
-                        <h4 className="text-lg font-bold font-mono tracking-tight text-white flex items-center gap-2">
-                          <Clock size={16} className="text-[#00D4FF]" />
+                        <h4 className="text-xl font-bold font-mono tracking-tight text-white flex items-center gap-2.5">
+                          <Clock size={18} className="text-[#00D4FF]" />
                           <span>{slot.time_window}</span>
                         </h4>
 
                         {/* Designated UPI Account Tag */}
-                        <div className="mt-2 text-[10px] font-mono text-[#A0A0A0] flex items-center gap-1.5 bg-black/40 px-2 py-1 border border-white/10">
-                          <QrCode size={11} className="text-[#FFB800] shrink-0" />
+                        <div className="mt-3 text-[11px] font-mono text-white/70 flex items-center gap-2 bg-black/50 px-3 py-1.5 border border-white/15 backdrop-blur-md">
+                          <QrCode size={13} className="text-[#FFB800] shrink-0" />
                           <span className="truncate">
                             UPI Recipient: <strong className="text-white">{merchant.name}</strong>
                           </span>
@@ -716,7 +714,7 @@ export default function LaserTag() {
                       </div>
 
                       {/* Team Sides Area */}
-                      <div className="p-5 space-y-4">
+                      <div className="p-6 space-y-4">
                         <TeamSideSelector
                           team={slot.team_a}
                           teamName="Team A"
@@ -733,9 +731,9 @@ export default function LaserTag() {
                       </div>
 
                       {/* Slot Footer indicator */}
-                      <div className="px-5 py-2.5 bg-black/40 border-t border-white/10 flex items-center justify-between text-[11px] font-mono text-[#71717A]">
+                      <div className="px-6 py-3.5 bg-black/50 border-t border-white/15 flex items-center justify-between text-xs font-mono text-white/60">
                         <span>Arena Limit: 8 spots</span>
-                        <span>
+                        <span className="font-semibold text-white/80">
                           {(slot.team_a.spots_left + slot.team_b.spots_left)} / 8 Available
                         </span>
                       </div>
@@ -753,36 +751,36 @@ export default function LaserTag() {
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 20 }}
-                  className="mt-16 border-2 border-[#00D4FF] bg-[#0a0c14]/90 backdrop-blur-2xl shadow-[0_0_45px_rgba(0,212,255,0.25)] relative overflow-hidden"
+                  className="mt-20 border-2 border-[#00D4FF] bg-black/50 backdrop-blur-3xl shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_25px_60px_rgba(0,0,0,0.85),0_0_35px_rgba(0,212,255,0.2)] relative overflow-hidden"
                 >
                   {/* Header Bar */}
-                  <div className="bg-[#111422] px-6 py-5 border-b border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="bg-black/60 px-8 py-6 border-b border-white/15 backdrop-blur-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                      <div className="flex items-center gap-2 text-xs font-mono text-[#00D4FF] uppercase tracking-wider">
-                        <Crosshair size={14} />
+                      <div className="flex items-center gap-2 text-xs font-mono text-[#00D4FF] uppercase tracking-wider font-semibold">
+                        <Crosshair size={15} />
                         <span>Squad Booking: Slot #{selectedSlot.slot_number} ({selectedSlot.time_window})</span>
                       </div>
-                      <h2 className="text-2xl font-bold uppercase tracking-tight text-white font-headline-md mt-1">
+                      <h2 className="text-2xl sm:text-3xl font-bold uppercase tracking-tight text-white font-headline-md mt-1.5">
                         {selectedSlot.time_window} • <span className="text-[#00D4FF]">{selectedTeam}</span>
                       </h2>
                     </div>
 
                     <button
                       onClick={() => setSelectedSlot(null)}
-                      className="self-start sm:self-center p-2 text-[#A0A0A0] hover:text-white border border-white/10 hover:border-white transition-colors"
+                      className="self-start sm:self-center p-2.5 text-white/70 hover:text-white border border-white/20 hover:border-white transition-colors bg-black/40 backdrop-blur-xl cursor-pointer"
                     >
                       <X size={18} />
                     </button>
                   </div>
 
-                  {/* Form Body */}
-                  <form onSubmit={handleSubmitGroupRegistration} className="p-6 md:p-8 space-y-8">
+                  {/* Form Body with generous breathing space */}
+                  <form onSubmit={handleSubmitGroupRegistration} className="p-8 sm:p-12 space-y-12">
                     {/* 1. Squad Size Selector (Strictly 3 or 4 Players) */}
                     <div>
-                      <label className="block text-xs font-mono uppercase tracking-wider text-[#A0A0A0] mb-3">
+                      <label className="block text-xs font-mono uppercase tracking-wider text-white/70 mb-4 font-semibold">
                         1. Select Squad Size ({selectedTeam}) — Strictly 3 or 4 Players
                       </label>
-                      <div className="grid grid-cols-2 gap-4 max-w-lg">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-xl">
                         {[3, 4].map((count) => {
                           const side = selectedTeam === 'Team A' ? selectedSlot.team_a : selectedSlot.team_b;
                           const isAvailable = count <= side.spots_left;
@@ -793,26 +791,26 @@ export default function LaserTag() {
                               type="button"
                               disabled={!isAvailable}
                               onClick={() => handlePlayerCountChange(count)}
-                              className={`p-4 border font-mono text-left transition-all ${
+                              className={`p-6 border-2 font-mono text-left transition-all backdrop-blur-xl cursor-pointer ${
                                 !isAvailable
-                                  ? 'opacity-30 border-white/5 bg-black/40 cursor-not-allowed text-[#555]'
+                                  ? 'opacity-30 border-white/10 bg-black/40 cursor-not-allowed text-white/40'
                                   : playerCount === count
-                                  ? 'border-[#00D4FF] bg-[#3300FF]/30 text-white shadow-[0_0_15px_rgba(0,212,255,0.3)]'
-                                  : 'border-white/10 bg-black/30 text-[#A0A0A0] hover:border-white/30 hover:text-white'
+                                  ? 'border-[#00D4FF] bg-[#00D4FF]/15 text-white shadow-[inset_0_1px_0_0_rgba(0,212,255,0.3),0_0_20px_rgba(0,212,255,0.25)]'
+                                  : 'border-white/20 bg-black/45 text-white/70 hover:border-white/40 hover:text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]'
                               }`}
                             >
-                              <span className="block text-xl font-bold text-white">
+                              <span className="block text-2xl font-bold text-white">
                                 {count} Players Squad
                               </span>
-                              <span className="text-sm text-[#00D4FF] font-semibold mt-0.5 block">
+                              <span className="text-base text-[#00D4FF] font-semibold mt-1 block">
                                 ₹{count * 100} Total
                               </span>
                               {!isAvailable ? (
-                                <span className="block text-[10px] text-red-400 mt-1">
+                                <span className="block text-[11px] text-red-400 mt-2">
                                   Only {side.spots_left} spot(s) remaining
                                 </span>
                               ) : (
-                                <span className="block text-[10px] text-emerald-400 mt-1">
+                                <span className="block text-[11px] text-emerald-400 mt-2">
                                   Eligible for slot lock
                                 </span>
                               )}
@@ -824,32 +822,32 @@ export default function LaserTag() {
 
                     {/* 2. Squad Roster Inputs */}
                     <div>
-                      <label className="block text-xs font-mono uppercase tracking-wider text-[#A0A0A0] mb-3">
+                      <label className="block text-xs font-mono uppercase tracking-wider text-white/70 mb-4 font-semibold">
                         2. Squad Roster Details ({playerCount} Players)
                       </label>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {players.map((p, idx) => (
                           <div
                             key={idx}
-                            className={`p-4 border ${
+                            className={`p-6 border backdrop-blur-2xl transition-all ${
                               idx === 0
-                                ? 'border-[#00D4FF]/50 bg-[#0e1424]/80'
-                                : 'border-white/10 bg-black/30'
+                                ? 'border-[#00D4FF]/70 bg-black/55 shadow-[inset_0_1px_0_0_rgba(0,212,255,0.2),0_0_25px_rgba(0,212,255,0.15)]'
+                                : 'border-white/20 bg-black/45 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]'
                             }`}
                           >
-                            <div className="flex items-center justify-between mb-3">
-                              <span className="font-mono text-xs font-bold uppercase text-white flex items-center gap-1.5">
-                                <User size={13} className={idx === 0 ? 'text-[#00D4FF]' : 'text-[#A0A0A0]'} />
+                            <div className="flex items-center justify-between mb-4">
+                              <span className="font-mono text-xs font-bold uppercase text-white flex items-center gap-2">
+                                <User size={14} className={idx === 0 ? 'text-[#00D4FF]' : 'text-white/60'} />
                                 <span>Player {idx + 1} {idx === 0 ? '• Squad Captain' : ''}</span>
                               </span>
                               {idx === 0 && (
-                                <span className="text-[10px] font-mono px-2 py-0.5 bg-[#00D4FF]/20 text-[#00D4FF] border border-[#00D4FF]/40">
+                                <span className="text-[10px] font-mono px-2.5 py-0.5 bg-[#00D4FF]/20 text-[#00D4FF] border border-[#00D4FF]/40 font-bold">
                                   Primary Contact
                                 </span>
                               )}
                             </div>
 
-                            <div className="space-y-3">
+                            <div className="space-y-4">
                               <div>
                                 <input
                                   type="text"
@@ -857,7 +855,7 @@ export default function LaserTag() {
                                   value={p.name}
                                   onChange={(e) => handlePlayerInputChange(idx, 'name', e.target.value)}
                                   placeholder="Full Name"
-                                  className="w-full bg-[#050608] border border-white/15 px-3.5 py-2.5 text-xs font-mono text-white placeholder-[#555] focus:border-[#00D4FF] outline-none"
+                                  className="w-full bg-black/60 border border-white/20 px-4 py-3 text-xs font-mono text-white placeholder-white/40 focus:border-[#00D4FF] focus:bg-black/80 outline-none backdrop-blur-md shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]"
                                 />
                               </div>
                               <div>
@@ -867,7 +865,7 @@ export default function LaserTag() {
                                   value={p.email}
                                   onChange={(e) => handlePlayerInputChange(idx, 'email', e.target.value)}
                                   placeholder="Email Address"
-                                  className="w-full bg-[#050608] border border-white/15 px-3.5 py-2.5 text-xs font-mono text-white placeholder-[#555] focus:border-[#00D4FF] outline-none"
+                                  className="w-full bg-black/60 border border-white/20 px-4 py-3 text-xs font-mono text-white placeholder-white/40 focus:border-[#00D4FF] focus:bg-black/80 outline-none backdrop-blur-md shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]"
                                 />
                               </div>
                               <div>
@@ -877,7 +875,7 @@ export default function LaserTag() {
                                   value={p.phone}
                                   onChange={(e) => handlePlayerInputChange(idx, 'phone', e.target.value)}
                                   placeholder="Phone / WhatsApp Number"
-                                  className="w-full bg-[#050608] border border-white/15 px-3.5 py-2.5 text-xs font-mono text-white placeholder-[#555] focus:border-[#00D4FF] outline-none"
+                                  className="w-full bg-black/60 border border-white/20 px-4 py-3 text-xs font-mono text-white placeholder-white/40 focus:border-[#00D4FF] focus:bg-black/80 outline-none backdrop-blur-md shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]"
                                 />
                               </div>
                             </div>
@@ -887,27 +885,27 @@ export default function LaserTag() {
                     </div>
 
                     {/* 3. Slot-Specific Rotating UPI QR & Payment Screenshot Upload */}
-                    <div className="p-6 border border-white/10 bg-[#060810]/70">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-                        <h3 className="text-xs font-mono uppercase tracking-wider text-[#A0A0A0] flex items-center gap-2">
+                    <div className="p-8 sm:p-10 border border-white/20 bg-black/45 backdrop-blur-2xl shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15)]">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-8">
+                        <h3 className="text-xs font-mono uppercase tracking-wider text-white/80 flex items-center gap-2 font-semibold">
                           <span>3. UPI Settlement & Verification Screenshot</span>
                         </h3>
-                        <span className="text-[11px] font-mono text-[#FFB800] bg-amber-950/40 px-2.5 py-0.5 border border-amber-800/40">
+                        <span className="text-[11px] font-mono text-[#FFB800] bg-black/60 px-3 py-1 border border-amber-500/40 backdrop-blur-md font-bold">
                           {selectedSlotMerchant.slotRange} Assigned to {selectedSlotMerchant.name}
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
                         {/* Left: Dynamic QR Code Card */}
-                        <div className="lg:col-span-5 bg-[#0e111a] border border-white/10 p-6 text-center flex flex-col items-center shadow-lg">
-                          <div className="text-[11px] font-mono uppercase text-[#A0A0A0] mb-1">
+                        <div className="lg:col-span-5 bg-black/60 border border-white/20 p-8 text-center flex flex-col items-center backdrop-blur-2xl shadow-2xl">
+                          <div className="text-xs font-mono uppercase text-white/70 mb-1">
                             Payable Amount ({playerCount} Players)
                           </div>
-                          <div className="text-3xl font-extrabold font-mono text-white mb-3">
+                          <div className="text-4xl font-extrabold font-mono text-white mb-4">
                             ₹{playerCount * 100}
                           </div>
 
-                          <div className="p-3 bg-white border-4 border-[#00D4FF] rounded-sm mb-3 inline-block shadow-[0_0_20px_rgba(0,212,255,0.4)]">
+                          <div className="p-3.5 bg-white border-4 border-[#00D4FF] rounded-sm mb-4 inline-block shadow-[0_0_25px_rgba(0,212,255,0.4)]">
                             <QRCodeSVG
                               value={currentGroupUpiPayload}
                               size={180}
@@ -917,19 +915,19 @@ export default function LaserTag() {
                           </div>
 
                           {/* Merchant Account Details */}
-                          <div className="w-full bg-[#05060a] border border-white/10 p-2.5 mb-3 text-left font-mono text-xs">
-                            <span className="text-[10px] text-[#71717A] uppercase block">Designated Merchant Node</span>
-                            <span className="text-white font-bold block">{selectedSlotMerchant.name}</span>
-                            <div className="flex items-center justify-between mt-1">
-                              <span className="text-[#00D4FF] text-[11px] truncate pr-2">
+                          <div className="w-full bg-black/50 border border-white/15 p-3.5 mb-4 text-left font-mono text-xs backdrop-blur-md">
+                            <span className="text-[10px] text-white/60 uppercase block font-semibold">Designated Merchant Node</span>
+                            <span className="text-white font-bold block mt-0.5">{selectedSlotMerchant.name}</span>
+                            <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/10">
+                              <span className="text-[#00D4FF] text-xs font-semibold truncate pr-2">
                                 {selectedSlotMerchant.upiId}
                               </span>
                               <button
                                 type="button"
                                 onClick={() => handleCopyUpi(selectedSlotMerchant.upiId)}
-                                className="flex items-center gap-1 px-2 py-0.5 bg-[#3300FF] hover:bg-[#00D4FF] text-white hover:text-black font-bold transition-colors text-[10px] uppercase shrink-0"
+                                className="flex items-center gap-1.5 px-2.5 py-1 bg-[#00D4FF] hover:bg-white text-black font-extrabold transition-colors text-[10px] uppercase shrink-0 cursor-pointer shadow-md"
                               >
-                                {copiedUpi ? <Check size={11} /> : <Copy size={11} />}
+                                {copiedUpi ? <Check size={12} /> : <Copy size={12} />}
                                 <span>{copiedUpi ? 'Copied' : 'Copy'}</span>
                               </button>
                             </div>
@@ -938,37 +936,37 @@ export default function LaserTag() {
                           {/* Mobile Pay Link */}
                           <a
                             href={currentGroupUpiPayload}
-                            className="w-full py-3 px-4 bg-[#3300FF] hover:bg-[#00D4FF] text-white hover:text-black text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors duration-300 shadow-[0_0_15px_rgba(51,0,255,0.4)]"
+                            className="w-full py-3.5 px-5 bg-[#00D4FF] hover:bg-white text-black text-xs font-mono font-extrabold uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-300 shadow-[0_0_20px_rgba(0,212,255,0.4)]"
                           >
-                            <ExternalLink size={14} />
+                            <ExternalLink size={15} />
                             <span>Pay Now via UPI App</span>
                           </a>
-                          <span className="block text-[10px] font-mono text-[#71717A] mt-2">
+                          <span className="block text-[11px] font-mono text-white/50 mt-3">
                             Google Pay • PhonePe • Paytm • BHIM
                           </span>
                         </div>
 
                         {/* Right: Payment Screenshot Upload (Mandatory) + UTR Input */}
-                        <div className="lg:col-span-7 space-y-4">
+                        <div className="lg:col-span-7 space-y-6">
                           <div>
-                            <label className="block text-xs font-mono uppercase tracking-wider text-white mb-1.5 flex items-center gap-2">
+                            <label className="block text-xs font-mono uppercase tracking-wider text-white mb-2 flex items-center gap-2 font-semibold">
                               <span>Upload Payment Screenshot (Mandatory)</span>
-                              <span className="text-[10px] text-red-400 font-normal">*Required</span>
+                              <span className="text-red-400 font-bold">*Required</span>
                             </label>
-                            <p className="text-[11px] font-mono text-[#A0A0A0] mb-3">
-                              Attach screenshot displaying transaction amount (₹{playerCount * 100}) and UPI reference. Slots are held provisionally upon upload.
+                            <p className="text-xs font-mono text-white/60 mb-4 leading-relaxed">
+                              Attach screenshot displaying transaction amount (₹{playerCount * 100}) and UPI reference. Spots are provisionally held upon submission.
                             </p>
 
                             {!screenshotPreview ? (
-                              <label className="border-2 border-dashed border-white/15 hover:border-[#00D4FF] bg-black/40 p-8 flex flex-col items-center justify-center cursor-pointer transition-colors group">
+                              <label className="border-2 border-dashed border-white/20 hover:border-[#00D4FF] bg-black/40 backdrop-blur-2xl p-10 flex flex-col items-center justify-center cursor-pointer transition-colors group">
                                 <UploadCloud
-                                  size={36}
-                                  className="text-[#71717A] group-hover:text-[#00D4FF] transition-colors mb-3"
+                                  size={40}
+                                  className="text-white/50 group-hover:text-[#00D4FF] transition-colors mb-3"
                                 />
-                                <span className="font-mono text-xs text-white font-bold uppercase">
+                                <span className="font-mono text-xs text-white font-bold uppercase tracking-wider">
                                   Click or Drag & Drop Payment Screenshot
                                 </span>
-                                <span className="font-mono text-[10px] text-[#A0A0A0] mt-1">
+                                <span className="font-mono text-[11px] text-white/50 mt-1">
                                   Supports PNG, JPG, JPEG, WEBP (Max 5 MB)
                                 </span>
                                 <input
@@ -979,20 +977,20 @@ export default function LaserTag() {
                                 />
                               </label>
                             ) : (
-                              <div className="relative border border-white/15 bg-black/50 p-3 flex items-center gap-4">
+                              <div className="relative border border-white/20 bg-black/60 backdrop-blur-2xl p-4 flex items-center gap-5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]">
                                 <img
                                   src={screenshotPreview}
                                   alt="Payment Proof Preview"
-                                  className="w-24 h-24 object-cover border border-white/10"
+                                  className="w-24 h-24 object-cover border border-white/20"
                                 />
-                                <div className="flex-1 min-w-0 font-mono text-xs">
-                                  <span className="text-emerald-400 font-bold block mb-1 flex items-center gap-1">
-                                    <CheckCircle2 size={14} /> File Attached
+                                <div className="flex-1 min-w-0 font-mono text-xs space-y-1">
+                                  <span className="text-emerald-400 font-bold block flex items-center gap-1.5">
+                                    <CheckCircle2 size={15} /> Screenshot Attached
                                   </span>
-                                  <span className="text-[#A0A0A0] block truncate">
+                                  <span className="text-white font-medium block truncate">
                                     {screenshotFile?.name}
                                   </span>
-                                  <span className="text-[10px] text-[#71717A] block">
+                                  <span className="text-[11px] text-white/50 block">
                                     {((screenshotFile?.size || 0) / 1024).toFixed(1)} KB
                                   </span>
                                 </div>
@@ -1002,17 +1000,17 @@ export default function LaserTag() {
                                     setScreenshotFile(null);
                                     setScreenshotPreview(null);
                                   }}
-                                  className="p-2 text-red-400 hover:text-red-300 border border-red-500/30 hover:border-red-400 transition-colors"
+                                  className="p-2 text-red-400 hover:text-red-300 border border-red-500/40 hover:border-red-400 transition-colors bg-red-950/30 cursor-pointer"
                                   title="Remove file"
                                 >
-                                  <X size={16} />
+                                  <X size={18} />
                                 </button>
                               </div>
                             )}
                           </div>
 
                           <div>
-                            <label className="block text-xs font-mono uppercase tracking-wider text-[#A0A0A0] mb-1.5">
+                            <label className="block text-xs font-mono uppercase tracking-wider text-white/70 mb-2 font-semibold">
                               UTR / UPI Transaction ID (Optional but recommended)
                             </label>
                             <input
@@ -1020,13 +1018,13 @@ export default function LaserTag() {
                               value={utrReference}
                               onChange={(e) => setUtrReference(e.target.value)}
                               placeholder="e.g. 4287XXXXXXXX or 12-digit UPI Ref"
-                              className="w-full bg-[#050608] border border-white/15 px-4 py-3 text-xs font-mono text-white placeholder-[#555] focus:border-[#00D4FF] outline-none"
+                              className="w-full bg-black/60 border border-white/20 px-4 py-3.5 text-xs font-mono text-white placeholder-white/40 focus:border-[#00D4FF] focus:bg-black/80 outline-none backdrop-blur-md shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]"
                             />
                           </div>
 
                           {submitError && (
-                            <div className="p-3 bg-red-950/60 border border-red-600/60 text-red-300 font-mono text-xs flex items-center gap-2">
-                              <AlertCircle size={16} className="shrink-0" />
+                            <div className="p-4 bg-red-950/50 border border-red-600/60 text-red-300 font-mono text-xs flex items-center gap-2.5 backdrop-blur-md">
+                              <AlertCircle size={18} className="shrink-0" />
                               <span>{submitError}</span>
                             </div>
                           )}
@@ -1034,10 +1032,10 @@ export default function LaserTag() {
                           <button
                             type="submit"
                             disabled={submitting || !screenshotFile}
-                            className={`w-full py-4 px-6 font-mono font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-all duration-300 ${
+                            className={`w-full py-4 px-6 font-mono font-extrabold text-xs uppercase tracking-widest flex items-center justify-center gap-2.5 transition-all duration-300 cursor-pointer ${
                               submitting || !screenshotFile
-                                ? 'bg-white/5 text-[#666] border border-white/10 cursor-not-allowed'
-                                : 'bg-[#00D4FF] hover:bg-[#3300FF] text-black hover:text-white shadow-[0_0_25px_rgba(0,212,255,0.4)]'
+                                ? 'bg-white/5 text-white/30 border border-white/10 cursor-not-allowed'
+                                : 'bg-[#00D4FF] hover:bg-white text-black shadow-[0_0_30px_rgba(0,212,255,0.5)]'
                             }`}
                           >
                             {submitting ? (
@@ -1067,27 +1065,28 @@ export default function LaserTag() {
 
         {/* MODE 2: SOLO MATCHMAKING POOL */}
         {registrationMode === 'SOLO' && (
-          <div ref={soloFormRef} className="max-w-4xl mx-auto">
-            <div className="border border-white/15 bg-[#0a0c14]/85 backdrop-blur-2xl p-6 md:p-10 shadow-[0_0_35px_rgba(0,212,255,0.15)] relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#FF2A55] via-[#00E5FF] to-[#FFB800]" />
+          <div ref={soloFormRef} className="max-w-4xl mx-auto my-12">
+            <div className="border border-white/20 bg-black/50 backdrop-blur-3xl p-8 sm:p-12 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_25px_60px_rgba(0,0,0,0.85)] relative overflow-hidden">
+              {/* Solid amber neon accent line - ZERO GRADIENTS */}
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-[#FFB800] shadow-[0_0_12px_#FFB800]" />
 
-              <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-[#FFB800] mb-2">
+              <div className="flex items-center gap-2.5 text-xs font-mono uppercase tracking-wider text-[#FFB800] mb-3 font-semibold">
                 <Sparkles size={16} />
                 <span>Solo Combatant Matchmaking Pool • ₹100 Entry Fee</span>
               </div>
 
-              <h2 className="text-3xl font-extrabold uppercase tracking-tight text-white font-headline-md">
+              <h2 className="text-3xl sm:text-4xl font-extrabold uppercase tracking-tight text-white font-headline-md">
                 Register as a Solo Player
               </h2>
-              <p className="mt-2 text-sm font-mono text-[#A0A0A0] leading-relaxed">
+              <p className="mt-3 text-sm font-mono text-white/70 leading-relaxed max-w-3xl">
                 Don't have a 3 or 4 player squad? Register solo, select your preferred 20-minute window, and our tournament marshals will draft you into a balanced 4-player team with other solo participants.
               </p>
 
-              <form onSubmit={handleSubmitSoloRegistration} className="mt-8 space-y-6">
+              <form onSubmit={handleSubmitSoloRegistration} className="mt-10 space-y-8">
                 {/* Contact Fields */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
-                    <label className="block text-xs font-mono uppercase tracking-wider text-[#A0A0A0] mb-2">
+                    <label className="block text-xs font-mono uppercase tracking-wider text-white/70 mb-2.5 font-semibold">
                       Full Name *
                     </label>
                     <input
@@ -1096,12 +1095,12 @@ export default function LaserTag() {
                       value={soloName}
                       onChange={(e) => setSoloName(e.target.value)}
                       placeholder="e.g. Alex Morgan"
-                      className="w-full bg-[#050608] border border-white/15 px-3.5 py-2.5 text-xs font-mono text-white placeholder-[#555] focus:border-[#00D4FF] outline-none"
+                      className="w-full bg-black/60 border border-white/20 px-4 py-3 text-xs font-mono text-white placeholder-white/40 focus:border-[#00D4FF] focus:bg-black/80 outline-none backdrop-blur-md shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-mono uppercase tracking-wider text-[#A0A0A0] mb-2">
+                    <label className="block text-xs font-mono uppercase tracking-wider text-white/70 mb-2.5 font-semibold">
                       Email Address *
                     </label>
                     <input
@@ -1110,12 +1109,12 @@ export default function LaserTag() {
                       value={soloEmail}
                       onChange={(e) => setSoloEmail(e.target.value)}
                       placeholder="e.g. alex@example.com"
-                      className="w-full bg-[#050608] border border-white/15 px-3.5 py-2.5 text-xs font-mono text-white placeholder-[#555] focus:border-[#00D4FF] outline-none"
+                      className="w-full bg-black/60 border border-white/20 px-4 py-3 text-xs font-mono text-white placeholder-white/40 focus:border-[#00D4FF] focus:bg-black/80 outline-none backdrop-blur-md shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-mono uppercase tracking-wider text-[#A0A0A0] mb-2">
+                    <label className="block text-xs font-mono uppercase tracking-wider text-white/70 mb-2.5 font-semibold">
                       Phone / WhatsApp *
                     </label>
                     <input
@@ -1124,20 +1123,20 @@ export default function LaserTag() {
                       value={soloPhone}
                       onChange={(e) => setSoloPhone(e.target.value)}
                       placeholder="e.g. +91 98765 43210"
-                      className="w-full bg-[#050608] border border-white/15 px-3.5 py-2.5 text-xs font-mono text-white placeholder-[#555] focus:border-[#00D4FF] outline-none"
+                      className="w-full bg-black/60 border border-white/20 px-4 py-3 text-xs font-mono text-white placeholder-white/40 focus:border-[#00D4FF] focus:bg-black/80 outline-none backdrop-blur-md shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]"
                     />
                   </div>
                 </div>
 
                 {/* Preferred Slot Selector */}
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-[#A0A0A0] mb-2">
+                  <label className="block text-xs font-mono uppercase tracking-wider text-white/70 mb-2.5 font-semibold">
                     Preferred Match Time Window (Subject to matchmaking availability)
                   </label>
                   <select
                     value={soloPreferredSlot}
                     onChange={(e) => setSoloPreferredSlot(e.target.value)}
-                    className="w-full bg-[#050608] border border-white/15 px-3.5 py-2.5 text-xs font-mono text-white focus:border-[#00D4FF] outline-none"
+                    className="w-full bg-black/60 border border-white/20 px-4 py-3.5 text-xs font-mono text-white focus:border-[#00D4FF] focus:bg-black/80 outline-none backdrop-blur-md shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]"
                   >
                     <option value="2026-10-22|SOLO_POOL">
                       Flexible / Any Time Slot (8:00 PM – 1:00 AM) — Recommended
@@ -1151,33 +1150,33 @@ export default function LaserTag() {
                 </div>
 
                 {/* Settlement Card for Solo (Hriday Goyal QR) */}
-                <div className="p-6 bg-black/50 border border-white/10">
-                  <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                <div className="p-8 sm:p-10 bg-black/45 border border-white/20 backdrop-blur-2xl shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)]">
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
                     <div className="md:col-span-5 flex flex-col items-center text-center">
-                      <div className="text-[11px] font-mono uppercase text-[#A0A0A0] mb-1">
+                      <div className="text-xs font-mono uppercase text-white/70 mb-1">
                         Solo Registration Fee
                       </div>
-                      <div className="text-3xl font-extrabold font-mono text-emerald-400 mb-3">
+                      <div className="text-4xl font-extrabold font-mono text-emerald-400 mb-4">
                         ₹100
                       </div>
 
-                      <div className="p-2.5 bg-white border-2 border-[#00D4FF] rounded-sm mb-3 shadow-[0_0_15px_rgba(0,212,255,0.3)]">
+                      <div className="p-3 bg-white border-4 border-[#00D4FF] rounded-sm mb-4 shadow-[0_0_20px_rgba(0,212,255,0.4)]">
                         <QRCodeSVG
                           value={soloUpiPayload}
-                          size={150}
+                          size={160}
                           level="M"
                           includeMargin={false}
                         />
                       </div>
 
-                      <div className="w-full bg-[#050608] border border-white/10 p-2 flex items-center justify-between font-mono text-xs">
-                        <span className="text-[#A0A0A0] text-[11px] truncate pr-2">
+                      <div className="w-full bg-black/60 border border-white/15 p-2.5 flex items-center justify-between font-mono text-xs backdrop-blur-md">
+                        <span className="text-white/80 text-[11px] truncate pr-2">
                           {UPI_ACCOUNTS.SOLO.upiId}
                         </span>
                         <button
                           type="button"
                           onClick={handleCopySoloUpi}
-                          className="px-2 py-0.5 bg-[#00D4FF] text-black font-bold text-[10px] uppercase shrink-0"
+                          className="px-2.5 py-1 bg-[#00D4FF] hover:bg-white text-black font-extrabold text-[10px] uppercase shrink-0 transition-colors cursor-pointer shadow-md"
                         >
                           {soloCopiedUpi ? 'Copied' : 'Copy'}
                         </button>
@@ -1185,29 +1184,29 @@ export default function LaserTag() {
 
                       <a
                         href={soloUpiPayload}
-                        className="w-full mt-2 py-2 px-3 bg-[#1e1e38] hover:bg-[#3300FF] text-white text-[11px] font-mono uppercase font-bold text-center block transition-colors"
+                        className="w-full mt-3 py-2.5 px-4 bg-[#00D4FF] hover:bg-white text-black text-xs font-mono uppercase font-extrabold text-center block transition-all shadow-[0_0_15px_rgba(0,212,255,0.35)]"
                       >
                         Pay ₹100 via App
                       </a>
                     </div>
 
-                    <div className="md:col-span-7 space-y-4">
+                    <div className="md:col-span-7 space-y-6">
                       <div>
-                        <label className="block text-xs font-mono uppercase tracking-wider text-white mb-1.5 flex items-center gap-2">
+                        <label className="block text-xs font-mono uppercase tracking-wider text-white mb-2 flex items-center gap-2 font-semibold">
                           <span>Upload Payment Screenshot (Mandatory)</span>
-                          <span className="text-[10px] text-red-400">*Required</span>
+                          <span className="text-red-400 font-bold">*Required</span>
                         </label>
 
                         {!soloScreenshotPreview ? (
-                          <label className="border-2 border-dashed border-white/15 hover:border-[#00D4FF] bg-black/40 p-6 flex flex-col items-center justify-center cursor-pointer transition-colors group">
+                          <label className="border-2 border-dashed border-white/20 hover:border-[#00D4FF] bg-black/40 backdrop-blur-2xl p-8 flex flex-col items-center justify-center cursor-pointer transition-colors group">
                             <UploadCloud
-                              size={30}
-                              className="text-[#71717A] group-hover:text-[#00D4FF] transition-colors mb-2"
+                              size={36}
+                              className="text-white/50 group-hover:text-[#00D4FF] transition-colors mb-2.5"
                             />
-                            <span className="font-mono text-xs text-white font-bold uppercase">
+                            <span className="font-mono text-xs text-white font-bold uppercase tracking-wider">
                               Click or Drag & Drop Screenshot
                             </span>
-                            <span className="font-mono text-[10px] text-[#A0A0A0] mt-0.5">
+                            <span className="font-mono text-[11px] text-white/50 mt-1">
                               PNG, JPG, WEBP (Max 5 MB)
                             </span>
                             <input
@@ -1218,17 +1217,17 @@ export default function LaserTag() {
                             />
                           </label>
                         ) : (
-                          <div className="relative border border-white/15 bg-black/50 p-3 flex items-center gap-4">
+                          <div className="relative border border-white/20 bg-black/60 backdrop-blur-2xl p-4 flex items-center gap-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]">
                             <img
                               src={soloScreenshotPreview}
                               alt="Payment Proof"
-                              className="w-20 h-20 object-cover border border-white/10"
+                              className="w-20 h-20 object-cover border border-white/20"
                             />
-                            <div className="flex-1 min-w-0 font-mono text-xs">
-                              <span className="text-emerald-400 font-bold block mb-1 flex items-center gap-1">
-                                <CheckCircle2 size={13} /> Screenshot Ready
+                            <div className="flex-1 min-w-0 font-mono text-xs space-y-1">
+                              <span className="text-emerald-400 font-bold block flex items-center gap-1.5">
+                                <CheckCircle2 size={14} /> Screenshot Ready
                               </span>
-                              <span className="text-[#A0A0A0] block truncate">
+                              <span className="text-white font-medium block truncate">
                                 {soloScreenshotFile?.name}
                               </span>
                             </div>
@@ -1238,16 +1237,16 @@ export default function LaserTag() {
                                 setSoloScreenshotFile(null);
                                 setSoloScreenshotPreview(null);
                               }}
-                              className="p-1.5 text-red-400 hover:text-red-300 border border-red-500/30"
+                              className="p-1.5 text-red-400 hover:text-red-300 border border-red-500/40 hover:border-red-400 bg-red-950/30 cursor-pointer"
                             >
-                              <X size={15} />
+                              <X size={16} />
                             </button>
                           </div>
                         )}
                       </div>
 
                       <div>
-                        <label className="block text-xs font-mono uppercase tracking-wider text-[#A0A0A0] mb-1">
+                        <label className="block text-xs font-mono uppercase tracking-wider text-white/70 mb-2 font-semibold">
                           UTR / UPI Reference (Optional)
                         </label>
                         <input
@@ -1255,7 +1254,7 @@ export default function LaserTag() {
                           value={soloUtrReference}
                           onChange={(e) => setSoloUtrReference(e.target.value)}
                           placeholder="e.g. 12-digit transaction ID"
-                          className="w-full bg-[#050608] border border-white/15 px-3.5 py-2 text-xs font-mono text-white placeholder-[#555] focus:border-[#00D4FF] outline-none"
+                          className="w-full bg-black/60 border border-white/20 px-4 py-3 text-xs font-mono text-white placeholder-white/40 focus:border-[#00D4FF] focus:bg-black/80 outline-none backdrop-blur-md shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]"
                         />
                       </div>
                     </div>
@@ -1263,8 +1262,8 @@ export default function LaserTag() {
                 </div>
 
                 {soloSubmitError && (
-                  <div className="p-3 bg-red-950/60 border border-red-600/60 text-red-300 font-mono text-xs flex items-center gap-2">
-                    <AlertCircle size={15} className="shrink-0" />
+                  <div className="p-4 bg-red-950/50 border border-red-600/60 text-red-300 font-mono text-xs flex items-center gap-2.5 backdrop-blur-md">
+                    <AlertCircle size={18} className="shrink-0" />
                     <span>{soloSubmitError}</span>
                   </div>
                 )}
@@ -1272,10 +1271,10 @@ export default function LaserTag() {
                 <button
                   type="submit"
                   disabled={soloSubmitting || !soloScreenshotFile}
-                  className={`w-full py-4 px-6 font-mono font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-all ${
+                  className={`w-full py-4 px-6 font-mono font-extrabold text-xs uppercase tracking-widest flex items-center justify-center gap-2.5 transition-all cursor-pointer ${
                     soloSubmitting || !soloScreenshotFile
-                      ? 'bg-white/5 text-[#666] border border-white/10 cursor-not-allowed'
-                      : 'bg-[#FFB800] hover:bg-[#00D4FF] text-black font-extrabold shadow-[0_0_20px_rgba(255,184,0,0.4)]'
+                      ? 'bg-white/5 text-white/30 border border-white/10 cursor-not-allowed'
+                      : 'bg-[#FFB800] hover:bg-white text-black shadow-[0_0_25px_rgba(255,184,0,0.45)]'
                   }`}
                 >
                   {soloSubmitting ? (
@@ -1302,50 +1301,50 @@ export default function LaserTag() {
       {/* ============================================================== */}
       <AnimatePresence>
         {showLookupModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-2xl">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-2xl bg-[#0a0c14] border border-white/15 shadow-[0_0_50px_rgba(0,0,0,0.9)] overflow-hidden"
+              className="w-full max-w-2xl bg-black/60 backdrop-blur-3xl border border-white/20 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_30px_70px_rgba(0,0,0,0.9)] overflow-hidden"
             >
               {/* Modal Header */}
-              <div className="px-6 py-4 bg-[#111422] border-b border-white/10 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Search size={16} className="text-[#00D4FF]" />
+              <div className="px-8 py-5 bg-black/70 border-b border-white/15 backdrop-blur-2xl flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <Search size={18} className="text-[#00D4FF]" />
                   <span className="font-mono text-xs font-bold uppercase tracking-wider text-white">
                     Check Laser Tag Booking Status
                   </span>
                 </div>
                 <button
                   onClick={() => setShowLookupModal(false)}
-                  className="p-1 text-[#A0A0A0] hover:text-white"
+                  className="p-1.5 text-white/60 hover:text-white transition-colors cursor-pointer"
                 >
                   <X size={18} />
                 </button>
               </div>
 
               {/* Modal Body */}
-              <div className="p-6 space-y-6">
-                <form onSubmit={handleLookup} className="flex gap-2">
+              <div className="p-8 space-y-6">
+                <form onSubmit={handleLookup} className="flex gap-3">
                   <input
                     type="text"
                     value={lookupQuery}
                     onChange={(e) => setLookupQuery(e.target.value)}
                     placeholder="Enter Registration ID, Captain Email, or Phone"
-                    className="flex-1 bg-[#050608] border border-white/15 px-4 py-3 font-mono text-xs text-white placeholder-[#555] focus:border-[#00D4FF] outline-none"
+                    className="flex-1 bg-black/60 border border-white/20 px-4 py-3.5 font-mono text-xs text-white placeholder-white/40 focus:border-[#00D4FF] focus:bg-black/80 outline-none backdrop-blur-md shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]"
                   />
                   <button
                     type="submit"
                     disabled={lookupLoading || !lookupQuery.trim()}
-                    className="px-6 py-3 bg-[#00D4FF] hover:bg-[#3300FF] disabled:bg-white/5 text-black hover:text-white font-mono text-xs font-bold uppercase tracking-wider transition-colors"
+                    className="px-7 py-3.5 bg-[#00D4FF] hover:bg-white disabled:bg-white/5 text-black disabled:text-white/30 font-mono text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer shadow-[0_0_20px_rgba(0,212,255,0.4)]"
                   >
                     {lookupLoading ? 'Searching...' : 'Search'}
                   </button>
                 </form>
 
                 {lookupError && (
-                  <p className="font-mono text-xs text-red-400 bg-red-950/40 p-3 border border-red-800/40">
+                  <p className="font-mono text-xs text-red-300 bg-red-950/40 p-4 border border-red-800/50 backdrop-blur-md">
                     {lookupError}
                   </p>
                 )}
@@ -1356,48 +1355,48 @@ export default function LaserTag() {
                     {lookupResults.map((booking) => (
                       <div
                         key={booking.registration_id}
-                        className="p-5 border border-white/10 bg-[#070910] space-y-3"
+                        className="p-6 border border-white/15 bg-black/50 backdrop-blur-2xl space-y-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]"
                       >
-                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
-                          <div className="flex items-center gap-2">
-                            <span className="font-mono font-bold text-sm text-[#00D4FF]">
+                        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/15 pb-4">
+                          <div className="flex items-center gap-2.5">
+                            <span className="font-mono font-bold text-base text-[#00D4FF]">
                               {booking.registration_id}
                             </span>
-                            <span className="px-2 py-0.5 text-[9px] font-mono uppercase bg-white/10 border border-white/15 text-white">
+                            <span className="px-2.5 py-0.5 text-[10px] font-mono uppercase bg-white/10 border border-white/20 text-white font-semibold">
                               {booking.registration_type === 'SOLO' ? 'Solo Matchmaking' : 'Group Squad'}
                             </span>
                           </div>
                           <BookingStatusBadge status={booking.booking_status} paymentStatus={booking.payment_status} />
                         </div>
 
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono text-xs">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 font-mono text-xs">
                           <div>
-                            <span className="text-[10px] text-[#71717A] uppercase block">Slot / Time Window</span>
-                            <span className="text-white font-semibold">{booking.time_window}</span>
+                            <span className="text-[10px] text-white/50 uppercase block font-semibold">Slot / Time Window</span>
+                            <span className="text-white font-semibold mt-0.5 block">{booking.time_window}</span>
                           </div>
                           <div>
-                            <span className="text-[10px] text-[#71717A] uppercase block">Team Assignment</span>
-                            <span className="text-white font-semibold">{booking.team}</span>
+                            <span className="text-[10px] text-white/50 uppercase block font-semibold">Team Assignment</span>
+                            <span className="text-white font-semibold mt-0.5 block">{booking.team}</span>
                           </div>
                           <div>
-                            <span className="text-[10px] text-[#71717A] uppercase block">Players</span>
-                            <span className="text-white font-semibold">{booking.player_count}</span>
+                            <span className="text-[10px] text-white/50 uppercase block font-semibold">Players</span>
+                            <span className="text-white font-semibold mt-0.5 block">{booking.player_count}</span>
                           </div>
                           <div>
-                            <span className="text-[10px] text-[#71717A] uppercase block">Amount Paid</span>
-                            <span className="text-emerald-400 font-semibold">₹{booking.total_fee}</span>
+                            <span className="text-[10px] text-white/50 uppercase block font-semibold">Amount Paid</span>
+                            <span className="text-emerald-400 font-bold mt-0.5 block">₹{booking.total_fee}</span>
                           </div>
                         </div>
 
                         {/* Preferred Slot for Solo */}
                         {booking.registration_type === 'SOLO' && booking.preferred_slot_id && (
-                          <div className="text-[11px] font-mono text-[#00D4FF] bg-[#101424] px-3 py-1.5 border border-[#00D4FF]/30">
+                          <div className="text-xs font-mono text-[#00D4FF] bg-black/60 px-3.5 py-2 border border-[#00D4FF]/30 backdrop-blur-md">
                             Preferred Time Slot requested: {booking.preferred_slot_id}
                           </div>
                         )}
 
                         {/* Captain Details */}
-                        <div className="pt-2 text-xs font-mono text-[#A0A0A0] border-t border-white/10 flex flex-wrap gap-x-6 gap-y-1">
+                        <div className="pt-3 text-xs font-mono text-white/70 border-t border-white/10 flex flex-wrap gap-x-8 gap-y-1.5">
                           <span>Name: <strong className="text-white">{booking.captain_name}</strong></span>
                           <span>Email: <strong className="text-white">{booking.captain_email}</strong></span>
                           <span>Phone: <strong className="text-white">{booking.captain_phone}</strong></span>
@@ -1405,8 +1404,8 @@ export default function LaserTag() {
 
                         {/* Admin Note if any */}
                         {booking.admin_note && (
-                          <div className="p-2.5 bg-[#141624] border-l-2 border-[#00D4FF] font-mono text-xs text-[#c4c7c8]">
-                            <span className="text-[10px] text-[#A0A0A0] uppercase block">Admin Verification Note:</span>
+                          <div className="p-3 bg-black/60 border-l-2 border-[#00D4FF] font-mono text-xs text-white/80 backdrop-blur-md">
+                            <span className="text-[10px] text-white/50 uppercase block font-semibold">Admin Verification Note:</span>
                             {booking.admin_note}
                           </div>
                         )}
@@ -1435,41 +1434,41 @@ function TeamSideSelector({ team, teamName, isSelected, onSelect }) {
 
   return (
     <div
-      className={`p-3.5 border transition-all ${
+      className={`p-4 border transition-all backdrop-blur-xl ${
         isSelected
-          ? 'border-[#00D4FF] bg-[#00D4FF]/15'
-          : 'border-white/10 bg-black/40 hover:border-white/30'
+          ? 'border-2 border-[#00D4FF] bg-[#00D4FF]/15 shadow-[inset_0_1px_0_0_rgba(0,212,255,0.3),0_0_20px_rgba(0,212,255,0.25)]'
+          : 'border-white/15 bg-black/45 hover:border-white/35 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]'
       }`}
     >
-      <div className="flex items-center justify-between mb-2">
-        <span className="font-mono text-xs font-bold uppercase text-white flex items-center gap-1.5">
+      <div className="flex items-center justify-between mb-2.5">
+        <span className="font-mono text-xs font-bold uppercase text-white flex items-center gap-2">
           <Shield
-            size={13}
+            size={14}
             className={teamName === 'Team A' ? 'text-[#00D4FF]' : 'text-[#FF2A55]'}
           />
           <span>{teamName}</span>
         </span>
-        <span className="font-mono text-[11px] text-[#A0A0A0]">
+        <span className="font-mono text-xs text-white/70">
           {team.spots_left}/4 Open
         </span>
       </div>
 
       {/* Status Badge */}
-      <div className="mb-3">
+      <div className="mb-3.5">
         {isAvailable && (
-          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-[10px] uppercase font-semibold">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/15 border border-emerald-500/35 text-emerald-300 font-mono text-[10px] uppercase font-semibold">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
             AVAILABLE (4/4 open)
           </span>
         )}
         {isOpen && (
           <div>
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-cyan-500/10 border border-cyan-500/30 text-[#00D4FF] font-mono text-[10px] uppercase font-semibold">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-cyan-500/15 border border-cyan-500/35 text-[#00D4FF] font-mono text-[10px] uppercase font-semibold">
               <span className="w-1.5 h-1.5 rounded-full bg-[#00D4FF]" />
               OPEN ({team.spots_left}/4 left)
             </span>
             {team.pending_players > 0 && (
-              <span className="block text-[9px] font-mono text-amber-400/90 mt-0.5">
+              <span className="block text-[10px] font-mono text-amber-300/90 mt-1">
                 • {team.pending_players} held awaiting verification
               </span>
             )}
@@ -1477,17 +1476,17 @@ function TeamSideSelector({ team, teamName, isSelected, onSelect }) {
         )}
         {isPending && (
           <div>
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-amber-500/10 border border-amber-500/30 text-amber-400 font-mono text-[10px] uppercase font-semibold">
-              <Clock size={10} />
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/15 border border-amber-500/35 text-amber-300 font-mono text-[10px] uppercase font-semibold">
+              <Clock size={11} />
               PENDING APPROVAL
             </span>
-            <span className="block text-[9px] font-mono text-[#A0A0A0] mt-0.5">
+            <span className="block text-[10px] font-mono text-white/60 mt-1">
               Held provisionally awaiting screenshot
             </span>
           </div>
         )}
         {isFull && (
-          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-zinc-800/60 border border-zinc-700/60 text-zinc-400 font-mono text-[10px] uppercase font-semibold">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/5 border border-white/15 text-white/40 font-mono text-[10px] uppercase font-semibold">
             FINALIZED / FULL (0/4)
           </span>
         )}
@@ -1498,12 +1497,12 @@ function TeamSideSelector({ team, teamName, isSelected, onSelect }) {
         type="button"
         disabled={!canFitGroup}
         onClick={onSelect}
-        className={`w-full py-2 px-3 font-mono text-xs font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5 ${
+        className={`w-full py-2.5 px-3.5 font-mono text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer ${
           !canFitGroup
-            ? 'bg-white/5 text-[#555] cursor-not-allowed border border-white/5'
+            ? 'bg-white/5 text-white/30 cursor-not-allowed border border-white/5'
             : isSelected
-            ? 'bg-[#00D4FF] text-black font-extrabold'
-            : 'bg-white/10 hover:bg-[#00D4FF] hover:text-black text-white border border-white/15'
+            ? 'bg-[#00D4FF] text-black font-extrabold shadow-[0_0_15px_rgba(0,212,255,0.4)]'
+            : 'bg-black/50 hover:bg-[#00D4FF] hover:text-black text-white border border-white/20 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]'
         }`}
       >
         <span>
@@ -1515,7 +1514,7 @@ function TeamSideSelector({ team, teamName, isSelected, onSelect }) {
             ? 'Selected'
             : 'Book Squad (3–4)'}
         </span>
-        {canFitGroup && !isSelected && <ChevronRight size={12} />}
+        {canFitGroup && !isSelected && <ChevronRight size={13} />}
       </button>
     </div>
   );
@@ -1525,7 +1524,7 @@ function TeamSideSelector({ team, teamName, isSelected, onSelect }) {
 function BookingStatusBadge({ status, paymentStatus }) {
   if (status === 'CONFIRMED' || paymentStatus === 'APPROVED') {
     return (
-      <span className="px-3 py-1 bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-mono text-xs uppercase font-bold flex items-center gap-1.5">
+      <span className="px-3.5 py-1.5 bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-mono text-xs uppercase font-bold flex items-center gap-1.5 backdrop-blur-md">
         <CheckCircle2 size={13} />
         <span>CONFIRMED</span>
       </span>
@@ -1533,14 +1532,14 @@ function BookingStatusBadge({ status, paymentStatus }) {
   }
   if (status === 'REJECTED' || paymentStatus === 'REJECTED') {
     return (
-      <span className="px-3 py-1 bg-red-500/20 border border-red-500/40 text-red-400 font-mono text-xs uppercase font-bold flex items-center gap-1.5">
+      <span className="px-3.5 py-1.5 bg-red-500/20 border border-red-500/40 text-red-400 font-mono text-xs uppercase font-bold flex items-center gap-1.5 backdrop-blur-md">
         <AlertCircle size={13} />
         <span>REJECTED</span>
       </span>
     );
   }
   return (
-    <span className="px-3 py-1 bg-amber-500/20 border border-amber-500/40 text-amber-400 font-mono text-xs uppercase font-bold flex items-center gap-1.5 animate-pulse">
+    <span className="px-3.5 py-1.5 bg-amber-500/20 border border-amber-500/40 text-amber-400 font-mono text-xs uppercase font-bold flex items-center gap-1.5 animate-pulse backdrop-blur-md">
       <Clock size={13} />
       <span>PENDING SCREENSHOT APPROVAL</span>
     </span>
