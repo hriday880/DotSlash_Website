@@ -14,5 +14,9 @@ export default defineConfig(({ mode }) => {
         }
       }
     ],
+    server: {
+      host: true,
+      allowedHosts: true,
+    },
   };
 });

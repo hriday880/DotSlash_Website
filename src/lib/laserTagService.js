@@ -95,6 +95,47 @@ export function generateSlotDefinitions() {
   }));
 }
 
+export function getDefaultSlots() {
+  return SLOT_SCHEDULE.map((s) => {
+    let hourBlock = 'ALL';
+    if (s.num <= 3) hourBlock = '20';
+    else if (s.num <= 6) hourBlock = '21';
+    else if (s.num <= 9) hourBlock = '22';
+    else if (s.num <= 12) hourBlock = '23';
+    else hourBlock = '00';
+
+    return {
+      slot_id: `2026-10-22|${s.start}`,
+      slot_number: s.num,
+      start_time: s.start,
+      end_time: s.end,
+      time_window: formatSlotTimeWindow(s.start, s.end),
+      hour_block: hourBlock,
+      merchant_name: s.name,
+      merchant_upi: s.upiId,
+      merchant_range: s.slotRange,
+      team_a: {
+        name: 'Team A',
+        max_spots: 4,
+        confirmed_players: 0,
+        pending_players: 0,
+        total_held: 0,
+        spots_left: 4,
+        status: 'AVAILABLE',
+      },
+      team_b: {
+        name: 'Team B',
+        max_spots: 4,
+        confirmed_players: 0,
+        pending_players: 0,
+        total_held: 0,
+        spots_left: 4,
+        status: 'AVAILABLE',
+      },
+    };
+  });
+}
+
 // Ensure schema and all 15 slots exist in Turso
 export async function ensureLaserTagSchema() {
   if (!db) return;
@@ -212,19 +253,24 @@ export async function uploadPaymentScreenshot(file) {
 
 // Get all 15 continuous slots with live computed capacities and statuses
 export async function getLaserTagSlots() {
-  await ensureLaserTagSchema();
+  try {
+    if (!db) return getDefaultSlots();
+    await ensureLaserTagSchema();
 
-  const [slotsRes, regRes] = await Promise.all([
-    db.execute('SELECT * FROM laser_tag_slots WHERE slot_number > 0 ORDER BY slot_number ASC'),
-    db.execute(`
-      SELECT slot_id, team, player_count, booking_status, payment_status, registration_type 
-      FROM laser_tag_registrations 
-      WHERE booking_status IN ('CONFIRMED', 'PENDING_APPROVAL')
-    `),
-  ]);
+    const [slotsRes, regRes] = await Promise.all([
+      db.execute('SELECT * FROM laser_tag_slots WHERE slot_number > 0 ORDER BY slot_number ASC'),
+      db.execute(`
+        SELECT slot_id, team, player_count, booking_status, payment_status, registration_type 
+        FROM laser_tag_registrations 
+        WHERE booking_status IN ('CONFIRMED', 'PENDING_APPROVAL')
+      `),
+    ]);
 
-  const rawSlots = slotsRes.rows || [];
-  const rawRegs = regRes.rows || [];
+    const rawSlots = slotsRes.rows || [];
+    if (!rawSlots.length) {
+      return getDefaultSlots();
+    }
+    const rawRegs = regRes.rows || [];
 
   // Group active bookings by `${slot_id}__${team}`
   const heldMap = {};
@@ -316,6 +362,10 @@ export async function getLaserTagSlots() {
       },
     };
   });
+  } catch (err) {
+    console.warn('Failed to load slots from database, using defaults:', err);
+    return getDefaultSlots();
+  }
 }
 
 // Concurrency-safe Group Registration (STRICTLY 3 OR 4 PLAYERS)
