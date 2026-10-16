@@ -522,6 +522,22 @@ export async function registerLaserTagSolo({
     finalScreenshotUrl = await uploadPaymentScreenshot(screenshotFile);
   }
 
+  // Reject registration if preferred slot is already completely full
+  if (preferredSlotId && preferredSlotId !== '2026-10-22|SOLO_POOL' && db) {
+    const regRes = await db.execute(
+      `SELECT player_count FROM laser_tag_registrations 
+       WHERE slot_id = ? AND booking_status IN ('CONFIRMED', 'PENDING_APPROVAL')`,
+      [preferredSlotId]
+    );
+    const rows = regRes.rows || [];
+    const totalBooked = rows.reduce((sum, r) => sum + (Number(r.player_count) || 0), 0);
+    if (totalBooked >= 8) {
+      throw new Error(
+        'This match slot is completely full (8/8 spots booked). You cannot set preference to an already full slot. Please select an open slot or choose Flexible.'
+      );
+    }
+  }
+
   const playerCount = 1;
   const totalFee = 100;
   const upiConfig = UPI_ACCOUNTS.SOLO;

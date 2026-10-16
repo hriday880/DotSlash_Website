@@ -98,12 +98,32 @@ export default function LaserTag() {
   const [soloEmail, setSoloEmail] = useState('');
   const [soloPhone, setSoloPhone] = useState('');
   const [soloPreferredSlot, setSoloPreferredSlot] = useState('2026-10-22|SOLO_POOL');
+  const [soloSlotFullWarning, setSoloSlotFullWarning] = useState('');
   const [soloUtrReference, setSoloUtrReference] = useState('');
   const [soloScreenshotFile, setSoloScreenshotFile] = useState(null);
   const [soloScreenshotPreview, setSoloScreenshotPreview] = useState(null);
   const [soloSubmitting, setSoloSubmitting] = useState(false);
   const [soloSubmitError, setSoloSubmitError] = useState('');
   const [soloCopiedUpi, setSoloCopiedUpi] = useState(false);
+
+  // Auto-fallback to Flexible if preferred slot becomes full or is full
+  useEffect(() => {
+    if (soloPreferredSlot && soloPreferredSlot !== '2026-10-22|SOLO_POOL') {
+      const targetSlot = slots.find(
+        (s) => s.slot_id === soloPreferredSlot || s.slot_id.endsWith(soloPreferredSlot.replace('2026-10-22|', ''))
+      );
+      if (targetSlot) {
+        const aOpen = targetSlot.team_a?.spots_left ?? 4;
+        const bOpen = targetSlot.team_b?.spots_left ?? 4;
+        if (aOpen + bOpen === 0) {
+          setSoloPreferredSlot('2026-10-22|SOLO_POOL');
+          setSoloSlotFullWarning(
+            `Slot #${targetSlot.slot_number} (${targetSlot.time_window}) is completely full (8/8 spots booked). Your preference was automatically switched to Flexible.`
+          );
+        }
+      }
+    }
+  }, [slots, soloPreferredSlot]);
 
   // Completed receipt
   const [completedBooking, setCompletedBooking] = useState(null);
@@ -289,6 +309,23 @@ export default function LaserTag() {
     if (!soloScreenshotFile) {
       setSoloSubmitError('Payment screenshot upload is mandatory to enter the solo player pool.');
       return;
+    }
+
+    // Verify requested preferred slot is not completely full
+    if (soloPreferredSlot && soloPreferredSlot !== '2026-10-22|SOLO_POOL') {
+      const chosen = slots.find(
+        (s) => s.slot_id === soloPreferredSlot || s.slot_id.endsWith(soloPreferredSlot.replace('2026-10-22|', ''))
+      );
+      if (chosen) {
+        const totalOpen = (chosen.team_a?.spots_left ?? 4) + (chosen.team_b?.spots_left ?? 4);
+        if (totalOpen === 0) {
+          setSoloSubmitError(
+            `Slot #${chosen.slot_number} (${chosen.time_window}) is completely full (8/8 spots booked). You cannot set preference to an already full slot. Please select an open slot or choose Flexible.`
+          );
+          setSoloPreferredSlot('2026-10-22|SOLO_POOL');
+          return;
+        }
+      }
     }
 
     setSoloSubmitting(true);
@@ -498,7 +535,11 @@ export default function LaserTag() {
           }}
           soloPreferredSlot={soloPreferredSlot}
           onSelectSoloSlot={(slot) => {
+            const aOpen = slot.team_a?.spots_left ?? 4;
+            const bOpen = slot.team_b?.spots_left ?? 4;
+            if (aOpen + bOpen === 0) return;
             setSoloPreferredSlot(`2026-10-22|${slot.start_time}`);
+            setSoloSlotFullWarning('');
             setTimeout(() => {
               soloFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 100);
@@ -1068,22 +1109,58 @@ export default function LaserTag() {
 
                 {/* Preferred Slot Selector */}
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-[#031844] mb-2.5 font-bold">
-                    Preferred Match Time Window (Subject to matchmaking availability)
+                  <label className="block text-xs font-mono uppercase tracking-wider text-[#031844] mb-2.5 font-bold flex items-center justify-between">
+                    <span>Preferred Match Time Window</span>
+                    <span className="text-[11px] text-[#52279B] font-semibold lowercase">Matchmaking availability</span>
                   </label>
+
+                  {soloSlotFullWarning && (
+                    <div className="mb-3 p-3 bg-amber-50 border border-amber-300 rounded-xl text-amber-800 text-xs font-mono flex items-center justify-between gap-2 shadow-sm">
+                      <div className="flex items-center gap-2">
+                        <AlertCircle size={15} className="text-amber-600 shrink-0" />
+                        <span>{soloSlotFullWarning}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setSoloSlotFullWarning('')}
+                        className="p-1 text-amber-600 hover:text-amber-900 rounded cursor-pointer"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  )}
+
                   <select
                     value={soloPreferredSlot}
-                    onChange={(e) => setSoloPreferredSlot(e.target.value)}
+                    onChange={(e) => {
+                      setSoloPreferredSlot(e.target.value);
+                      setSoloSlotFullWarning('');
+                    }}
                     className="w-full bg-[#FFFFFF] border border-[#031844]/30 px-4 py-3.5 text-xs font-mono text-[#031844] focus:border-[#52279B] focus:ring-1 focus:ring-[#52279B] rounded-xl outline-none"
                   >
                     <option value="2026-10-22|SOLO_POOL">
                       Flexible / Any Time Slot (8:00 PM – 1:00 AM) — Recommended
                     </option>
-                    {SLOT_SCHEDULE.map((s) => (
-                      <option key={s.num} value={`2026-10-22|${s.start}`}>
-                        Slot #{s.num}: {s.start} – {s.end}
-                      </option>
-                    ))}
+                    {SLOT_SCHEDULE.map((s) => {
+                      const slotData = slots.find(
+                        (sl) => sl.slot_id === `2026-10-22|${s.start}` || Number(sl.slot_number) === s.num
+                      );
+                      const aOpen = slotData?.team_a?.spots_left ?? 4;
+                      const bOpen = slotData?.team_b?.spots_left ?? 4;
+                      const totalOpen = aOpen + bOpen;
+                      const isFull = totalOpen === 0;
+
+                      return (
+                        <option
+                          key={s.num}
+                          value={`2026-10-22|${s.start}`}
+                          disabled={isFull}
+                          className={isFull ? 'text-gray-400 bg-gray-100 font-normal' : 'text-[#031844] font-bold'}
+                        >
+                          Slot #{s.num}: {s.start} – {s.end} {isFull ? '— FULL (0/8 Spots Open)' : `(${totalOpen}/8 spots open)`}
+                        </option>
+                      );
+                    })}
                   </select>
                 </div>
 

@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { Clock, ChevronLeft, ChevronRight, Check, Sparkles } from 'lucide-react';
+import { Clock, ChevronLeft, ChevronRight, Check, Sparkles, AlertCircle, X } from 'lucide-react';
 
 // Guaranteed fallback slots for instant, offline, and load-safe interaction
 const DEFAULT_SLOTS = [
@@ -568,27 +568,68 @@ export default function MinimalistClockSelector({
                 Book Squad for {formatSlotTime(activeSlot)} ({selectedTeam}) ›
               </button>
             </div>
-          ) : (
-            /* SOLO POOL MODE: Set Preferred Window */
-            <div className="my-5 p-4 bg-[#FFFFFF] border-2 border-[#031844] rounded-xl space-y-3 font-mono">
-              <div className="flex items-center gap-2 text-xs font-bold text-[#52279B] uppercase">
-                <Sparkles size={14} />
-                <span>Solo Matchmaking Window</span>
-              </div>
-              <p className="text-xs text-[#031844]/80 leading-relaxed">
-                Preferred slot will be set to <strong className="text-[#031844]">Slot #{activeSlot.slot_number} ({activeSlot.time_window})</strong>. Arena marshals will draft you into a balanced 4-player squad.
-              </p>
+          ) : (() => {
+            const activeOpenSpots = (activeSlot.team_a?.spots_left ?? 4) + (activeSlot.team_b?.spots_left ?? 4);
+            const isSlotFull = activeOpenSpots === 0;
 
-              <button
-                type="button"
-                onClick={() => onSelectSoloSlot && onSelectSoloSlot(activeSlot)}
-                className="w-full mt-2 py-3.5 px-6 rounded-xl bg-[#8AF100] hover:bg-[#FEDC36] text-[#031844] font-mono font-extrabold text-xs uppercase tracking-widest border-2 border-[#031844] shadow-[0_4px_0_0_#031844] active:translate-y-1 active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-2"
-              >
-                <Check size={16} />
-                <span>Set {formatSlotTime(activeSlot)} as Solo Preference (₹100)</span>
-              </button>
-            </div>
-          )}
+            return (
+              /* SOLO POOL MODE: Set Preferred Window */
+              <div className="my-5 p-4 bg-[#FFFFFF] border-2 border-[#031844] rounded-xl space-y-3 font-mono">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#52279B] uppercase">
+                    <Sparkles size={14} />
+                    <span>Solo Matchmaking Window</span>
+                  </div>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                    isSlotFull 
+                      ? 'bg-red-100 text-red-700 border border-red-300' 
+                      : 'bg-[#8AF100]/30 text-[#031844] border border-[#031844]/20'
+                  }`}>
+                    {isSlotFull ? 'FULL • 0 Spots' : `${activeOpenSpots}/8 Spots Open`}
+                  </span>
+                </div>
+
+                {isSlotFull ? (
+                  <div className="p-3 bg-red-50 border border-red-300 rounded-lg text-red-700 text-xs space-y-1">
+                    <div className="flex items-center gap-1.5 font-bold">
+                      <AlertCircle size={14} className="shrink-0 text-red-600" />
+                      <span>Slot #{activeSlot.slot_number} is Completely Full</span>
+                    </div>
+                    <p className="text-[11px] text-red-600/90 leading-tight">
+                      All 8/8 spots in this time window are booked or held. You cannot set an already full slot as your preference. Please rotate to an open slot or select Flexible below.
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-xs text-[#031844]/80 leading-relaxed">
+                    Preferred slot will be set to <strong className="text-[#031844]">Slot #{activeSlot.slot_number} ({activeSlot.time_window})</strong>. Arena marshals will draft you into a balanced 4-player squad.
+                  </p>
+                )}
+
+                <button
+                  type="button"
+                  disabled={isSlotFull}
+                  onClick={() => !isSlotFull && onSelectSoloSlot && onSelectSoloSlot(activeSlot)}
+                  className={`w-full mt-2 py-3.5 px-6 rounded-xl font-mono font-extrabold text-xs uppercase tracking-widest border-2 transition-all flex items-center justify-center gap-2 ${
+                    isSlotFull
+                      ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed shadow-none'
+                      : 'bg-[#8AF100] hover:bg-[#FEDC36] text-[#031844] border-[#031844] shadow-[0_4px_0_0_#031844] active:translate-y-1 active:shadow-none cursor-pointer'
+                  }`}
+                >
+                  {isSlotFull ? (
+                    <>
+                      <X size={16} />
+                      <span>Slot Full (0/8 Spots Open)</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check size={16} />
+                      <span>Set {formatSlotTime(activeSlot)} as Solo Preference (₹100)</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            );
+          })()}
 
           <p className="text-[10px] text-center font-mono text-[#031844]/60 mt-3">
             Instant UPI reservation • Official pass dispatched to email upon marshal approval

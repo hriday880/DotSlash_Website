@@ -309,6 +309,21 @@ export function createLaserTagApiMiddleware(env) {
 
         const soloUpi = 'hridaygoyal2000@oksbi';
         const targetSlot = preferredSlotId || '2026-10-22|SOLO_POOL';
+
+        if (targetSlot && targetSlot !== '2026-10-22|SOLO_POOL') {
+          const regs = await execute(
+            `SELECT player_count FROM laser_tag_registrations 
+             WHERE slot_id = ? AND booking_status IN ('CONFIRMED', 'PENDING_APPROVAL')`,
+            [targetSlot]
+          );
+          const totalBooked = regs.reduce((sum, r) => sum + (Number(r.player_count) || 0), 0);
+          if (totalBooked >= 8) {
+            return sendJson(res, 400, {
+              error: 'This match slot is completely full (8/8 spots booked). You cannot set preference to an already full slot. Please select an open slot or choose Flexible.'
+            });
+          }
+        }
+
         const randomSuffix = Math.random().toString(36).substring(2, 7).toUpperCase();
         const timeSuffix = Date.now().toString(36).slice(-4).toUpperCase();
         const registrationId = `LT-SOLO-${timeSuffix}${randomSuffix}`;
