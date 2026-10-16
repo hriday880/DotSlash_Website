@@ -492,6 +492,12 @@ export default function MinimalistClockSelector({
                 10m Play • 5m Setup • 5m Wrap-up
               </span>
             </div>
+
+            {/* Venue Indicator */}
+            <div className="mt-2 px-2.5 py-1.5 bg-[#FFFFFF] border border-[#031844]/15 rounded-lg flex items-center justify-between text-[11px] font-mono">
+              <span className="text-[#52279B] font-bold">📍 Arena Venue</span>
+              <span className="text-[#031844] font-semibold">Learning Commons A&B, FLAME</span>
+            </div>
           </div>
 
           {/* GROUP SQUAD MODE: Team A vs Team B Selectors */}

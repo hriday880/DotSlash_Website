@@ -421,6 +421,9 @@ export default function LaserTag() {
                 <span className="text-[#031844] font-bold text-sm block mt-0.5">October 22, 2026</span>
                 <span className="block text-[11px] text-[#031844]/80 mt-0.5">8:00 PM – 1:00 AM (15 Slots)</span>
                 <span className="block text-[10px] text-[#52279B] font-bold mt-1">10m Play • 5m Setup • 5m Wrap-up</span>
+                <span className="block text-[10px] text-[#031844] font-semibold mt-1 pt-1 border-t border-[#031844]/15">
+                  Learning Commons A&B
+                </span>
               </div>
 
               <div className="flex flex-col gap-2.5">
@@ -564,6 +567,11 @@ export default function LaserTag() {
                     </div>
 
                     <div className="pt-2 border-t border-[#031844]/15 flex items-center gap-2 text-xs font-mono text-[#031844]">
+                      <span className="text-[#52279B] font-bold">Venue:</span>
+                      <span>DotSlash Laser Tag Arena (Learning Commons A&B), FLAME University Campus</span>
+                    </div>
+
+                    <div className="pt-1.5 border-t border-[#031844]/15 flex items-center gap-2 text-xs font-mono text-[#031844]">
                       <Mail size={14} className="text-[#52279B] shrink-0" />
                       <span>
                         Official confirmation pass & receipt will be sent to registered email: <strong className="underline">{completedBooking.captain_email || 'your registered email'}</strong> upon marshal approval.
@@ -1350,6 +1358,10 @@ export default function LaserTag() {
                               <span>Match Schedule: 10m Playing Time • 5m Setup & Calibration • 5m Scoring Wrap-up</span>
                             </span>
                             <span className="text-[10px] text-[#031844]/60 uppercase">Arrive 10m Prior</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-[#031844] text-[11px] pt-1.5 border-t border-[#031844]/15">
+                            <span className="text-[#52279B] font-bold">Venue:</span>
+                            <span>DotSlash Laser Tag Arena (Learning Commons A&B), FLAME University Campus</span>
                           </div>
                           <div className="flex items-center gap-2 text-[#031844]/70 text-[11px] pt-1.5 border-t border-[#031844]/15">
                             <Mail size={13} className="text-[#52279B] shrink-0" />
