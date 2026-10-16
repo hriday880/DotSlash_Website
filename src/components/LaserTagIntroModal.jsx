@@ -129,7 +129,7 @@ export default function LaserTagIntroModal({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   const videoSrc =
-    typeof window !== 'undefined' && window.innerWidth <= 640
+    typeof window !== 'undefined' && window.innerWidth <= 768
       ? '/laser_intro/intro_540p.mp4'
       : '/laser_intro/intro.mp4';
 
@@ -169,7 +169,7 @@ export default function LaserTagIntroModal({ isOpen, onClose }) {
             console.warn('Video failed to load');
             setHasError(true);
           }}
-          className="w-full h-auto max-h-[70vh] sm:max-h-[85vh] md:max-h-full md:h-full md:w-full object-contain md:object-cover mx-auto my-auto z-10 transition-transform duration-300 pointer-events-auto"
+          className="w-full h-full object-cover mx-auto my-auto z-10 transition-transform duration-300 pointer-events-auto"
         />
 
         {/* Ambient Dark Scrim */}
