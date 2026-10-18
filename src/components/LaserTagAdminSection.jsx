@@ -78,6 +78,7 @@ Total Slot Window  : 20 Minutes
 • Venue: DotSlash Laser Tag Arena (Learning Commons A&B), FLAME University Campus.
 • Arrival Time: Please report AT LEAST 10 minutes prior to ${slotWindow} for vest fitting, sensor calibration, and meeting your assigned teammates.
 • Equipment: Combat vests and laser rifles are provided on site.
+• Policy: All registrations and slot fees are strictly non-refundable and non-transferable.
 • Live Status & Verification: You can view or verify your live booking receipt anytime at:
   ${window.location.origin}/laser-tag (Search Registration ID: ${regId})
 
@@ -131,6 +132,7 @@ ${playersList}
 • Venue: DotSlash Laser Tag Arena (Learning Commons A&B), FLAME University Campus.
 • Arrival Time: Please ensure ALL squad members arrive AT LEAST 10 minutes prior to ${slotWindow} for sensor calibration, vest fitting, and tactical briefing.
 • Equipment: Combat vests and laser rifles are provided on site.
+• Policy: All squad registrations and slot fees are strictly non-refundable and non-transferable.
 • Live Status & Verification: You can view or verify your live booking receipt anytime at:
   ${window.location.origin}/laser-tag (Search Registration ID: ${regId})
 

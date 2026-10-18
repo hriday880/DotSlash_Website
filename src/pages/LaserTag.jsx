@@ -618,6 +618,11 @@ export default function LaserTag() {
                         Official confirmation pass & receipt will be sent to registered email: <strong className="underline">{completedBooking.captain_email || 'your registered email'}</strong> upon marshal approval.
                       </span>
                     </div>
+
+                    <div className="pt-1.5 border-t border-[#031844]/15 flex items-center gap-2 text-xs font-mono text-[#031844]">
+                      <Shield size={14} className="text-[#52279B] shrink-0" />
+                      <span>Policy: All registrations and slot payments are strictly non-refundable and non-transferable.</span>
+                    </div>
                   </div>
                 </div>
 
@@ -832,9 +837,12 @@ export default function LaserTag() {
                           <div className="text-xs font-mono uppercase text-[#031844]/70 mb-1 font-semibold">
                             Payable Amount ({playerCount} Players)
                           </div>
-                          <div className="text-4xl font-extrabold font-mono text-[#031844] mb-4">
+                          <div className="text-4xl font-extrabold font-mono text-[#031844] mb-2">
                             ₹{playerCount * 100}
                           </div>
+                          <span className="inline-block text-[10px] font-mono uppercase bg-amber-100 text-amber-900 border border-amber-300 px-2.5 py-0.5 rounded-full font-bold mb-4">
+                            Strictly Non-Refundable
+                          </span>
 
                           <div className="p-3.5 bg-white border-2 border-[#031844] rounded-xl mb-4 inline-block shadow-sm">
                             <QRCodeSVG
@@ -964,6 +972,10 @@ export default function LaserTag() {
                               <span>
                                 Official verification pass and receipt will be dispatched to squad captain email: <strong className="text-[#031844] underline">{players[0]?.email || 'Squad Captain Email'}</strong>.
                               </span>
+                            </div>
+                            <div className="flex items-center gap-2 text-[#031844] text-[11px] font-bold pt-1.5 border-t border-[#031844]/15">
+                              <Shield size={13} className="text-[#52279B] shrink-0" />
+                              <span>Policy: All slot bookings and payments are strictly non-refundable and non-transferable.</span>
                             </div>
                           </div>
 
@@ -1171,9 +1183,12 @@ export default function LaserTag() {
                       <div className="text-xs font-mono uppercase text-[#031844]/70 mb-1 font-semibold">
                         Solo Registration Fee
                       </div>
-                      <div className="text-4xl font-extrabold font-mono text-[#031844] mb-4">
+                      <div className="text-4xl font-extrabold font-mono text-[#031844] mb-2">
                         ₹100
                       </div>
+                      <span className="inline-block text-[10px] font-mono uppercase bg-amber-100 text-amber-900 border border-amber-300 px-2.5 py-0.5 rounded-full font-bold mb-4">
+                        Strictly Non-Refundable
+                      </span>
 
                       <div className="p-3.5 bg-white border-2 border-[#031844] rounded-xl mb-4 shadow-sm inline-block">
                         <QRCodeSVG
@@ -1287,6 +1302,10 @@ export default function LaserTag() {
                     <span>
                       Official verification pass and receipt will be dispatched to registered solo combatant email: <strong className="text-[#031844] underline">{soloEmail || 'registered solo email'}</strong>.
                     </span>
+                  </div>
+                  <div className="flex items-center gap-2 text-[#031844] text-[11px] font-bold pt-1.5 border-t border-[#031844]/15">
+                    <Shield size={13} className="text-[#52279B] shrink-0" />
+                    <span>Policy: All registrations and slot payments are strictly non-refundable and non-transferable.</span>
                   </div>
                 </div>
 
@@ -1445,6 +1464,10 @@ export default function LaserTag() {
                             <span>
                               Official receipt & verification pass dispatched to: <strong className="text-[#031844] underline">{booking.captain_email}</strong>
                             </span>
+                          </div>
+                          <div className="flex items-center gap-2 text-[#031844] text-[11px] font-bold pt-1.5 border-t border-[#031844]/15">
+                            <Shield size={13} className="text-[#52279B] shrink-0" />
+                            <span>Payment Policy: Confirmed bookings and slot fees are strictly non-refundable.</span>
                           </div>
                         </div>
 

@@ -632,7 +632,7 @@ export default function MinimalistClockSelector({
           })()}
 
           <p className="text-[10px] text-center font-mono text-[#031844]/60 mt-3">
-            Instant UPI reservation • Official pass dispatched to email upon marshal approval
+            Instant UPI reservation • Strictly non-refundable • Official pass dispatched to email upon marshal approval
           </p>
 
         </div>
