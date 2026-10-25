@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "vite",
     "prebuild": "node scripts/fetch_blogs.js",
-    "seed:laser-tag": "node scripts/seed_laser_tag.js",
     "build": "vite build",
     "preview": "vite preview"
   },
