@@ -6,35 +6,27 @@ import { db } from '../lib/db';
 const MODES = [
   {
     id: 'SOLO',
-    label: 'Solo Entry',
+    label: 'Solo Entry (1 Player)',
     playersCount: 1,
-    price: 150,
-    subtitle: '1 Player · Auto-paired into a 4v4 arena squad',
-    badge: '₹150'
-  },
-  {
-    id: 'DUO',
-    label: 'Duo Squad',
-    playersCount: 2,
-    price: 300,
-    subtitle: '2 Players · Paired together on the same team',
-    badge: '₹300'
+    price: 100,
+    subtitle: '1 Player · ₹100/person · Solo Combatant Matchmaking Pool',
+    badge: '₹100'
   },
   {
     id: 'TRIO',
-    label: 'Trio Squad',
+    label: 'Squad of 3 Players',
     playersCount: 3,
-    price: 450,
-    subtitle: '3 Players · Paired together + 1 solo teammate',
-    badge: '₹450'
+    price: 300,
+    subtitle: '3 Players · ₹100/person · Paired with 1 solo teammate',
+    badge: '₹300'
   },
   {
     id: 'SQUAD',
     label: 'Full Squad (4 Players)',
     playersCount: 4,
-    price: 500,
-    subtitle: '4 Players · Complete 4-player side (₹50 off)',
-    badge: '₹500'
+    price: 400,
+    subtitle: '4 Players · ₹100/person · Complete 4-player arena side',
+    badge: '₹400'
   }
 ];
 
@@ -548,7 +540,7 @@ export default function LaserTag() {
                 </span>
               </div>
 
-              <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div className="p-6 grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                 {MODES.map(m => {
                   const active = selectedMode === m.id;
                   return (
