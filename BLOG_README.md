@@ -12,9 +12,8 @@ node scripts/seed_blogs.js
 ```
 
 ### 2. Markdown Content
-The seed script maps blogs to markdown files located in `public/blogs/`. Two sample files have been created:
-- `public/blogs/future-of-data.md`
-- `public/blogs/scaling-webgl.md`
+The seed script maps blogs to markdown files located in `public/blogs/`. Currently published:
+- `public/blogs/tag-youre-built.md` — *Tag, You're Built!* (laser tag build newsletter)
 
 ### 3. Fetching & Build Process
 To secure the Turso credentials, we moved to a **build-time JSON generation** architecture.
@@ -32,4 +31,4 @@ This generates `public/blogs/blogs.json`, which the React app safely reads witho
 ## Customization
 - **Palette**: The palette uses tokens from `tailwind.config.js`.
 - **Masthead Name**: To change "DOTSLASH DAILY", edit the title string in the Canvas generator inside `src/components/blog/Newspaper.jsx`.
-- **Rack Configuration**: Modify `TIERS`, `ITEMS_PER_TIER`, and `RADIUS` in `src/components/blog/NewspaperRack.jsx`.
+- **Shelf Configuration**: Shelf dimensions (`CELL_W`, `CELL_H`, `DEPTH`, …) live in `src/components/blog/Bookshelf.jsx`. The grid (columns × rows per bay) is picked from the viewport aspect in `src/pages/Blog.jsx`, and the camera is locked and auto-framed in `src/components/blog/Newsstand.jsx`.

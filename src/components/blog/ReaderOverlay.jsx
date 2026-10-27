@@ -1,13 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { X, ChevronLeft, ChevronRight, Share2 } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Share2, Download } from 'lucide-react';
+
+// No typography plugin is installed, so style markdown elements explicitly
+const MD_COMPONENTS = {
+  h2: ({ children }) => (
+    <h2 className="clear-both font-mono font-bold text-2xl md:text-3xl text-[#3300FF] leading-tight mt-12 mb-5">{children}</h2>
+  ),
+  h3: ({ children }) => <h3 className="font-mono font-bold text-xl text-[#01040B] mt-8 mb-3">{children}</h3>,
+  p: ({ children }) => <p className="text-lg leading-relaxed mb-6">{children}</p>,
+  ul: ({ children }) => <ul className="list-disc pl-6 mb-6 space-y-2 text-lg">{children}</ul>,
+  ol: ({ children }) => <ol className="list-decimal pl-6 mb-6 space-y-2 text-lg">{children}</ol>,
+  a: ({ children, href }) => (
+    <a href={href} className="text-[#3300FF] underline underline-offset-2" target="_blank" rel="noreferrer">
+      {children}
+    </a>
+  ),
+};
 
 export default function ReaderOverlay({ blog, onClose, onNavigate, hasNext, hasPrev }) {
   const [content, setContent] = useState('');
 
   useEffect(() => {
-    if (blog && blog.content_path) {
+    setContent(blog?.body || '');
+    if (blog && !blog.body && blog.content_path) {
       fetch(blog.content_path)
         .then(res => res.text())
         .then(text => setContent(text))
@@ -77,6 +94,17 @@ export default function ReaderOverlay({ blog, onClose, onNavigate, hasNext, hasP
           </div>
           
           <div className="flex gap-4">
+            {blog.pdf_path && (
+              <a
+                href={blog.pdf_path}
+                download
+                className="flex items-center gap-2 px-3 py-2 border border-[#00123B] hover:bg-[#3300FF] hover:text-white transition-colors font-mono text-xs uppercase tracking-widest"
+                title="Download PDF"
+              >
+                <Download size={18} />
+                <span className="hidden sm:inline">PDF</span>
+              </a>
+            )}
             <button 
               className="p-2 border border-[#00123B] hover:bg-[#3300FF] hover:text-white transition-colors"
               onClick={() => navigator.clipboard.writeText(window.location.href)}
@@ -93,10 +121,30 @@ export default function ReaderOverlay({ blog, onClose, onNavigate, hasNext, hasP
           </div>
         </div>
 
+        {blog.page_images?.length ? (
+          // Laid-out newsletter: show the designed pages exactly as published
+          <div className="flex-1 bg-[#E3E6F0] p-3 sm:p-6 md:p-10 flex flex-col gap-6 md:gap-10">
+            {blog.page_images.map((src, i) => (
+              <img
+                key={src}
+                src={src}
+                alt={i === 0 ? blog.title : `${blog.title}, page ${i + 1}`}
+                className="w-full h-auto bg-white shadow-[0_10px_40px_rgba(1,4,11,0.18)]"
+              />
+            ))}
+            {/* Text version for screen readers and search engines */}
+            <div className="sr-only">
+              <h1>{blog.title}</h1>
+              {blog.excerpt && <p>{blog.excerpt}</p>}
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+            </div>
+          </div>
+        ) : (
+        <>
         {/* Masthead */}
         <header className="px-8 py-10 border-b-4 border-[#3300FF] text-center">
           <div className="flex justify-between items-end border-b border-[#00123B] pb-2 mb-6 font-mono text-xs text-[#717784] uppercase">
-            <span>ISSUE NO. {blog.id} <br/><span className="text-[#3300FF] font-bold">{readTime} MIN READ</span></span>
+            <span>ISSUE NO. {blog.issue ?? blog.id} <br/><span className="text-[#3300FF] font-bold">{readTime} MIN READ</span></span>
             <div className="flex items-center gap-2">
               <span className="text-[#3300FF] text-lg font-black leading-none">/.</span>
               <span>DOTSLASH MONTHLY</span>
@@ -137,11 +185,13 @@ export default function ReaderOverlay({ blog, onClose, onNavigate, hasNext, hasP
           )}
 
           <div className="first-letter:text-6xl first-letter:font-black first-letter:text-[#3300FF] first-letter:mr-2 first-letter:float-left">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            <ReactMarkdown remarkPlugins={[remarkGfm]} components={MD_COMPONENTS}>
               {content || '*Loading contents...*'}
             </ReactMarkdown>
           </div>
         </article>
+        </>
+        )}
       </div>
     </div>
   );

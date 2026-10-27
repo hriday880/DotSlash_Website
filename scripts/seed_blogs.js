@@ -75,64 +75,16 @@ CREATE TABLE IF NOT EXISTS blogs (
 
 const sampleBlogs = [
   {
-    slug: 'future-of-data',
-    title: 'THE FUTURE OF DATA ARCHITECTURE',
-    excerpt: 'Examining the paradigm shift in low-latency processing pipelines.',
-    author: 'SYSTEM ADMIN',
-    author_role: 'LEAD ARCHITECT',
-    tags: JSON.stringify(['DATA', 'ARCHITECTURE']),
+    slug: 'tag-youre-built',
+    title: "TAG, YOU'RE BUILT!",
+    excerpt: 'Nothing worked the first time. Or the second. Here’s how we built the infrastructure for our laser tag event.',
+    author: 'DOTSLASH',
+    author_role: null,
+    tags: JSON.stringify(['HARDWARE', 'LASER TAG']),
     cover_image: null,
     status: 'published',
     accent: '#3300FF',
-    content_path: '/blogs/future-of-data.md'
-  },
-  {
-    slug: 'scaling-webgl',
-    title: 'SCALING WEBGL PERFORMANCES',
-    excerpt: 'Techniques for maintaining 60FPS in complex 3D web environments.',
-    author: 'RENDER.BOT',
-    author_role: 'GRAPHICS ENGINEER',
-    tags: JSON.stringify(['WEBGL', 'PERFORMANCE']),
-    cover_image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=80',
-    status: 'published',
-    accent: '#00D4FF',
-    content_path: '/blogs/scaling-webgl.md'
-  },
-  {
-    slug: 'designing-interfaces',
-    title: 'BRUTALIST INTERFACE DESIGN',
-    excerpt: 'Why strict constraints lead to better user experiences.',
-    author: 'UX_MODULE',
-    author_role: 'DESIGN RESEARCH',
-    tags: JSON.stringify(['DESIGN', 'UI']),
-    cover_image: null,
-    status: 'published',
-    accent: '#1f1f1f',
-    content_path: '/blogs/designing-interfaces.md'
-  },
-  {
-    slug: 'distributed-systems',
-    title: 'DISTRIBUTED CONSENSUS',
-    excerpt: 'A deep dive into modern consensus algorithms.',
-    author: 'SYSTEM ADMIN',
-    author_role: 'LEAD ARCHITECT',
-    tags: JSON.stringify(['SYSTEMS', 'BACKEND']),
-    cover_image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80',
-    status: 'published',
-    accent: '#3300FF',
-    content_path: '/blogs/distributed-systems.md'
-  },
-  {
-    slug: 'cyber-security',
-    title: 'ZERO TRUST NETWORKS',
-    excerpt: 'Implementing zero trust in legacy architectures.',
-    author: 'SEC_OP',
-    author_role: 'SECURITY LEAD',
-    tags: JSON.stringify(['SECURITY', 'INFRA']),
-    cover_image: null,
-    status: 'published',
-    accent: '#A0A0A0',
-    content_path: '/blogs/cyber-security.md'
+    content_path: '/blogs/tag-youre-built.md'
   }
 ];
 

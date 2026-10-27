@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { db } from '../lib/db';
-import { LogOut, Upload, Trash2, Megaphone, Users, FileText, Eye, Edit2, Calendar } from 'lucide-react';
+import { publishNewsletter, updateNewsletter, listNewsletters, deleteNewsletter } from '../lib/newsletters';
+import { LogOut, Upload, Trash2, Megaphone, Users, FileText, Edit2, Calendar } from 'lucide-react';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -31,7 +32,9 @@ export default function AdminDashboard() {
   const [memberForm, setMemberForm] = useState({ name: '', role: '', department: 'executive', imageFile: null });
   const [editMemberId, setEditMemberId] = useState(null);
   
-  const [blogForm, setBlogForm] = useState({ title: '', url: '', thumbnailFile: null, date: '' });
+  const [blogForm, setBlogForm] = useState({ title: '', author: '', excerpt: '', date: '', pdfFile: null });
+  const [publishStatus, setPublishStatus] = useState('');
+  const [editBlogId, setEditBlogId] = useState(null);
   const [announcementForm, setAnnouncementForm] = useState({ content: '' });
   
   const [eventForm, setEventForm] = useState({ title: '', date: '', description: '', imageFile: null });
@@ -157,7 +160,11 @@ export default function AdminDashboard() {
       const seededPersonnel = await checkAndSeedPersonnel(loadedPersonnel);
       setMembers(seededPersonnel);
 
-      if (blogRes.rows) setBlogs(blogRes.rows);
+      try {
+        setBlogs((await listNewsletters()) || []);
+      } catch (err) {
+        console.error('Failed to load newsletters:', err);
+      }
       if (annRes.rows) setAnnouncements(annRes.rows);
       
       const loadedEvents = evRes.rows || [];
@@ -244,35 +251,50 @@ export default function AdminDashboard() {
 
   const handleBlogSubmit = async (e) => {
     e.preventDefault();
-    if (!blogForm.title || !blogForm.url || !blogForm.date) {
-      alert("Fill required fields");
+    if (!blogForm.title || !blogForm.date || (!blogForm.pdfFile && !editBlogId)) {
+      alert("Title, date and PDF are required");
       return;
     }
     setUploading(true);
     try {
-      let thumbnailUrl = null;
-      if (blogForm.thumbnailFile) {
-        thumbnailUrl = await uploadImage(blogForm.thumbnailFile);
+      const fields = { file: blogForm.pdfFile, title: blogForm.title, author: blogForm.author, excerpt: blogForm.excerpt, date: blogForm.date };
+      if (editBlogId) {
+        await updateNewsletter(editBlogId, fields, setPublishStatus);
+        setEditBlogId(null);
+      } else {
+        await publishNewsletter(fields, setPublishStatus);
       }
-      
-      const id = (window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : Math.random().toString(36).substring(2));
-      await db.execute(
-        'INSERT INTO blogs (id, title, url, thumbnail, date) VALUES (?, ?, ?, ?, ?)',
-        [id, blogForm.title, blogForm.url, thumbnailUrl, blogForm.date]
-      );
-      setBlogForm({ title: '', url: '', thumbnailFile: null, date: '' });
+      setBlogForm({ title: '', author: '', excerpt: '', date: '', pdfFile: null });
       loadData();
     } catch (err) {
       console.error(err);
-      alert("Failed to add blog");
+      alert(`Failed to publish newsletter: ${err.message}`);
     } finally {
       setUploading(false);
+      setPublishStatus('');
     }
   };
 
+  const editBlog = (blog) => {
+    setBlogForm({
+      title: blog.title || '',
+      author: blog.author || '',
+      excerpt: blog.excerpt || '',
+      date: (blog.date || '').slice(0, 10),
+      pdfFile: null,
+    });
+    setEditBlogId(blog.id);
+    setActiveTab('blogs');
+  };
+
+  const cancelBlogEdit = () => {
+    setEditBlogId(null);
+    setBlogForm({ title: '', author: '', excerpt: '', date: '', pdfFile: null });
+  };
+
   const deleteBlog = async (id) => {
-    if (!confirm("Delete this blog?")) return;
-    await db.execute('DELETE FROM blogs WHERE id = ?', [id]);
+    if (!confirm("Delete this newsletter? It will be removed from the newsstand.")) return;
+    await deleteNewsletter(id);
     loadData();
   };
 
@@ -431,21 +453,28 @@ export default function AdminDashboard() {
               </form>
             )}
 
-            {/* Blogs Form */}
+            {/* Newsletter (PDF) Form */}
             {activeTab === 'blogs' && (
               <form onSubmit={handleBlogSubmit} className="flex flex-col gap-5">
-                <input type="text" placeholder="Blog Title" value={blogForm.title} onChange={(e) => setBlogForm({...blogForm, title: e.target.value})} className="w-full bg-[#030303] border border-[#353535] px-4 py-3 text-white font-mono text-sm focus:border-[#00D4FF] outline-none" />
-                <input type="url" placeholder="Medium URL" value={blogForm.url} onChange={(e) => setBlogForm({...blogForm, url: e.target.value})} className="w-full bg-[#030303] border border-[#353535] px-4 py-3 text-white font-mono text-sm focus:border-[#00D4FF] outline-none" />
+                <input type="text" placeholder="Newsletter Title *" value={blogForm.title} onChange={(e) => setBlogForm({...blogForm, title: e.target.value})} className="w-full bg-[#030303] border border-[#353535] px-4 py-3 text-white font-mono text-sm focus:border-[#00D4FF] outline-none" />
+                <input type="text" placeholder="Author Name" value={blogForm.author} onChange={(e) => setBlogForm({...blogForm, author: e.target.value})} className="w-full bg-[#030303] border border-[#353535] px-4 py-3 text-white font-mono text-sm focus:border-[#00D4FF] outline-none" />
+                <textarea placeholder="Short summary (optional)" value={blogForm.excerpt} onChange={(e) => setBlogForm({...blogForm, excerpt: e.target.value})} className="w-full bg-[#030303] border border-[#353535] px-4 py-3 text-white font-mono text-sm focus:border-[#00D4FF] outline-none h-20 resize-none" />
                 <input type="date" value={blogForm.date} onChange={(e) => setBlogForm({...blogForm, date: e.target.value})} className="w-full bg-[#030303] border border-[#353535] px-4 py-3 text-white font-mono text-sm focus:border-[#00D4FF] outline-none" />
-                
+
                 <label className="w-full bg-[#030303] border border-[#353535] border-dashed p-6 flex flex-col items-center cursor-pointer hover:border-[#00D4FF]">
                   <Upload size={20} className="text-[#A0A0A0] mb-3" />
-                  <span className="text-xs font-mono text-[#A0A0A0] truncate max-w-full">{blogForm.thumbnailFile ? blogForm.thumbnailFile.name : 'Optional Thumbnail'}</span>
-                  <input type="file" className="hidden" accept="image/*" onChange={(e) => setBlogForm({...blogForm, thumbnailFile: e.target.files[0]})} />
+                  <span className="text-xs font-mono text-[#A0A0A0] truncate max-w-full">{blogForm.pdfFile ? blogForm.pdfFile.name : (editBlogId ? 'Replace PDF (optional)' : 'Select newsletter PDF *')}</span>
+                  <input type="file" className="hidden" accept="application/pdf" onChange={(e) => setBlogForm({...blogForm, pdfFile: e.target.files[0] || null})} />
                 </label>
                 <button type="submit" disabled={uploading} className="mt-4 bg-[#3300FF] hover:bg-[#00D4FF] text-white py-4 uppercase tracking-[0.2em] font-bold text-sm shadow-[0_0_15px_rgba(51,0,255,0.4)] disabled:opacity-50">
-                  {uploading ? 'UPLOADING...' : 'SAVE BLOG'}
+                  {uploading ? (publishStatus || 'UPLOADING...') : (editBlogId ? 'SAVE CHANGES' : 'PUBLISH NEWSLETTER')}
                 </button>
+                {editBlogId && (
+                  <button type="button" onClick={cancelBlogEdit} disabled={uploading} className="border border-[#353535] hover:border-[#A0A0A0] text-[#A0A0A0] py-3 uppercase tracking-[0.2em] font-mono text-xs">
+                    Cancel edit
+                  </button>
+                )}
+                <p className="text-[10px] font-mono text-[#A0A0A0] leading-relaxed">Each PDF page is shown exactly as designed. The newsstand shelf resizes automatically to fit every issue.</p>
               </form>
             )}
 
@@ -512,21 +541,25 @@ export default function AdminDashboard() {
                   </div>
                 ))}
 
-                {/* Blogs List */}
-                {activeTab === 'blogs' && blogs.map(blog => (
-                  <div key={blog.id} className="bg-[#0a0a0a] border border-[#222] hover:border-[#3300FF] p-4 relative group transition-all">
-                    {blog.thumbnail && <img src={blog.thumbnail} alt="" className="w-full h-32 object-cover mb-4 opacity-50 group-hover:opacity-100" />}
-                    <h3 className="font-headline-md text-white text-md line-clamp-2">{blog.title}</h3>
-                    <div className="flex justify-between items-center mt-2 pr-8">
-                      <p className="text-[10px] text-[#00D4FF] font-mono">{blog.date}</p>
-                      <div className="flex items-center gap-1 text-[10px] text-[#A0A0A0] font-mono bg-[#111] px-2 py-1 rounded">
-                        <Eye size={12} />
-                        {blog.views || 0}
+                {/* Newsletters List */}
+                {activeTab === 'blogs' && blogs.map(blog => {
+                  let cover = null;
+                  try { cover = JSON.parse(blog.pages || '[]')[0]; } catch { cover = null; }
+                  return (
+                    <div key={blog.id} className={`bg-[#0a0a0a] border ${editBlogId === blog.id ? 'border-[#00D4FF]' : 'border-[#222]'} hover:border-[#3300FF] p-4 relative group transition-all`}>
+                      {cover && <img src={cover} alt="" className="w-full h-40 object-cover object-top mb-4 opacity-60 group-hover:opacity-100" />}
+                      <h3 className="font-headline-md text-white text-md line-clamp-2">{blog.title}</h3>
+                      <div className="flex justify-between items-center mt-2 pr-8 gap-2">
+                        <p className="text-[10px] text-[#00D4FF] font-mono">{blog.date}</p>
+                        <p className="text-[10px] text-[#A0A0A0] font-mono truncate">{blog.author || 'DOTSLASH'}</p>
+                      </div>
+                      <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onClick={() => editBlog(blog)} className="bg-[#00D4FF]/20 p-2 text-[#00D4FF]" title="Edit"><Edit2 size={14} /></button>
+                        <button onClick={() => deleteBlog(blog.id)} className="bg-[#FF3366]/20 p-2 text-[#FF3366]" title="Delete"><Trash2 size={14} /></button>
                       </div>
                     </div>
-                    <button onClick={() => deleteBlog(blog.id)} className="absolute top-4 right-4 bg-[#FF3366]/20 p-2 text-[#FF3366] opacity-0 group-hover:opacity-100"><Trash2 size={14} /></button>
-                  </div>
-                ))}
+                  );
+                })}
 
                 {/* Announcements List */}
                 {activeTab === 'announcements' && announcements.map(ann => (
