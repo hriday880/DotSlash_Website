@@ -258,14 +258,15 @@ export const laserTagApi = {
     const live = await liveBookings();
     const slotBookings = bySlot(live).get(slot.number) || [];
 
-    const taken = new Set();
+    const takenEmails = new Set();
+    const takenPhones = new Set();
     for (const b of slotBookings) {
       for (const p of JSON.parse(b.players_json || '[]')) {
-        taken.add(p.email);
-        taken.add(p.phone);
+        if (p.email) takenEmails.add(p.email);
+        if (p.phone) takenPhones.add(p.phone);
       }
     }
-    const clash = players.find(p => taken.has(p.email) || taken.has(p.phone));
+    const clash = players.find(p => (p.email && takenEmails.has(p.email)) || (p.phone && takenPhones.has(p.phone)));
     if (clash) throw appError(`${clash.name} is already booked in this slot.`, 409);
 
     const team = assignTeam(slotBookings, mode.id);

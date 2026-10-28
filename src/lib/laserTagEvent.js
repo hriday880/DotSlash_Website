@@ -121,18 +121,29 @@ export function parseBookingRequest(body) {
     const who = i === 0 ? 'the lead player' : `player ${i + 1}`;
     const name = String(p?.name || '').trim().slice(0, 80);
     const email = String(p?.email || '').trim().toLowerCase().slice(0, 120);
-    const phone = String(p?.phone || '').replace(/\D/g, '').slice(-10);
+    const rawPhone = String(p?.phone || '').replace(/\D/g, '').slice(-10);
     const studentId = String(p?.studentId || '').trim().slice(0, 40);
     if (!name) throw new Error(`Enter a name for ${who}.`);
     if (!EMAIL_RE.test(email)) throw new Error(`Enter a valid email for ${who}.`);
-    if (phone.length !== 10) throw new Error(`Enter a 10-digit phone number for ${who}.`);
+    if (i === 0 && rawPhone.length !== 10) {
+      throw new Error(`Enter a 10-digit phone number for ${who}.`);
+    }
+    if (rawPhone && rawPhone.length !== 10) {
+      throw new Error(`Enter a valid 10-digit phone number for ${who}, or leave it blank.`);
+    }
+    const phone = rawPhone || '';
     return { name, email, phone, studentId };
   });
 
   const emails = new Set(players.map(p => p.email));
-  const phones = new Set(players.map(p => p.phone));
-  if (emails.size !== players.length || phones.size !== players.length) {
-    throw new Error('Each player needs their own email and phone number.');
+  if (emails.size !== players.length) {
+    throw new Error('Each player needs their own email.');
+  }
+
+  const nonBlankPhones = players.map(p => p.phone).filter(Boolean);
+  const phones = new Set(nonBlankPhones);
+  if (phones.size !== nonBlankPhones.length) {
+    throw new Error('Phone numbers must be unique across players if provided.');
   }
 
   const squadName = mode.seats > 1 ? String(body.squadName || '').trim().slice(0, 40) : '';

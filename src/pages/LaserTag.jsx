@@ -581,7 +581,15 @@ export default function LaserTag() {
                     <div className="grid sm:grid-cols-2 gap-3">
                       <input className={input} required placeholder="Full name *" value={p.name} onChange={e => updatePlayer(i, 'name', e.target.value)} />
                       <input className={input} required type="email" placeholder="FLAME email *" value={p.email} onChange={e => updatePlayer(i, 'email', e.target.value)} />
-                      <input className={input} required type="tel" inputMode="numeric" placeholder="10-digit phone *" value={p.phone} onChange={e => updatePlayer(i, 'phone', e.target.value.replace(/\D/g, '').slice(0, 10))} />
+                      <input
+                        className={input}
+                        required={i === 0}
+                        type="tel"
+                        inputMode="numeric"
+                        placeholder={i === 0 ? "10-digit phone *" : "10-digit phone (optional)"}
+                        value={p.phone}
+                        onChange={e => updatePlayer(i, 'phone', e.target.value.replace(/\D/g, '').slice(0, 10))}
+                      />
                       <input className={input} placeholder="Student ID (optional)" value={p.studentId} onChange={e => updatePlayer(i, 'studentId', e.target.value)} />
                     </div>
                   </div>
