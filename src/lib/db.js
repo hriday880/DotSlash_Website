@@ -1,6 +1,7 @@
 // Direct Turso HTTP API client — bypasses @libsql/client migration bug
-const url = import.meta.env.VITE_TURSO_DATABASE_URL;
-const authToken = import.meta.env.VITE_TURSO_AUTH_TOKEN;
+const env = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env : (typeof process !== 'undefined' ? process.env : {});
+const url = env.VITE_TURSO_DATABASE_URL;
+const authToken = env.VITE_TURSO_AUTH_TOKEN;
 
 class TursoDB {
   constructor(url, token) {

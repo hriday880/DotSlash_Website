@@ -1,12 +1,12 @@
 // In-site Laser Tag booking engine backed directly by Turso (src/lib/db.js).
 // No separate backend server or Render web service required.
-import { db } from './db';
+import { db } from './db.js';
 import {
   EVENT, MODES, SLOTS, HOLD_MINUTES,
   getSlot, assignTeam, slotAvailability, price, normalizeCode, parseBookingRequest
-} from './laserTagEvent';
+} from './laserTagEvent.js';
 
-const env = import.meta.env || {};
+const env = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env : (typeof process !== 'undefined' ? process.env : {});
 const UPI_ID = env.VITE_LASER_TAG_UPI_ID || env.VITE_UPI_ID || 'hridaygoyal2000@oksbi';
 const UPI_NAME = env.VITE_LASER_TAG_UPI_NAME || env.VITE_UPI_NAME || 'DotSlash';
 const BOOKINGS_OPEN = env.VITE_BOOKINGS_OPEN !== 'false';
