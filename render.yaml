@@ -17,7 +17,7 @@ services:
     runtime: node
     plan: starter
     rootDir: server
-    buildCommand: echo "no dependencies"
+    buildCommand: npm install
     startCommand: node index.js
     healthCheckPath: /health
     numInstances: 1 # writes are serialised in-process; keep a single instance
@@ -38,3 +38,5 @@ services:
         sync: false
       - key: ALLOWED_ORIGINS
         sync: false
+      - key: BOOKINGS_OPEN
+        value: "true"

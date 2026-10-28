@@ -34,9 +34,22 @@ async function fetchBlogs() {
     return;
   }
 
+  const blogsJsonPath = path.join(process.cwd(), 'public/blogs/blogs.json');
+  let existingBySlug = new Map();
+  try {
+    const existing = JSON.parse(fs.readFileSync(blogsJsonPath, 'utf8'));
+    if (Array.isArray(existing)) {
+      existing.forEach((b) => {
+        if (b?.slug) existingBySlug.set(b.slug, b);
+      });
+    }
+  } catch {
+    // ignore missing or invalid file
+  }
+
   const pipelineUrl = url.replace(/\/$/, '') + '/v2/pipeline';
-  const sql = `SELECT * FROM blogs WHERE status = 'published' ORDER BY published_at DESC`;
-  
+  const sql = `SELECT * FROM newsletters ORDER BY date DESC, created_at DESC`;
+
   const res = await fetch(pipelineUrl, {
     method: 'POST',
     headers: {
@@ -56,12 +69,18 @@ async function fetchBlogs() {
 
   const data = await res.json();
   const result = data.results[0];
-  if (result.type === 'error') throw new Error(result.error.message);
+  if (result.type === 'error') {
+    if (/no such table/i.test(result.error.message || '')) {
+      console.log('ℹ️ Newsletters table not initialized yet; retaining bundled public/blogs/blogs.json.');
+      return;
+    }
+    throw new Error(result.error.message);
+  }
 
   const cols = result.response.result.cols;
   const rawRows = result.response.result.rows;
 
-  const rows = rawRows.map(row => {
+  const dbRows = rawRows.map((row) => {
     const obj = {};
     cols.forEach((col, i) => {
       const cell = row[i];
@@ -70,9 +89,42 @@ async function fetchBlogs() {
     return obj;
   });
 
+  if (dbRows.length === 0) {
+    console.log('ℹ️ No newsletter rows in DB yet; retaining bundled public/blogs/blogs.json.');
+    return;
+  }
+
+  const rows = dbRows.map((row, idx) => {
+    let pages = [];
+    try {
+      pages = JSON.parse(row.pages || '[]');
+    } catch {
+      pages = [];
+    }
+    const prev = existingBySlug.get(row.slug) || {};
+    return {
+      id: prev.id ?? row.id ?? idx + 1,
+      slug: row.slug,
+      title: row.title,
+      excerpt: row.excerpt ?? prev.excerpt ?? null,
+      author: row.author || prev.author || 'DOTSLASH',
+      author_role: prev.author_role ?? null,
+      tags: prev.tags ?? null,
+      cover_image: prev.cover_image ?? null,
+      published_at: row.date || row.created_at || prev.published_at,
+      status: 'published',
+      featured: prev.featured ?? 0,
+      accent: prev.accent || '#3300FF',
+      content_path: prev.content_path ?? null,
+      front_image: pages[0] || prev.front_image || null,
+      page_images: pages.length ? pages : (prev.page_images || []),
+      pdf_path: row.pdf_url || prev.pdf_path || null,
+    };
+  });
+
   fs.mkdirSync(path.join(process.cwd(), 'public/blogs'), { recursive: true });
-  fs.writeFileSync(path.join(process.cwd(), 'public/blogs/blogs.json'), JSON.stringify(rows, null, 2));
-  console.log(`✅ Successfully fetched ${rows.length} blogs and saved to public/blogs/blogs.json`);
+  fs.writeFileSync(blogsJsonPath, JSON.stringify(rows, null, 2) + '\n');
+  console.log(`✅ Successfully synced ${rows.length} newsletter issue(s) to public/blogs/blogs.json`);
 }
 
 fetchBlogs().catch(console.error);
