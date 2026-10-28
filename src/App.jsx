@@ -17,6 +17,7 @@ import Blog from './pages/Blog';
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import LaserTag from './pages/LaserTag';
+import LaserTagAdmin from './pages/LaserTagAdmin';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -78,6 +79,7 @@ function App() {
   <Route path="/login" element={<Login />} />
   <Route path="/admin" element={<AdminDashboard />} />
   <Route path="/laser-tag" element={<LaserTag />} />
+  <Route path="/laser-tag/admin" element={<LaserTagAdmin />} />
   </Routes>
  </>
  );

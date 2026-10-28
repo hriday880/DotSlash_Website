@@ -1,0 +1,14 @@
+{
+  "name": "dotslash-laser-tag-api",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Booking + payment verification API for DotSlash \u00d7 Glitch Laser Tag (2 Nov 2026)",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "node --test"
+  }
+}

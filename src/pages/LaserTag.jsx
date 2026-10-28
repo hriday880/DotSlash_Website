@@ -1,828 +1,658 @@
-import { useState, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { ShieldCheck, Users, User, Clock, Zap, CheckCircle2, AlertCircle, Loader2, ExternalLink } from 'lucide-react';
-import { db } from '../lib/db';
+import QRCode from 'qrcode';
+import {
+  CalendarDays, Clock, MapPin, Users, User, Loader2, AlertCircle, CheckCircle2,
+  Search, X, Ticket, Copy, Smartphone, Upload, Hourglass, XCircle
+} from 'lucide-react';
+import { laserTagApi, SUPPORT, safeStorage, compressScreenshot } from '../lib/laserTagApi';
 
-const MODES = [
-  {
-    id: 'SOLO',
-    label: 'Solo Entry (1 Player)',
-    playersCount: 1,
-    price: 100,
-    subtitle: '1 Player · ₹100/person · Solo Combatant Matchmaking Pool',
-    badge: '₹100'
-  },
-  {
-    id: 'TRIO',
-    label: 'Squad of 3 Players',
-    playersCount: 3,
-    price: 300,
-    subtitle: '3 Players · ₹100/person · Paired with 1 solo teammate',
-    badge: '₹300'
-  },
-  {
-    id: 'SQUAD',
-    label: 'Full Squad (4 Players)',
-    playersCount: 4,
-    price: 400,
-    subtitle: '4 Players · ₹100/person · Complete 4-player arena side',
-    badge: '₹400'
-  }
-];
+const PRICE_PER_PLAYER = 100;
+const PROMO_PERCENT = 10;
+const VERIFY_WITHIN = '6 hours';
+const ACTIVE_KEY = 'lt_active_booking';
+const storage = safeStorage('local');
 
-const SLOTS = [
-  'Slot 1 · 8:00 PM – 8:20 PM',
-  'Slot 2 · 8:20 PM – 8:40 PM',
-  'Slot 3 · 8:40 PM – 9:00 PM',
-  'Slot 4 · 9:00 PM – 9:20 PM',
-  'Slot 5 · 9:20 PM – 9:40 PM',
-  'Slot 6 · 9:40 PM – 10:00 PM',
-  'Slot 7 · 10:00 PM – 10:20 PM',
-  'Slot 8 · 10:20 PM – 10:40 PM',
-  'Slot 9 · 10:40 PM – 11:00 PM',
-  'Slot 10 · 11:00 PM – 11:20 PM',
-  'Slot 11 · 11:20 PM – 11:40 PM',
-  'Slot 12 · 11:40 PM – 12:00 AM',
-  'Slot 13 · 12:00 AM – 12:20 AM',
-  'Slot 14 · 12:20 AM – 12:40 AM',
-  'Slot 15 · 12:40 AM – 1:00 AM'
-];
+const MODE_INFO = {
+  SOLO: { icon: User, seats: 1, hint: 'Join a team in the slot' },
+  TRIO: { icon: Users, seats: 3, hint: 'One solo player fills your 4th spot' },
+  SQUAD: { icon: Users, seats: 4, hint: 'A full team side' }
+};
 
-const EMPTY_PLAYER = () => ({
-  name: '',
-  email: '',
-  phone: '',
-  studentId: ''
-});
+const EMPTY_PLAYER = () => ({ name: '', email: '', phone: '', studentId: '' });
 
-export default function LaserTag() {
-  const [searchParams] = useSearchParams();
-  const initialMode = (searchParams.get('mode') || 'SOLO').toUpperCase();
-  const validInitialMode = MODES.some(m => m.id === initialMode) ? initialMode : 'SOLO';
+const label = 'font-sans text-xs tracking-widest uppercase font-semibold text-[#030303]';
+const input =
+  'w-full bg-[#F4F4F5] border border-[#E4E4E7] text-[#030303] px-3.5 py-2.5 font-mono text-sm focus:outline-none focus:border-[#3300FF] transition-colors';
+const card = 'bg-white border border-[#E4E4E7] rounded-xl';
+const primaryBtn =
+  'w-full py-4 bg-[#3300FF] hover:bg-[#2900CC] disabled:opacity-50 text-white font-sans text-sm tracking-widest uppercase font-semibold flex items-center justify-center gap-2 transition-colors';
 
-  const [selectedMode, setSelectedMode] = useState(validInitialMode);
-  const [squadName, setSquadName] = useState('');
-  const [preferredSlot, setPreferredSlot] = useState(SLOTS[0]);
-  const [players, setPlayers] = useState([
-    EMPTY_PLAYER(),
-    EMPTY_PLAYER(),
-    EMPTY_PLAYER(),
-    EMPTY_PLAYER()
-  ]);
+function availabilityTag(slot) {
+  if (slot.closed) return { text: 'Closed', tone: 'text-[#A1A1AA]' };
+  if (slot.seatsLeft === 0) return { text: 'Sold out', tone: 'text-[#A1A1AA]' };
+  if (slot.seatsLeft <= 3) return { text: `Filling fast · ${slot.seatsLeft} left`, tone: 'text-[#D97706]' };
+  return { text: `${slot.seatsLeft} spots left`, tone: 'text-[#059669]' };
+}
 
-  const [gatewayBaseUrl, setGatewayBaseUrl] = useState('http://localhost:7100');
-  const [gatewayOnline, setGatewayOnline] = useState(false);
-  const [gatewayChecking, setGatewayChecking] = useState(true);
-
-  const [isLaunchingGateway, setIsLaunchingGateway] = useState(false);
-  const [activeGatewaySession, setActiveGatewaySession] = useState(null);
-  const [errorMsg, setErrorMsg] = useState('');
-  const [confirmedReceipt, setConfirmedReceipt] = useState(null);
-
-  const pollTimerRef = useRef(null);
-
-  const modeConfig = MODES.find(m => m.id === selectedMode) || MODES[0];
-
-  // Ensure Turso table exists and resolve live YouPI-PG Gateway URL
+function useCountdown(until) {
+  const [now, setNow] = useState(Date.now());
   useEffect(() => {
-    let cancelled = false;
+    if (!until) return;
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, [until]);
+  if (!until) return null;
+  const left = Math.max(0, until - now);
+  return `${Math.floor(left / 60000)}:${String(Math.floor((left % 60000) / 1000)).padStart(2, '0')}`;
+}
 
-    async function initGatewayAndDb() {
-      setGatewayChecking(true);
-      try {
-        await db.execute(`
-          CREATE TABLE IF NOT EXISTS laser_tag_registrations (
-            id TEXT PRIMARY KEY,
-            order_id TEXT NOT NULL,
-            payment_id TEXT NOT NULL,
-            mode TEXT NOT NULL,
-            squad_name TEXT,
-            players_count INTEGER NOT NULL,
-            amount_inr INTEGER NOT NULL,
-            lead_name TEXT NOT NULL,
-            lead_email TEXT NOT NULL,
-            lead_phone TEXT NOT NULL,
-            lead_student_id TEXT,
-            players_json TEXT NOT NULL,
-            preferred_slot TEXT NOT NULL,
-            payment_status TEXT NOT NULL,
-            utr TEXT,
-            verified_at TEXT NOT NULL
-          )
-        `);
-      } catch (e) {
-        console.warn('Turso table init warning:', e.message);
-      }
-
-      const candidates = [];
-      const isLocal =
-        window.location.hostname === 'localhost' ||
-        window.location.hostname === '127.0.0.1';
-
-      if (isLocal) {
-        candidates.push('http://localhost:7100');
-      }
-
-      try {
-        const res = await db.execute(
-          `SELECT public_url, local_url FROM youpi_gateway_config WHERE id = 'primary' LIMIT 1`
-        );
-        const rows = res?.rows || [];
-        if (rows[0]?.public_url) {
-          candidates.push(rows[0].public_url.replace(/\/+$/, ''));
-        }
-        if (!isLocal && rows[0]?.local_url) {
-          candidates.push(rows[0].local_url.replace(/\/+$/, ''));
-        }
-      } catch {}
-
-      if (!isLocal) {
-        candidates.push('http://localhost:7100');
-      }
-
-      for (const url of candidates) {
-        try {
-          const res = await fetch(`${url}/health`, {
-            method: 'GET',
-            signal: AbortSignal.timeout(3500)
-          });
-          if (res.ok) {
-            if (!cancelled) {
-              setGatewayBaseUrl(url);
-              setGatewayOnline(true);
-              setGatewayChecking(false);
-            }
-            return;
-          }
-        } catch {}
-      }
-
-      if (!cancelled) {
-        if (candidates[0]) setGatewayBaseUrl(candidates[0]);
-        setGatewayOnline(false);
-        setGatewayChecking(false);
-      }
-    }
-
-    initGatewayAndDb();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  // Listen for postMessage events from the embedded YouPI-PG Checkout Portal iframe
+function Qr({ value, size = 'w-40 h-40' }) {
+  const [src, setSrc] = useState('');
   useEffect(() => {
-    function handleGatewayMessage(e) {
-      const payload = e.data;
-      if (!payload || typeof payload !== 'object') return;
+    QRCode.toDataURL(value, { margin: 1, width: 260, color: { dark: '#030303', light: '#ffffff' } })
+      .then(setSrc)
+      .catch(() => setSrc(''));
+  }, [value]);
+  return src ? <img src={src} alt="QR code" className={size} /> : <div className={`${size} bg-[#F4F4F5]`} />;
+}
 
-      const evt = payload.event || payload.type || '';
-      if (
-        evt === 'youpi.payment_success' ||
-        evt === 'PAYMENT_SUCCESS' ||
-        payload.status === 'SUCCESS'
-      ) {
-        if (activeGatewaySession) {
-          verifyAndFinalizeOrder(
-            activeGatewaySession.paymentId,
-            activeGatewaySession.orderId,
-            payload.data?.utr || payload.utr || null
-          );
-        }
-      } else if (
-        evt === 'youpi.modal_close' ||
-        evt === 'youpi.close' ||
-        evt === 'youpi.cancel' ||
-        evt === 'youpi.payment_cancelled'
-      ) {
-        if (pollTimerRef.current) {
-          clearInterval(pollTimerRef.current);
-          pollTimerRef.current = null;
-        }
-        setActiveGatewaySession(null);
-      }
-    }
+function SupportLine() {
+  return (
+    <p className="text-center font-mono text-xs text-[#52525B]">
+      Problems? DM <a className="text-[#3300FF]" href={SUPPORT.instagramUrl} target="_blank" rel="noreferrer">{SUPPORT.instagram}</a> or email{' '}
+      <a className="text-[#3300FF]" href={`mailto:${SUPPORT.email}`}>{SUPPORT.email}</a>
+    </p>
+  );
+}
 
-    window.addEventListener('message', handleGatewayMessage);
-    return () => window.removeEventListener('message', handleGatewayMessage);
-  }, [activeGatewaySession]);
+function BookingFacts({ b }) {
+  return (
+    <div className="grid grid-cols-2 gap-4 content-start">
+      <div className="col-span-2">
+        <p className="font-mono text-[11px] uppercase tracking-widest text-[#52525B]">Slot {b.slot}</p>
+        <p className="font-sans text-xl font-semibold text-[#030303]">{b.slotLabel}</p>
+      </div>
+      <div>
+        <p className="font-mono text-[11px] uppercase tracking-widest text-[#52525B]">Team</p>
+        <p className="font-sans text-lg font-semibold text-[#3300FF]">Team {b.team}</p>
+      </div>
+      <div>
+        <p className="font-mono text-[11px] uppercase tracking-widest text-[#52525B]">Booking</p>
+        <p className="font-sans text-lg font-semibold text-[#030303]">{b.modeLabel}</p>
+      </div>
+      <div className="col-span-2">
+        <p className="font-mono text-[11px] uppercase tracking-widest text-[#52525B] mb-1">{b.mode === 'SOLO' ? 'Player' : b.squadName}</p>
+        <ul className="font-mono text-sm text-[#030303] space-y-0.5">
+          {b.players.map((p, i) => <li key={i}>{i + 1}. {p.name}</li>)}
+        </ul>
+      </div>
+      <div className="col-span-2 flex justify-between border-t border-dashed border-[#E4E4E7] pt-3">
+        <span className="font-mono text-sm text-[#52525B]">Amount{b.promoApplied ? ' (promo applied)' : ''}</span>
+        <span className="font-mono text-sm font-bold text-[#030303]">₹{b.amount}</span>
+      </div>
+    </div>
+  );
+}
 
-  function updatePlayer(index, field, value) {
-    setPlayers(prev => {
-      const copy = [...prev];
-      copy[index] = { ...copy[index], [field]: value };
-      return copy;
-    });
-  }
+function TicketCard({ ticket }) {
+  const checkinUrl = `${window.location.origin}/laser-tag/admin?checkin=${ticket.id}`;
+  return (
+    <div className={`${card} overflow-hidden`}>
+      <div className="bg-[#3300FF] text-white px-6 py-4 flex items-center justify-between">
+        <div>
+          <p className="font-mono text-[11px] tracking-widest uppercase opacity-80">Laser Tag · {ticket.event.venue}</p>
+          <p className="font-sans font-semibold text-lg">{ticket.event.date}</p>
+        </div>
+        <CheckCircle2 className="w-7 h-7" />
+      </div>
+      <div className="p-6 flex flex-col sm:flex-row gap-6">
+        <div className="flex flex-col items-center gap-2 shrink-0">
+          <Qr value={checkinUrl} />
+          <p className="font-mono text-sm font-bold text-[#030303] tracking-wider">{ticket.id}</p>
+        </div>
+        <div className="flex-1"><BookingFacts b={ticket} /></div>
+      </div>
+      <p className="px-6 pb-5 font-mono text-xs text-[#52525B]">
+        Show this QR at the venue, and arrive 5 minutes early. Take a screenshot, or find it again later with “Find my booking”.
+      </p>
+    </div>
+  );
+}
 
-  function validateForm() {
-    const activePlayers = players.slice(0, modeConfig.playersCount);
+function StatusCard({ booking }) {
+  if (booking.status === 'PAID') return <TicketCard ticket={booking} />;
+  const rejected = booking.status === 'REJECTED';
+  return (
+    <div className={`${card} p-6 space-y-5`}>
+      <div className="flex items-start gap-3">
+        {rejected ? <XCircle className="w-7 h-7 text-[#DC2626] shrink-0" /> : <Hourglass className="w-7 h-7 text-[#D97706] shrink-0" />}
+        <div>
+          <p className="font-sans text-lg font-semibold text-[#030303]">{rejected ? 'Payment not verified' : 'Verifying your payment'}</p>
+          <p className="font-mono text-sm text-[#52525B]">
+            {rejected
+              ? `${booking.rejectionReason || 'We couldn’t match your payment.'} Your seats have been released. If you did pay, contact us with booking ID ${booking.id}.`
+              : `We got your UTR and screenshot. Your seats are held, and your ticket will appear here once we check the payment (usually within ${VERIFY_WITHIN}). Come back any time with “Find my booking”.`}
+          </p>
+        </div>
+      </div>
+      <p className="font-mono text-sm text-[#030303]">Booking ID: <strong className="tracking-wider">{booking.id}</strong></p>
+      <BookingFacts b={booking} />
+    </div>
+  );
+}
 
-    if (modeConfig.playersCount > 1 && !squadName.trim()) {
-      return 'Please enter a Squad Name for your team.';
-    }
+function PaymentStep({ booking, onSubmitted }) {
+  const left = useCountdown(booking.holdExpiresAt);
+  const [utr, setUtr] = useState('');
+  const [file, setFile] = useState(null);
+  const [preview, setPreview] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const [copied, setCopied] = useState(false);
+  const { payment } = booking;
 
-    for (let i = 0; i < activePlayers.length; i++) {
-      const p = activePlayers[i];
-      const label = i === 0 ? 'Lead Player (Player 1)' : `Player ${i + 1}`;
-      if (!p.name.trim()) {
-        return `Please enter Full Name for ${label}.`;
-      }
-      if (!p.email.trim() || !p.email.includes('@')) {
-        return `Please enter a valid Email Address for ${label}.`;
-      }
-      const cleanPhone = p.phone.replace(/\D/g, '').slice(-10);
-      if (cleanPhone.length !== 10) {
-        return `Please enter a valid 10-digit WhatsApp/Mobile number for ${label}.`;
-      }
-    }
+  const lapsed = left === '0:00';
 
-    return null;
-  }
+  useEffect(() => {
+    if (!file) return setPreview('');
+    const url = URL.createObjectURL(file);
+    setPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
 
-  async function verifyAndFinalizeOrder(paymentId, orderId, fallbackUtr = null) {
+  async function copyUpi() {
     try {
-      const res = await fetch(`${gatewayBaseUrl}/api/v1/payments/${encodeURIComponent(paymentId)}`);
-      if (!res.ok) return false;
-      const paymentData = await res.json();
-
-      if (paymentData.status !== 'SUCCESS') {
-        return false;
-      }
-
-      if (pollTimerRef.current) {
-        clearInterval(pollTimerRef.current);
-        pollTimerRef.current = null;
-      }
-
-      const activePlayers = players.slice(0, modeConfig.playersCount).map(p => ({
-        name: p.name.trim(),
-        email: p.email.trim().toLowerCase(),
-        phone: p.phone.replace(/\D/g, '').slice(-10),
-        studentId: p.studentId.trim()
-      }));
-
-      const lead = activePlayers[0];
-      const verifiedAt = new Date().toISOString();
-      const utr = paymentData.utr || fallbackUtr || 'VERIFIED-BY-OBSERVER';
-      const registrationId = `LT-REG-${Date.now().toString(36).toUpperCase()}`;
-
-      await db.execute(
-        `INSERT INTO laser_tag_registrations (
-          id, order_id, payment_id, mode, squad_name, players_count, amount_inr,
-          lead_name, lead_email, lead_phone, lead_student_id, players_json,
-          preferred_slot, payment_status, utr, verified_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'SUCCESS', ?, ?)`,
-        [
-          registrationId,
-          orderId,
-          paymentId,
-          modeConfig.id,
-          modeConfig.playersCount > 1 ? squadName.trim() : `${lead.name} (Solo)`,
-          modeConfig.playersCount,
-          modeConfig.price,
-          lead.name,
-          lead.email,
-          lead.phone,
-          lead.studentId || '',
-          JSON.stringify(activePlayers),
-          preferredSlot,
-          utr,
-          verifiedAt
-        ]
-      );
-
-      setActiveGatewaySession(null);
-      setConfirmedReceipt({
-        registrationId,
-        orderId,
-        paymentId,
-        mode: modeConfig.label,
-        squadName: modeConfig.playersCount > 1 ? squadName.trim() : `${lead.name} (Solo)`,
-        playersCount: modeConfig.playersCount,
-        amount: modeConfig.price,
-        preferredSlot,
-        players: activePlayers,
-        utr,
-        verifiedAt
-      });
-      return true;
-    } catch (err) {
-      console.error('Error finalizing verified payment:', err);
-      return false;
-    }
+      await navigator.clipboard.writeText(payment.upiId);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch { /* clipboard blocked */ }
   }
 
-  async function handleLaunchYoupiGateway(e) {
+  async function submit(e) {
     e.preventDefault();
-    setErrorMsg('');
-
-    const validationError = validateForm();
-    if (validationError) {
-      setErrorMsg(validationError);
-      return;
-    }
-
-    setIsLaunchingGateway(true);
-
+    setError('');
+    if (!/^\d{12}$/.test(utr)) return setError('The UTR is the 12-digit number in your UPI app’s payment details.');
+    if (!file) return setError('Attach a screenshot of the successful payment.');
+    setBusy(true);
     try {
-      const lead = players[0];
-      const cleanPhone = lead.phone.replace(/\D/g, '').slice(-10);
-      const orderId = `LT-${modeConfig.id}-${Date.now().toString(36).toUpperCase()}`;
-
-      const createRes = await fetch(`${gatewayBaseUrl}/api/v1/payments`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Merchant-Id': '00000000-0000-0000-0000-000000000001'
-        },
-        body: JSON.stringify({
-          orderId,
-          amount: modeConfig.price.toFixed(2),
-          currency: 'INR',
-          customer: {
-            fullName: lead.name.trim(),
-            name: lead.name.trim(),
-            email: lead.email.trim().toLowerCase(),
-            phoneNumber: cleanPhone,
-            mobileNumber: cleanPhone
-          },
-          description: `DotSlash X Glitch Laser Tag · ${modeConfig.label}`,
-          metadata: {
-            mode: modeConfig.id,
-            playersCount: modeConfig.playersCount,
-            squadName: modeConfig.playersCount > 1 ? squadName.trim() : `${lead.name.trim()} (Solo)`,
-            preferredSlot
-          }
-        })
-      });
-
-      const data = await createRes.json();
-      if (!createRes.ok || !data.paymentId) {
-        throw new Error(data.error || data.message || 'Unable to initialize YouPI-PG payment session.');
-      }
-
-      const checkoutIframeUrl = `${gatewayBaseUrl}/checkout/${encodeURIComponent(data.paymentId)}?embedded=1`;
-
-      setActiveGatewaySession({
-        paymentId: data.paymentId,
-        orderId,
-        amount: modeConfig.price,
-        checkoutUrl: checkoutIframeUrl
-      });
-
-      // Start real-time status polling against YouPI-PG Payment API
-      if (pollTimerRef.current) clearInterval(pollTimerRef.current);
-      pollTimerRef.current = setInterval(async () => {
-        const done = await verifyAndFinalizeOrder(data.paymentId, orderId);
-        if (done && pollTimerRef.current) {
-          clearInterval(pollTimerRef.current);
-          pollTimerRef.current = null;
-        }
-      }, 2000);
+      const screenshot = await compressScreenshot(file);
+      onSubmitted(await laserTagApi.submitPayment(booking.id, utr, screenshot));
     } catch (err) {
-      setErrorMsg(
-        err.message ||
-          'Could not connect to the YouPI Payment Gateway. Make sure the gateway service is running.'
-      );
+      setError(err.message);
     } finally {
-      setIsLaunchingGateway(false);
+      setBusy(false);
     }
   }
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white pt-24 pb-20 px-4 sm:px-6">
-      <div className="max-w-3xl mx-auto">
-        {/* Top Banner */}
-        <div className="rounded-2xl border border-red-500/30 bg-gradient-to-b from-red-950/30 to-zinc-950 p-6 sm:p-8 mb-6 shadow-2xl">
-          <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-wider bg-red-500/15 text-red-400 border border-red-500/30">
-              <Zap className="w-3.5 h-3.5" /> DotSlash × Glitch · Laser Tag Arena
-            </span>
-            <span
-              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono border ${
-                gatewayChecking
-                  ? 'bg-zinc-900 text-zinc-400 border-zinc-700'
-                  : gatewayOnline
-                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                  : 'bg-amber-500/10 text-amber-300 border-amber-500/30'
-              }`}
-            >
-              <span
-                className={`w-2 h-2 rounded-full ${
-                  gatewayChecking
-                    ? 'bg-zinc-400 animate-pulse'
-                    : gatewayOnline
-                    ? 'bg-emerald-400 animate-pulse'
-                    : 'bg-amber-400'
-                }`}
-              />
-              {gatewayChecking
-                ? 'Connecting to YouPI Gateway...'
-                : gatewayOnline
-                ? 'YouPI-PG Automated Gateway Online'
-                : 'YouPI-PG Gateway Standby'}
-            </span>
-          </div>
+    <section className={`${card} overflow-hidden`}>
+      <div className="px-6 py-4 border-b border-[#E4E4E7] flex flex-wrap items-center justify-between gap-2">
+        <h2 className={label}><span className="text-[#3300FF]">05</span> · Pay ₹{payment.amount} by UPI</h2>
+        <span className="font-mono text-xs text-[#D97706]">{lapsed ? 'Hold expired' : `Seats held for ${left}`}</span>
+      </div>
 
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2">
-            Laser Tag Registration &amp; Instant YouPI Checkout
-          </h1>
-          <p className="text-sm text-zinc-400 leading-relaxed">
-            Venue: <strong className="text-zinc-200">Learning Commons A&amp;B</strong> · 20-Minute
-            Arena Slots (10m Active Combat, 5m Briefing, 5m Debrief). Payments are verified{' '}
-            <strong className="text-emerald-400">automatically in real time by YouPI-PG</strong> — no
-            manual UTR entry required.
+      <div className="p-6 grid sm:grid-cols-[auto,1fr] gap-6 items-start">
+        <div className="flex flex-col items-center gap-2">
+          <Qr value={payment.link} size="w-48 h-48" />
+          <p className="font-mono text-[11px] text-[#52525B]">Scan with any UPI app</p>
+        </div>
+        <div className="space-y-3 font-mono text-sm text-[#030303]">
+          <a href={payment.link} className="sm:hidden flex items-center justify-center gap-2 w-full py-3 bg-[#030303] text-white font-sans text-xs tracking-widest uppercase font-semibold">
+            <Smartphone className="w-4 h-4" /> Open UPI app
+          </a>
+          <div className="flex justify-between gap-3"><span className="text-[#52525B]">Pay to</span><span className="text-right">{payment.payee}</span></div>
+          <div className="flex justify-between gap-3 items-center">
+            <span className="text-[#52525B]">UPI ID</span>
+            <button type="button" onClick={copyUpi} className="flex items-center gap-1.5 font-bold break-all text-right">
+              {payment.upiId} <Copy className="w-3.5 h-3.5 shrink-0 text-[#3300FF]" />
+            </button>
+          </div>
+          {copied && <p className="text-right text-[11px] text-[#059669]">Copied</p>}
+          <div className="flex justify-between gap-3"><span className="text-[#52525B]">Amount</span><span className="font-bold">₹{payment.amount}.00</span></div>
+          <div className="flex justify-between gap-3"><span className="text-[#52525B]">Note</span><span className="font-bold tracking-wider">{payment.note}</span></div>
+          <p className="text-[11px] text-[#52525B]">Pay the exact amount. If you pay by UPI ID, add the booking ID as the note.</p>
+        </div>
+      </div>
+
+      <form onSubmit={submit} className="px-6 pb-6 space-y-4 border-t border-[#E4E4E7] pt-5">
+        <p className={label}>After paying</p>
+        {lapsed && (
+          <p className="font-mono text-xs text-[#B91C1C]">
+            Your 15-minute hold ran out. If you’ve already paid, submit anyway and we’ll seat you if there’s room, or refund you.
+            If you haven’t paid yet, don’t pay. Start a new booking instead.
+          </p>
+        )}
+        <div className="space-y-1.5">
+          <label className="font-mono text-xs text-[#52525B]" htmlFor="utr">12-digit UTR / UPI reference no. *</label>
+          <input id="utr" className={input} inputMode="numeric" placeholder="e.g. 431245678901" value={utr} onChange={e => setUtr(e.target.value.replace(/\D/g, '').slice(0, 12))} />
+        </div>
+        <div className="space-y-1.5">
+          <span className="font-mono text-xs text-[#52525B]">Payment screenshot *</span>
+          <label className="flex items-center gap-3 p-3 border border-dashed border-[#A1A1AA] bg-[#F4F4F5] cursor-pointer hover:border-[#3300FF]">
+            {preview ? <img src={preview} alt="Screenshot preview" className="w-14 h-14 object-cover border border-[#E4E4E7]" /> : <Upload className="w-5 h-5 text-[#3300FF]" />}
+            <span className="font-mono text-sm text-[#030303] truncate">{file ? file.name : 'Choose screenshot'}</span>
+            <input type="file" accept="image/*" className="sr-only" onChange={e => setFile(e.target.files?.[0] || null)} />
+          </label>
+        </div>
+        {error && (
+          <div className="flex items-start gap-2 p-3 border border-[#FCA5A5] bg-[#FEF2F2] font-mono text-xs text-[#B91C1C]">
+            <AlertCircle className="w-4 h-4 shrink-0" /> {error}
+          </div>
+        )}
+        <button type="submit" disabled={busy} className={primaryBtn}>
+          {busy ? <><Loader2 className="w-4 h-4 animate-spin" /> Submitting…</> : 'Submit payment details'}
+        </button>
+        <p className="font-mono text-[11px] text-[#52525B]">
+          We check every payment by hand against our UPI account. Fake or reused UTRs are rejected. Tickets are non-refundable.
+        </p>
+      </form>
+    </section>
+  );
+}
+
+function FindBooking({ onFound }) {
+  const [ref, setRef] = useState('');
+  const [email, setEmail] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+
+  async function submit(e) {
+    e.preventDefault();
+    setBusy(true);
+    setError('');
+    try {
+      const { tickets } = await laserTagApi.lookup(ref, email);
+      onFound(tickets);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <form onSubmit={submit} className={`${card} p-6 space-y-4`}>
+      <h2 className={`${label} flex items-center gap-2`}><Search className="w-4 h-4 text-[#3300FF]" /> Find my booking</h2>
+      <div className="grid sm:grid-cols-2 gap-3">
+        <input className={input} placeholder="Booking ID or lead phone" value={ref} onChange={e => setRef(e.target.value)} required />
+        <input className={input} type="email" placeholder="Lead player’s email" value={email} onChange={e => setEmail(e.target.value)} required />
+      </div>
+      {error && <p className="font-mono text-xs text-[#DC2626]">{error}</p>}
+      <button type="submit" disabled={busy} className="px-5 py-2.5 bg-[#030303] text-white font-sans text-xs tracking-widest uppercase font-semibold disabled:opacity-50">
+        {busy ? 'Searching…' : 'Find booking'}
+      </button>
+    </form>
+  );
+}
+
+export default function LaserTag() {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [eventData, setEventData] = useState(null);
+  const [loadError, setLoadError] = useState('');
+
+  const [slotNumber, setSlotNumber] = useState(null);
+  const [mode, setMode] = useState(null);
+  const [squadName, setSquadName] = useState('');
+  const [players, setPlayers] = useState([EMPTY_PLAYER(), EMPTY_PLAYER(), EMPTY_PLAYER(), EMPTY_PLAYER()]);
+
+  const [promoInput, setPromoInput] = useState('');
+  const [promo, setPromo] = useState(null);
+  const [promoError, setPromoError] = useState('');
+  const [promoBusy, setPromoBusy] = useState(false);
+
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [hold, setHold] = useState(null); // booking awaiting UPI payment
+  const [results, setResults] = useState(null); // PENDING / PAID / REJECTED bookings to show
+
+  const loadEvent = useCallback(async () => {
+    try {
+      setEventData(await laserTagApi.getEvent());
+      setLoadError('');
+    } catch (err) {
+      setLoadError(err.message);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadEvent();
+    const t = setInterval(loadEvent, 20000);
+    return () => clearInterval(t);
+  }, [loadEvent]);
+
+  const showBooking = useCallback(booking => {
+    if (booking.status === 'HOLD') {
+      setHold(booking);
+      return;
+    }
+    setHold(null);
+    if (booking.status === 'EXPIRED') {
+      storage.remove(ACTIVE_KEY);
+      setError(`Your 15-minute hold on booking ${booking.id} ran out, so the seats were released. If you already paid, contact us with the booking ID.`);
+      loadEvent();
+      return;
+    }
+    if (booking.status === 'PENDING') storage.set(ACTIVE_KEY, booking.id);
+    else storage.remove(ACTIVE_KEY);
+    setResults([booking]);
+    setSearchParams({ booking: booking.id }, { replace: true });
+    window.scrollTo(0, 0);
+  }, [loadEvent, setSearchParams]);
+
+  const refresh = useCallback(async id => {
+    try {
+      showBooking(await laserTagApi.getBooking(id));
+    } catch (err) {
+      if (err.status === 404) storage.remove(ACTIVE_KEY);
+    }
+  }, [showBooking]);
+
+  // Resume from the URL or from a booking left open in this browser.
+  useEffect(() => {
+    const id = searchParams.get('booking') || storage.get(ACTIVE_KEY);
+    if (id) refresh(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // While verifying, check back so the ticket appears without a reload.
+  const pendingId = results?.length === 1 && results[0].status === 'PENDING' ? results[0].id : null;
+  useEffect(() => {
+    if (!pendingId) return;
+    const t = setInterval(() => refresh(pendingId), 30000);
+    return () => clearInterval(t);
+  }, [pendingId, refresh]);
+
+  const slots = eventData?.slots || [];
+  const selectedSlot = slots.find(s => s.number === slotNumber) || null;
+  const modes = eventData?.modes || [];
+  const seats = mode ? MODE_INFO[mode].seats : 0;
+
+  const pricing = useMemo(() => {
+    const base = seats * PRICE_PER_PLAYER;
+    const discount = promo ? Math.round((base * PROMO_PERCENT) / 100) : 0;
+    return { base, discount, total: base - discount };
+  }, [seats, promo]);
+
+  const fits = (s, id) => ({ SOLO: s.canSolo, TRIO: s.canTrio, SQUAD: s.canSquad }[id]);
+
+  function pickSlot(s) {
+    setSlotNumber(s.number);
+    setError('');
+    if (mode && !fits(s, mode)) setMode(null);
+  }
+
+  function updatePlayer(i, field, value) {
+    setPlayers(prev => prev.map((p, idx) => (idx === i ? { ...p, [field]: value } : p)));
+  }
+
+  async function applyPromo() {
+    if (!promoInput.trim()) return;
+    setPromoBusy(true);
+    setPromoError('');
+    try {
+      const res = await laserTagApi.checkPromo(promoInput, mode || 'SOLO');
+      setPromo({ code: res.code });
+    } catch (err) {
+      setPromo(null);
+      setPromoError(err.message);
+    } finally {
+      setPromoBusy(false);
+    }
+  }
+
+  async function holdSeats(e) {
+    e.preventDefault();
+    setError('');
+    if (!selectedSlot || !mode) return setError('Pick a slot and how many players first.');
+    setSubmitting(true);
+    try {
+      const booking = await laserTagApi.createBooking({
+        slot: slotNumber,
+        mode,
+        squadName,
+        players: players.slice(0, seats),
+        promoCode: promo?.code || ''
+      });
+      storage.set(ACTIVE_KEY, booking.id);
+      setHold(booking);
+      loadEvent();
+    } catch (err) {
+      setError(err.message);
+      loadEvent();
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  const ev = eventData?.event;
+
+  if (results) {
+    const allPaid = results.every(r => r.status === 'PAID');
+    return (
+      <div className="min-h-screen bg-[#F3F4F6] pt-28 pb-20 px-4">
+        <div className="max-w-2xl mx-auto space-y-6">
+          {allPaid && (
+            <div className="text-center">
+              <p className="font-mono text-xs tracking-widest uppercase text-[#059669] mb-2">Booking confirmed</p>
+              <h1 className="font-sans text-3xl sm:text-4xl font-semibold uppercase tracking-wider text-[#3300FF]">You’re in</h1>
+            </div>
+          )}
+          {results.map(b => <StatusCard key={b.id} booking={b} />)}
+          <button
+            type="button"
+            onClick={() => { setResults(null); setSearchParams({}, { replace: true }); loadEvent(); }}
+            className="w-full py-3 border border-[#E4E4E7] bg-white font-sans text-xs tracking-widest uppercase font-semibold text-[#030303] hover:border-[#3300FF]"
+          >
+            Book another slot
+          </button>
+          <SupportLine />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#F3F4F6] pt-28 pb-20 px-4">
+      <div className="max-w-3xl mx-auto space-y-6">
+        {/* Event card */}
+        <div className={`${card} p-6 sm:p-8`}>
+          <p className="font-mono text-xs tracking-widest uppercase text-[#52525B] mb-2">DotSlash × Glitch</p>
+          <h1 className="font-sans text-4xl sm:text-5xl font-semibold uppercase tracking-wider text-[#3300FF] mb-5">Laser Tag</h1>
+          <div className="grid sm:grid-cols-3 gap-3 font-mono text-sm text-[#030303]">
+            <span className="flex items-center gap-2"><CalendarDays className="w-4 h-4 text-[#3300FF]" /> {ev?.dateLabel || 'Sunday, 2 November 2026'}</span>
+            <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-[#3300FF]" /> {ev?.timeLabel || '8:00 PM – 1:00 AM'}</span>
+            <span className="flex items-center gap-2"><MapPin className="w-4 h-4 text-[#3300FF]" /> {ev?.venue || 'Learning Commons A&B'}</span>
+          </div>
+          <p className="font-mono text-sm text-[#52525B] mt-4">
+            20-minute slots: a 5-minute briefing, 10 minutes of play and a 5-minute debrief. Two teams of 4 per slot. ₹{PRICE_PER_PLAYER} per player.
           </p>
         </div>
 
-        {/* Confirmed Receipt View */}
-        {confirmedReceipt ? (
-          <div className="rounded-2xl border border-emerald-500/40 bg-zinc-950 p-6 sm:p-8 shadow-2xl">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
-                <CheckCircle2 className="w-7 h-7" />
-              </div>
-              <div>
-                <span className="text-xs font-mono uppercase tracking-wider text-emerald-400">
-                  Verified by YouPI-PG Banking Observer
-                </span>
-                <h2 className="text-xl sm:text-2xl font-bold text-white">
-                  Registration &amp; Payment Confirmed!
-                </h2>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-zinc-900/80 border border-zinc-800 rounded-xl p-4 mb-6 text-sm">
-              <div>
-                <span className="text-zinc-500 block text-xs">Registration ID</span>
-                <span className="font-mono font-semibold text-white">
-                  {confirmedReceipt.registrationId}
-                </span>
-              </div>
-              <div>
-                <span className="text-zinc-500 block text-xs">YouPI Order ID</span>
-                <span className="font-mono font-semibold text-white">
-                  {confirmedReceipt.orderId}
-                </span>
-              </div>
-              <div>
-                <span className="text-zinc-500 block text-xs">Mode &amp; Squad</span>
-                <span className="font-semibold text-white">
-                  {confirmedReceipt.mode} · {confirmedReceipt.squadName}
-                </span>
-              </div>
-              <div>
-                <span className="text-zinc-500 block text-xs">Amount Verified</span>
-                <span className="font-bold text-emerald-400">₹{confirmedReceipt.amount}.00</span>
-              </div>
-              <div>
-                <span className="text-zinc-500 block text-xs">Preferred Slot</span>
-                <span className="text-zinc-200">{confirmedReceipt.preferredSlot}</span>
-              </div>
-              <div>
-                <span className="text-zinc-500 block text-xs">YouPI Payment Session</span>
-                <span className="font-mono text-xs text-zinc-300">
-                  {confirmedReceipt.paymentId}
-                </span>
-              </div>
-            </div>
-
-            <div className="mb-6">
-              <h3 className="text-xs font-mono uppercase tracking-wider text-zinc-400 mb-2">
-                Registered Roster ({confirmedReceipt.playersCount} Player
-                {confirmedReceipt.playersCount > 1 ? 's' : ''})
-              </h3>
-              <div className="space-y-2">
-                {confirmedReceipt.players.map((p, idx) => (
-                  <div
-                    key={idx}
-                    className="flex flex-wrap items-center justify-between gap-2 px-3.5 py-2.5 rounded-lg bg-zinc-900/50 border border-zinc-800/80 text-sm"
-                  >
-                    <span className="font-medium text-white">
-                      {idx + 1}. {p.name}
-                    </span>
-                    <span className="text-xs font-mono text-zinc-400">
-                      {p.email} · +91 {p.phone}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => {
-                setConfirmedReceipt(null);
-                setPlayers([EMPTY_PLAYER(), EMPTY_PLAYER(), EMPTY_PLAYER(), EMPTY_PLAYER()]);
-                setSquadName('');
-              }}
-              className="w-full py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-semibold text-sm transition"
-            >
-              Register Another Squad / Player
-            </button>
+        {loadError && (
+          <div className="flex items-start gap-2 p-4 border border-[#FCA5A5] bg-[#FEF2F2] rounded-xl font-mono text-sm text-[#B91C1C]">
+            <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" /> {loadError}
           </div>
-        ) : (
-          <form onSubmit={handleLaunchYoupiGateway} className="space-y-6">
-            {/* SECTION 1: SQUAD SIZE & MODE */}
-            <div className="rounded-2xl border border-zinc-800 bg-zinc-950/90 overflow-hidden">
-              <div className="bg-zinc-900/90 border-b border-zinc-800 px-6 py-4 flex items-center justify-between">
-                <div>
-                  <span className="text-[11px] font-mono uppercase tracking-widest text-red-400 block">
-                    Section 1 of 4
-                  </span>
-                  <h2 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
-                    <Users className="w-4 h-4 text-red-400" /> Choose Registration Mode
-                  </h2>
-                </div>
-                <span className="text-sm font-mono font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-lg">
-                  Total: ₹{modeConfig.price}
-                </span>
-              </div>
+        )}
 
-              <div className="p-6 grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-                {MODES.map(m => {
-                  const active = selectedMode === m.id;
+        {hold ? (
+          <>
+            <div className={`${card} p-6`}>
+              <div className="flex items-center justify-between gap-3 mb-3">
+                <p className={label}>Your booking · {hold.id}</p>
+                <button
+                  type="button"
+                  onClick={() => { storage.remove(ACTIVE_KEY); setHold(null); loadEvent(); }}
+                  className="font-mono text-xs text-[#52525B] underline"
+                >
+                  Start over
+                </button>
+              </div>
+              <BookingFacts b={hold} />
+            </div>
+            <PaymentStep booking={hold} onSubmitted={showBooking} />
+          </>
+        ) : eventData && !eventData.bookingsOpen ? (
+          <div className={`${card} p-6 font-mono text-sm text-[#030303]`}>Online booking is closed. Walk-ins are handled at the venue.</div>
+        ) : eventData ? (
+          <form onSubmit={holdSeats} className="space-y-6">
+            {/* 1. Slot */}
+            <section className={`${card} p-6`}>
+              <h2 className={`${label} mb-4`}><span className="text-[#3300FF]">01</span> · Pick a slot</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {slots.map(s => {
+                  const tag = availabilityTag(s);
+                  const disabled = s.closed || s.seatsLeft === 0;
+                  const active = s.number === slotNumber;
                   return (
                     <button
-                      key={m.id}
+                      key={s.number}
                       type="button"
-                      onClick={() => setSelectedMode(m.id)}
-                      className={`text-left p-4 rounded-xl border transition-all ${
+                      disabled={disabled}
+                      onClick={() => pickSlot(s)}
+                      className={`text-left p-3 rounded-lg border transition-colors ${
                         active
-                          ? 'border-red-500 bg-red-500/10 shadow-lg shadow-red-950/30'
-                          : 'border-zinc-800 bg-zinc-900/40 hover:border-zinc-700'
+                          ? 'border-[#3300FF] bg-[#3300FF]/5 ring-1 ring-[#3300FF]'
+                          : disabled
+                          ? 'border-[#E4E4E7] bg-[#F4F4F5] cursor-not-allowed'
+                          : 'border-[#E4E4E7] bg-white hover:border-[#3300FF]'
                       }`}
                     >
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-bold text-white text-sm sm:text-base">{m.label}</span>
-                        <span
-                          className={`text-xs font-mono font-bold px-2.5 py-0.5 rounded-md ${
-                            active
-                              ? 'bg-red-500 text-white'
-                              : 'bg-zinc-800 text-zinc-300'
-                          }`}
-                        >
-                          {m.badge}
-                        </span>
-                      </div>
-                      <p className="text-xs text-zinc-400">{m.subtitle}</p>
+                      <p className={`font-mono text-sm font-bold ${disabled ? 'text-[#A1A1AA]' : 'text-[#030303]'}`}>{s.label}</p>
+                      <p className={`font-mono text-[11px] mt-1 ${tag.tone}`}>{tag.text}</p>
                     </button>
                   );
                 })}
               </div>
-            </div>
+            </section>
 
-            {/* SECTION 2: PLAYER / SQUAD DETAILS */}
-            <div className="rounded-2xl border border-zinc-800 bg-zinc-950/90 overflow-hidden">
-              <div className="bg-zinc-900/90 border-b border-zinc-800 px-6 py-4">
-                <span className="text-[11px] font-mono uppercase tracking-widest text-red-400 block">
-                  Section 2 of 4
-                </span>
-                <h2 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
-                  <User className="w-4 h-4 text-red-400" />{' '}
-                  {modeConfig.playersCount === 1
-                    ? 'Solo Player Details'
-                    : `${modeConfig.label} Roster (${modeConfig.playersCount} Players)`}
-                </h2>
+            {/* 2. Players */}
+            <section className={`${card} p-6`}>
+              <h2 className={`${label} mb-4`}><span className="text-[#3300FF]">02</span> · How many players?</h2>
+              <div className="grid sm:grid-cols-3 gap-3">
+                {modes.map(m => {
+                  const info = MODE_INFO[m.id];
+                  const Icon = info.icon;
+                  const allowed = !selectedSlot || fits(selectedSlot, m.id);
+                  const active = mode === m.id;
+                  return (
+                    <button
+                      key={m.id}
+                      type="button"
+                      disabled={!allowed}
+                      onClick={() => setMode(m.id)}
+                      className={`text-left p-4 rounded-lg border transition-colors ${
+                        active
+                          ? 'border-[#3300FF] bg-[#3300FF]/5 ring-1 ring-[#3300FF]'
+                          : allowed
+                          ? 'border-[#E4E4E7] hover:border-[#3300FF]'
+                          : 'border-[#E4E4E7] bg-[#F4F4F5] opacity-60 cursor-not-allowed'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="flex items-center gap-2 font-sans font-semibold text-[#030303]"><Icon className="w-4 h-4 text-[#3300FF]" /> {m.label}</span>
+                        <span className="font-mono text-sm font-bold text-[#030303]">₹{m.price}</span>
+                      </div>
+                      <p className="font-mono text-[11px] text-[#52525B]">
+                        {m.seats} player{m.seats > 1 ? 's' : ''} · {allowed ? info.hint : 'No room in this slot'}
+                      </p>
+                    </button>
+                  );
+                })}
               </div>
+            </section>
 
-              <div className="p-6 space-y-6">
-                {modeConfig.playersCount > 1 && (
-                  <div>
-                    <label className="block text-xs font-mono uppercase text-zinc-300 mb-1.5">
-                      Squad / Team Name *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={squadName}
-                      onChange={e => setSquadName(e.target.value)}
-                      placeholder="e.g. Neon Vipers"
-                      className="w-full px-4 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white text-sm focus:outline-none focus:border-red-500"
-                    />
+            {/* 3. Details */}
+            {mode && (
+              <section className={`${card} p-6 space-y-5`}>
+                <h2 className={label}><span className="text-[#3300FF]">03</span> · Player details</h2>
+                {seats > 1 && (
+                  <div className="space-y-1.5">
+                    <label className="font-mono text-xs text-[#52525B]" htmlFor="squad">Squad name *</label>
+                    <input id="squad" className={input} required maxLength={40} value={squadName} onChange={e => setSquadName(e.target.value)} placeholder="e.g. Neon Vipers" />
                   </div>
                 )}
-
-                {Array.from({ length: modeConfig.playersCount }).map((_, idx) => (
-                  <div
-                    key={idx}
-                    className="p-4 rounded-xl bg-zinc-900/50 border border-zinc-800/90 space-y-4"
-                  >
-                    <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
-                      <span className="text-xs font-mono uppercase tracking-wider text-red-400 font-semibold">
-                        {idx === 0
-                          ? 'Player 1 · Lead Player (Payment Contact)'
-                          : `Player ${idx + 1} · Squad Teammate`}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                      <div>
-                        <label className="block text-xs text-zinc-400 mb-1">Full Name *</label>
-                        <input
-                          type="text"
-                          required
-                          value={players[idx].name}
-                          onChange={e => updatePlayer(idx, 'name', e.target.value)}
-                          placeholder="Full Name"
-                          className="w-full px-3.5 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-white text-sm focus:outline-none focus:border-red-500"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-xs text-zinc-400 mb-1">
-                          FLAME Email Address *
-                        </label>
-                        <input
-                          type="email"
-                          required
-                          value={players[idx].email}
-                          onChange={e => updatePlayer(idx, 'email', e.target.value)}
-                          placeholder="student@flame.edu.in"
-                          className="w-full px-3.5 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-white text-sm focus:outline-none focus:border-red-500"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-xs text-zinc-400 mb-1">
-                          10-Digit WhatsApp / Mobile Number *
-                        </label>
-                        <input
-                          type="tel"
-                          required
-                          maxLength={10}
-                          value={players[idx].phone}
-                          onChange={e =>
-                            updatePlayer(idx, 'phone', e.target.value.replace(/\D/g, '').slice(0, 10))
-                          }
-                          placeholder="10-digit mobile number"
-                          className="w-full px-3.5 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-white text-sm focus:outline-none focus:border-red-500"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-xs text-zinc-400 mb-1">
-                          FLAME Student ID / Roll No.
-                        </label>
-                        <input
-                          type="text"
-                          value={players[idx].studentId}
-                          onChange={e => updatePlayer(idx, 'studentId', e.target.value)}
-                          placeholder="e.g. FU2026..."
-                          className="w-full px-3.5 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-white text-sm focus:outline-none focus:border-red-500"
-                        />
-                      </div>
+                {players.slice(0, seats).map((p, i) => (
+                  <div key={i} className={`space-y-3 ${i > 0 ? 'pt-4 border-t border-[#E4E4E7]' : ''}`}>
+                    <p className="font-mono text-xs uppercase tracking-widest text-[#3300FF]">
+                      {i === 0 ? (seats > 1 ? 'Player 1 · Lead (payment contact)' : 'Your details') : `Player ${i + 1}`}
+                    </p>
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      <input className={input} required placeholder="Full name *" value={p.name} onChange={e => updatePlayer(i, 'name', e.target.value)} />
+                      <input className={input} required type="email" placeholder="FLAME email *" value={p.email} onChange={e => updatePlayer(i, 'email', e.target.value)} />
+                      <input className={input} required type="tel" inputMode="numeric" placeholder="10-digit phone *" value={p.phone} onChange={e => updatePlayer(i, 'phone', e.target.value.replace(/\D/g, '').slice(0, 10))} />
+                      <input className={input} placeholder="Student ID (optional)" value={p.studentId} onChange={e => updatePlayer(i, 'studentId', e.target.value)} />
                     </div>
                   </div>
                 ))}
-              </div>
-            </div>
+              </section>
+            )}
 
-            {/* SECTION 3: PREFERRED TIME SLOT */}
-            <div className="rounded-2xl border border-zinc-800 bg-zinc-950/90 overflow-hidden">
-              <div className="bg-zinc-900/90 border-b border-zinc-800 px-6 py-4">
-                <span className="text-[11px] font-mono uppercase tracking-widest text-red-400 block">
-                  Section 3 of 4
-                </span>
-                <h2 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-red-400" /> Preferred Arena Time Slot
-                </h2>
-              </div>
-
-              <div className="p-6">
-                <label className="block text-xs text-zinc-400 mb-2">
-                  Select your preferred 20-minute slot at Learning Commons A&amp;B
-                </label>
-                <select
-                  value={preferredSlot}
-                  onChange={e => setPreferredSlot(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-800 text-white text-sm focus:outline-none focus:border-red-500"
-                >
-                  {SLOTS.map(slot => (
-                    <option key={slot} value={slot}>
-                      {slot}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* SECTION 4: OFFICIAL YOUPI-PG AUTOMATED CHECKOUT */}
-            <div className="rounded-2xl border border-red-500/30 bg-zinc-950/95 overflow-hidden">
-              <div className="bg-zinc-900/90 border-b border-zinc-800 px-6 py-4 flex items-center justify-between">
-                <div>
-                  <span className="text-[11px] font-mono uppercase tracking-widest text-red-400 block">
-                    Section 4 of 4 · Automated UPI Gateway
-                  </span>
-                  <h2 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-emerald-400" /> Instant Payment via YouPI-PG
-                  </h2>
+            {/* 4. Summary */}
+            {mode && selectedSlot && (
+              <section className={`${card} p-6 space-y-4`}>
+                <h2 className={label}><span className="text-[#3300FF]">04</span> · Summary</h2>
+                <div className="font-mono text-sm text-[#030303] space-y-2">
+                  <div className="flex justify-between gap-3"><span className="text-[#52525B]">Slot</span><span>{selectedSlot.label}</span></div>
+                  <div className="flex justify-between gap-3"><span className="text-[#52525B]">{modes.find(m => m.id === mode)?.label} · {seats} × ₹{PRICE_PER_PLAYER}</span><span>₹{pricing.base}</span></div>
+                  {promo && (
+                    <div className="flex justify-between gap-3 text-[#059669]">
+                      <span className="flex items-center gap-2">Promo {promo.code}
+                        <button type="button" aria-label="Remove promo" onClick={() => setPromo(null)}><X className="w-3.5 h-3.5" /></button>
+                      </span>
+                      <span>−₹{pricing.discount}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between border-t border-[#E4E4E7] pt-2 text-base font-bold"><span>Total</span><span>₹{pricing.total}</span></div>
                 </div>
-                <span className="text-xs font-mono text-zinc-400">0% Gateway Fee · Auto-Verified</span>
-              </div>
 
-              <div className="p-6 space-y-4">
-                <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl bg-zinc-900/80 border border-zinc-800">
+                {!promo && (
                   <div>
-                    <div className="text-xs text-zinc-400">Merchant Account</div>
-                    <div className="text-sm font-bold text-white">
-                      DotSlash X Glitch (Verified YouPI-PG Gateway)
+                    <div className="flex gap-2">
+                      <input
+                        className={`${input} uppercase`}
+                        placeholder="Promo code"
+                        value={promoInput}
+                        onChange={e => { setPromoInput(e.target.value); setPromoError(''); }}
+                        onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); applyPromo(); } }}
+                      />
+                      <button type="button" onClick={applyPromo} disabled={promoBusy || !promoInput.trim()} className="px-5 border border-[#030303] font-sans text-xs tracking-widest uppercase font-semibold text-[#030303] disabled:opacity-40">
+                        {promoBusy ? '…' : 'Apply'}
+                      </button>
                     </div>
-                    <div className="text-xs text-zinc-500 mt-0.5">
-                      Dynamic Vector QR · Single-Slot Queue · Real-Time Bank SMS &amp; Gmail Observer
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-xs text-zinc-400">Payable Amount</div>
-                    <div className="text-2xl font-extrabold text-emerald-400">
-                      ₹{modeConfig.price}.00
-                    </div>
-                  </div>
-                </div>
-
-                <div className="text-xs text-zinc-400 bg-red-950/20 border border-red-500/20 rounded-lg px-3.5 py-2.5">
-                  <strong className="text-red-300">Note:</strong> Payments are strictly
-                  non-refundable. Clicking below opens the live{' '}
-                  <strong className="text-white">YouPI-PG Payment Gateway</strong> modal which
-                  automatically detects and confirms your UPI transfer without manual UTR entry.
-                </div>
-
-                {errorMsg && (
-                  <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-red-500/10 border border-red-500/40 text-red-300 text-xs">
-                    <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                    <span>{errorMsg}</span>
+                    {promoError && <p className="font-mono text-xs text-[#DC2626] mt-1.5">{promoError}</p>}
                   </div>
                 )}
 
-                <button
-                  type="submit"
-                  disabled={isLaunchingGateway}
-                  className="w-full py-4 px-6 rounded-xl bg-red-600 hover:bg-red-500 disabled:opacity-60 text-white font-bold text-base shadow-lg shadow-red-950/50 transition flex items-center justify-center gap-2"
-                >
-                  {isLaunchingGateway ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Initializing YouPI-PG Session...
-                    </>
-                  ) : (
-                    <>
-                      <Zap className="w-5 h-5" />
-                      Pay ₹{modeConfig.price}.00 with YouPI Payment Gateway
-                    </>
-                  )}
+                {error && (
+                  <div className="flex items-start gap-2 p-3 border border-[#FCA5A5] bg-[#FEF2F2] font-mono text-xs text-[#B91C1C]">
+                    <AlertCircle className="w-4 h-4 shrink-0" /> {error}
+                  </div>
+                )}
+
+                <button type="submit" disabled={submitting} className={primaryBtn}>
+                  {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> Holding your seats…</> : <><Ticket className="w-4 h-4" /> Continue to pay ₹{pricing.total}</>}
                 </button>
+                <p className="font-mono text-[11px] text-[#52525B]">
+                  Next you pay by UPI and upload your UTR and screenshot. Seats are held for 15 minutes while you do.
+                </p>
+              </section>
+            )}
+
+            {error && !(mode && selectedSlot) && (
+              <div className="flex items-start gap-2 p-3 border border-[#FCA5A5] bg-[#FEF2F2] font-mono text-xs text-[#B91C1C]">
+                <AlertCircle className="w-4 h-4 shrink-0" /> {error}
               </div>
-            </div>
+            )}
           </form>
+        ) : (
+          !loadError && <div className="flex justify-center py-10"><Loader2 className="w-6 h-6 animate-spin text-[#3300FF]" /></div>
         )}
+
+        {!hold && <FindBooking onFound={found => { setResults(found); window.scrollTo(0, 0); }} />}
+        <SupportLine />
       </div>
-
-      {/* LIVE YOUPI-PG CHECKOUT MODAL OVERLAY */}
-      {activeGatewaySession && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4">
-          <div className="relative w-full max-w-[920px] h-[90vh] max-h-[680px] bg-white rounded-2xl overflow-hidden shadow-2xl border border-zinc-700 flex flex-col">
-            <div className="bg-zinc-950 text-white px-4 py-2.5 flex items-center justify-between border-b border-zinc-800 text-xs">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="font-mono font-semibold">
-                  YOUPI PG LIVE CHECKOUT · Order #{activeGatewaySession.orderId}
-                </span>
-              </div>
-              <div className="flex items-center gap-3">
-                <a
-                  href={activeGatewaySession.checkoutUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1 text-zinc-400 hover:text-white"
-                >
-                  Open in New Tab <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (pollTimerRef.current) {
-                      clearInterval(pollTimerRef.current);
-                      pollTimerRef.current = null;
-                    }
-                    setActiveGatewaySession(null);
-                  }}
-                  className="px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-mono"
-                >
-                  ✕ Close
-                </button>
-              </div>
-            </div>
-
-            <iframe
-              src={activeGatewaySession.checkoutUrl}
-              title="YouPI-PG Live Payment Gateway"
-              className="w-full flex-1 border-0 bg-white"
-              allow="clipboard-write; payment"
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 }

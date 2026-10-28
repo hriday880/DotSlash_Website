@@ -4,7 +4,37 @@ services:
     runtime: static
     buildCommand: npm run build
     staticPublishPath: dist
+    envVars:
+      - key: VITE_LASER_API_URL
+        sync: false
     routes:
       - type: rewrite
         source: /*
         destination: /index.html
+
+  - type: web
+    name: dotslash-laser-tag-api
+    runtime: node
+    plan: starter
+    rootDir: server
+    buildCommand: echo "no dependencies"
+    startCommand: node index.js
+    healthCheckPath: /health
+    numInstances: 1 # writes are serialised in-process; keep a single instance
+    envVars:
+      - key: TURSO_DATABASE_URL
+        sync: false
+      - key: TURSO_AUTH_TOKEN
+        sync: false
+      - key: UPI_ID
+        sync: false
+      - key: UPI_NAME
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: SIGNING_SECRET # signs every booking row; never change it after launch
+        generateValue: true
+      - key: PROMO_CODES
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false
