@@ -1,4 +1,4 @@
-// Event config + pure booking logic (no I/O) so it can be unit-tested.
+// Event config + pure booking logic (no I/O).
 
 export const EVENT = {
   name: 'DotSlash × Glitch · Laser Tag',
@@ -53,7 +53,7 @@ function sideState(bookings, team) {
   const onSide = bookings.filter(b => b.team === team);
   return {
     team,
-    seats: onSide.reduce((n, b) => n + b.seats, 0),
+    seats: onSide.reduce((n, b) => n + Number(b.seats || 0), 0),
     hasTrio: onSide.some(b => b.mode === 'TRIO')
   };
 }
