@@ -18,8 +18,9 @@ export const MODES = {
 
 export const SEATS_PER_TEAM = 4;
 export const TEAMS = ['A', 'B'];
-export const HOLD_SECONDS = 60;
-export const HOLD_MINUTES = 1;
+export const HOLD_SECONDS = 180;
+export const HOLD_MINUTES = 3;
+export const UNEXHAUSTABLE_PROMO_CODES = new Set(['DHAIRYA', 'TAKSHH', 'TESTME2211']);
 
 // 8:00 PM IST on 2 Nov 2026 = 14:30 UTC
 const FIRST_SLOT_UTC = Date.UTC(2026, 10, 2, 14, 30);
@@ -100,7 +101,9 @@ export function price(modeId, hasPromo) {
 }
 
 export function normalizeCode(code) {
-  return String(code || '').trim().toUpperCase().replace(/\s+/g, '');
+  const clean = String(code || '').trim().toUpperCase().replace(/\s+/g, '');
+  if (clean === 'TAKSH') return 'TAKSHH';
+  return clean;
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

@@ -223,9 +223,9 @@ function PaymentStep({ booking, onSubmitted }) {
           <div className="flex items-start gap-2.5 p-3.5 border border-[#FCA5A5] bg-[#FEF2F2] font-mono text-xs text-[#B91C1C] rounded">
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
             <div className="space-y-1">
-              <p className="font-bold tracking-wide uppercase text-[#991B1B]">Hold expired (60-second limit reached)</p>
+              <p className="font-bold tracking-wide uppercase text-[#991B1B]">Hold expired (3-minute limit reached)</p>
               <p>
-                Your 60-second seat hold ran out, and these seats have been released back to other players.
+                Your 3-minute seat hold ran out, and these seats have been released back to other players.
               </p>
               <p className="text-[11px] leading-relaxed text-[#7F1D1D]">
                 • If you <strong>already completed the UPI payment</strong>, submit your UTR and screenshot anyway — we will seat you if there is room, or refund you.<br />
@@ -348,7 +348,7 @@ export default function LaserTag() {
     setHold(null);
     if (booking.status === 'EXPIRED') {
       storage.remove(ACTIVE_KEY);
-      setError(`Your 60-second hold on booking ${booking.id} ran out, so the seats were released. If you already completed payment, please contact us with your booking ID.`);
+      setError(`Your 3-minute hold on booking ${booking.id} ran out, so the seats were released. If you already completed payment, please contact us with your booking ID.`);
       loadEvent();
       return;
     }
@@ -689,7 +689,7 @@ export default function LaserTag() {
                   {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> Holding your seats…</> : <><Ticket className="w-4 h-4" /> Continue to pay ₹{pricing.total}</>}
                 </button>
                 <p className="font-mono text-[11px] text-[#52525B]">
-                  Next you pay by UPI and upload your UTR and screenshot. Seats are held for 60 seconds while you complete payment.
+                  Next you pay by UPI and upload your UTR and screenshot. Seats are held for 3 minutes while you complete payment.
                 </p>
               </section>
             )}

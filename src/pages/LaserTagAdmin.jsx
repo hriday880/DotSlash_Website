@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { Loader2, RefreshCw, CheckCircle2, AlertTriangle, LogOut, ArrowLeft } from 'lucide-react';
+import { Loader2, RefreshCw, CheckCircle2, AlertTriangle, LogOut, ArrowLeft, Tag } from 'lucide-react';
 import { laserTagApi, safeStorage } from '../lib/laserTagApi';
 
 const TOKEN_KEY = 'lt_admin_token';
@@ -24,7 +24,7 @@ function BookingRow({ b, onCheckin, busy, highlight }) {
           <p className="font-mono text-xs text-[#52525B]">Slot {b.slot} · {b.slotLabel} · ₹{b.amount}{b.promo_code ? ` (${b.promo_code})` : ''}</p>
         </div>
         {b.status === 'HOLD' ? (
-          <span className="font-mono text-xs text-[#D97706]">Paying now (60s hold)</span>
+          <span className="font-mono text-xs text-[#D97706]">Paying now (3-min hold)</span>
         ) : b.status === 'PENDING' ? (
           <span className="font-mono text-xs text-[#D97706]">Awaiting verification · UTR {b.utr}</span>
         ) : b.status === 'REJECTED' ? (
@@ -259,6 +259,57 @@ export default function LaserTagAdmin() {
           ))}
         </div>
 
+        {/* Ambassador Promocodes Live Counters */}
+        <div className="bg-white border border-[#E4E4E7] rounded-lg p-5">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-3.5 border-b border-[#E4E4E7] pb-3">
+            <div>
+              <h2 className="font-sans text-base font-semibold uppercase tracking-wider text-[#030303] flex items-center gap-2">
+                <Tag className="w-4 h-4 text-[#3300FF]" /> Ambassador Promocodes (10% Discount · Unexhaustable)
+              </h2>
+              <p className="font-mono text-xs text-[#52525B]">Live usage counters for Dhairya and Takshh</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setTab('promos')}
+              className="font-mono text-xs text-[#3300FF] hover:underline"
+            >
+              View detailed usages →
+            </button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {['DHAIRYA', 'TAKSHH'].map(code => {
+              const promo = data?.unexhaustablePromos?.find(p => p.code === code) || { totalUses: 0, paidCount: 0, pendingCount: 0, heldCount: 0, revenue: 0, bookings: [] };
+              return (
+                <div key={code} className="p-4 border border-[#E4E4E7] rounded-lg bg-[#FAFAFA] flex flex-col justify-between hover:border-[#3300FF]/40 transition-colors">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-sm font-bold uppercase tracking-wider px-2.5 py-1 bg-[#3300FF] text-white rounded">
+                          {code}
+                        </span>
+                        <span className="font-mono text-[11px] text-[#059669] font-semibold bg-[#ECFDF5] px-2 py-0.5 rounded border border-[#A7F3D0]">
+                          10% OFF
+                        </span>
+                      </div>
+                      <p className="font-mono text-xs text-[#52525B] mt-2">Unexhaustable · Unlimited uses</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-mono text-[11px] uppercase tracking-wider text-[#52525B]">Total Times Used</p>
+                      <p className="font-sans text-3xl font-bold text-[#030303]">{promo.totalUses}</p>
+                    </div>
+                  </div>
+                  <div className="mt-4 pt-3 border-t border-[#E4E4E7] flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-[#52525B]">
+                    <span>
+                      <strong className="text-[#059669]">{promo.paidCount}</strong> paid · <strong className="text-[#D97706]">{promo.pendingCount}</strong> pending {promo.heldCount > 0 && <span>· <span className="text-[#3300FF]">{promo.heldCount} holding</span></span>}
+                    </span>
+                    <span className="font-bold text-[#030303]">₹{promo.revenue} collected</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         {error && <p className="font-mono text-xs text-[#DC2626]">{error}</p>}
 
         {data?.tamperedRows?.length > 0 && (
@@ -277,7 +328,14 @@ export default function LaserTagAdmin() {
           </button>
           <button type="button" className={tabBtn(tab === 'checkin')} onClick={() => setTab('checkin')}>Check-in</button>
           <button type="button" className={tabBtn(tab === 'slots')} onClick={() => setTab('slots')}>Slots</button>
-          <button type="button" className={tabBtn(tab === 'promos')} onClick={() => setTab('promos')}>Promo codes</button>
+          <button type="button" className={tabBtn(tab === 'promos')} onClick={() => setTab('promos')}>
+            Promo codes
+            {data?.unexhaustablePromos && (
+              <span className="ml-1.5 opacity-80 font-normal">
+                (Dhairya: {data.unexhaustablePromos.find(p => p.code === 'DHAIRYA')?.totalUses || 0} · Takshh: {data.unexhaustablePromos.find(p => p.code === 'TAKSHH')?.totalUses || 0})
+              </span>
+            )}
+          </button>
         </div>
 
         {tab === 'verify' && data && (
@@ -329,15 +387,82 @@ export default function LaserTagAdmin() {
         )}
 
         {tab === 'promos' && data && (
-          <div className="bg-white border border-[#E4E4E7] rounded-lg divide-y divide-[#E4E4E7]">
-            {data.promoCodes.map(p => (
-              <div key={p.code} className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 font-mono text-sm">
-                <span className="font-bold text-[#030303]">{p.code}</span>
-                <span className={p.status === 'USED' ? 'text-[#52525B]' : p.status === 'HELD' ? 'text-[#D97706]' : 'text-[#059669]'}>
-                  {p.status === 'UNUSED' ? 'Unused' : `${p.status === 'USED' ? 'Used' : 'Held'} · ${p.leadName} · ${p.bookingId}`}
-                </span>
+          <div className="space-y-6">
+            {/* Unexhaustable ambassadors detailed breakdown */}
+            <div className="bg-white border border-[#E4E4E7] rounded-lg p-5 space-y-4">
+              <div>
+                <h3 className="font-sans text-base font-semibold uppercase tracking-wider text-[#030303] flex items-center gap-2">
+                  <Tag className="w-4 h-4 text-[#3300FF]" /> Ambassador Promocodes (10% Discount · Unexhaustable)
+                </h3>
+                <p className="font-mono text-xs text-[#52525B]">
+                  These promocodes give 10% off and can be redeemed unlimited times by multiple players.
+                </p>
               </div>
-            ))}
+
+              <div className="grid sm:grid-cols-2 gap-4">
+                {['DHAIRYA', 'TAKSHH'].map(code => {
+                  const p = data.unexhaustablePromos?.find(u => u.code === code) || { totalUses: 0, paidCount: 0, pendingCount: 0, heldCount: 0, revenue: 0, bookings: [] };
+                  return (
+                    <div key={code} className="border border-[#E4E4E7] rounded-lg p-4 bg-[#FAFAFA] space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-base font-bold text-[#030303] px-2.5 py-0.5 bg-white border border-[#E4E4E7] rounded">{code}</span>
+                        <span className="font-mono text-xs font-bold text-[#3300FF]">Used {p.totalUses} time{p.totalUses === 1 ? '' : 's'}</span>
+                      </div>
+                      <div className="font-mono text-xs text-[#52525B] space-y-1">
+                        <p>Paid: <strong className="text-[#059669]">{p.paidCount}</strong> · Pending: <strong className="text-[#D97706]">{p.pendingCount}</strong> {p.heldCount > 0 ? `· Active hold: ${p.heldCount}` : ''}</p>
+                        <p>Total Revenue: <strong className="text-[#030303]">₹{p.revenue}</strong></p>
+                      </div>
+                      {p.bookings.length > 0 ? (
+                        <div className="border-t border-[#E4E4E7] pt-2 space-y-1.5 max-h-48 overflow-y-auto">
+                          <p className="font-mono text-[10px] uppercase tracking-wider text-[#52525B]">Bookings that used this code:</p>
+                          {p.bookings.map((b, idx) => (
+                            <div key={idx} className="flex items-center justify-between font-mono text-xs p-1.5 bg-white rounded border border-[#E4E4E7]">
+                              <div>
+                                <span className="font-bold text-[#030303]">{b.leadName}</span>
+                                <span className="text-[#52525B] text-[11px] ml-1.5">({b.id})</span>
+                              </div>
+                              <span className={`text-[11px] font-semibold ${b.status === 'PAID' ? 'text-[#059669]' : b.status === 'PENDING' ? 'text-[#D97706]' : 'text-[#52525B]'}`}>
+                                {b.status} · ₹{b.amount}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="font-mono text-xs text-[#A1A1AA] border-t border-[#E4E4E7] pt-2">No bookings have used this code yet.</p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* All Promo Codes */}
+            <div className="bg-white border border-[#E4E4E7] rounded-lg divide-y divide-[#E4E4E7]">
+              <div className="p-4 bg-[#FAFAFA] border-b border-[#E4E4E7]">
+                <h3 className="font-sans text-sm font-semibold uppercase tracking-wider text-[#030303]">
+                  All Single-Use & General Promo Codes ({data.promoCodes.length})
+                </h3>
+              </div>
+              {data.promoCodes.map(p => (
+                <div key={p.code} className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 font-mono text-sm">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-[#030303]">{p.code}</span>
+                    {p.isUnexhaustable && (
+                      <span className="text-[10px] bg-[#3300FF]/10 text-[#3300FF] px-1.5 py-0.5 rounded font-semibold uppercase">
+                        Unexhaustable ({p.totalUses} uses)
+                      </span>
+                    )}
+                  </div>
+                  <span className={p.status === 'USED' ? 'text-[#52525B]' : p.status === 'HELD' ? 'text-[#D97706]' : 'text-[#059669]'}>
+                    {p.isUnexhaustable
+                      ? `${p.totalUses} uses (₹${p.revenue})`
+                      : p.status === 'UNUSED'
+                      ? 'Unused'
+                      : `${p.status === 'USED' ? 'Used' : 'Held'} · ${p.leadName} · ${p.bookingId}`}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>

@@ -2,7 +2,7 @@
 // No separate backend server or Render web service required.
 import { db } from './db.js';
 import {
-  EVENT, MODES, SLOTS, HOLD_SECONDS, HOLD_MINUTES,
+  EVENT, MODES, SLOTS, HOLD_SECONDS, HOLD_MINUTES, UNEXHAUSTABLE_PROMO_CODES,
   getSlot, assignTeam, slotAvailability, price, normalizeCode, parseBookingRequest
 } from './laserTagEvent.js';
 
@@ -15,6 +15,8 @@ const ADMIN_PASSWORD_HASH =
 const PLAIN_ADMIN_PASSWORD = env.VITE_LASER_ADMIN_PASSWORD || '';
 
 const DEFAULT_PROMO_CODES = [
+  'DHAIRYA',
+  'TAKSHH',
   'TESTME2211',
   'ZAP-E8G6B', 'ZAP-FGCV8', 'ZAP-JD88E', 'ZAP-KYMBG', 'ZAP-Q3X8N',
   'FRAG-66YMQ', 'FRAG-8X4SZ', 'FRAG-F4YB3', 'FRAG-KMDT5', 'FRAG-PX6QG',
@@ -32,11 +34,12 @@ const DEFAULT_PROMO_CODES = [
   'CYBER-SA4M7', 'CYBER-UZG4R', 'CYBER-4N77E', 'CYBER-S8EES', 'CYBER-M7XTJ'
 ];
 
-const PROMO_CODES = new Set(
-  (env.VITE_PROMO_CODES ? String(env.VITE_PROMO_CODES).split(',') : DEFAULT_PROMO_CODES)
+const PROMO_CODES = new Set([
+  ...UNEXHAUSTABLE_PROMO_CODES,
+  ...(env.VITE_PROMO_CODES ? String(env.VITE_PROMO_CODES).split(',') : DEFAULT_PROMO_CODES)
     .map(normalizeCode)
     .filter(Boolean)
-);
+]);
 
 const MAX_SCREENSHOT_CHARS = 1_200_000;
 const ID_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
@@ -176,8 +179,9 @@ function bySlot(bookings) {
 }
 
 function promoFree(code, live) {
-  if (code === 'TESTME2211') return true;
-  return PROMO_CODES.has(code) && !live.some(b => b.promo_code === code);
+  const norm = normalizeCode(code);
+  if (UNEXHAUSTABLE_PROMO_CODES.has(norm)) return true;
+  return PROMO_CODES.has(norm) && !live.some(b => b.promo_code === norm);
 }
 
 function upiLink(b) {
@@ -377,11 +381,11 @@ export const laserTagApi = {
       const seat = assignTeam(bySlot(others).get(b.slot) || [], b.mode);
       if (seat) {
         team = seat;
-        notes.push('Submitted after the 60-second hold expired.');
+        notes.push('Submitted after the 3-minute hold expired.');
       } else {
         notes.push('Submitted after the hold expired and the slot has since filled — move or refund.');
       }
-      if (promo && others.some(o => o.promo_code === promo)) {
+      if (promo && !UNEXHAUSTABLE_PROMO_CODES.has(normalizeCode(promo)) && others.some(o => o.promo_code === promo)) {
         notes.push(`Promo ${promo} was re-used by another booking — they paid the discounted ₹${b.amount}.`);
         promo = null;
       }
@@ -440,7 +444,7 @@ export const laserTagApi = {
     await requireAdmin(token);
     await ensureTables();
     const { rows } = await db.execute(
-      `SELECT * FROM lt_bookings WHERE status IN ('HOLD', 'PENDING', 'PAID', 'REJECTED') ORDER BY slot, team, created_at`
+      `SELECT * FROM lt_bookings ORDER BY slot, team, created_at`
     );
     const normalized = rows.map(normalizeRow);
     const now = Date.now();
@@ -448,6 +452,52 @@ export const laserTagApi = {
     const shown = normalized.filter(b => b.status === 'REJECTED' || isLive(b, now));
     const live = shown.filter(b => b.status !== 'REJECTED');
     const byCode = new Map(live.filter(b => b.promo_code).map(b => [b.promo_code, b]));
+
+    const unexhaustableCodes = ['DHAIRYA', 'TAKSHH', 'TESTME2211'];
+    const promoStatsMap = Object.fromEntries(unexhaustableCodes.map(c => [c, {
+      code: c,
+      isUnexhaustable: true,
+      totalUses: 0,
+      paidCount: 0,
+      pendingCount: 0,
+      heldCount: 0,
+      revenue: 0,
+      bookings: []
+    }]));
+
+    for (const b of normalized) {
+      const code = b.promo_code ? normalizeCode(b.promo_code) : null;
+      if (!code || !promoStatsMap[code]) continue;
+      const stat = promoStatsMap[code];
+      const slot = getSlot(b.slot);
+      const bookingItem = {
+        id: b.id,
+        leadName: b.lead_name,
+        leadPhone: b.lead_phone,
+        leadEmail: b.lead_email,
+        slot: b.slot,
+        slotLabel: slot?.label || `Slot ${b.slot}`,
+        team: b.team,
+        mode: b.mode,
+        status: b.status,
+        amount: b.amount,
+        createdAt: b.created_at
+      };
+      if (b.status === 'PAID') {
+        stat.paidCount++;
+        stat.totalUses++;
+        stat.revenue += (b.amount || 0);
+        stat.bookings.push(bookingItem);
+      } else if (b.status === 'PENDING') {
+        stat.pendingCount++;
+        stat.totalUses++;
+        stat.revenue += (b.amount || 0);
+        stat.bookings.push(bookingItem);
+      } else if (b.status === 'HOLD' && isLive(b, now)) {
+        stat.heldCount++;
+        stat.bookings.push(bookingItem);
+      }
+    }
 
     return {
       upiId: UPI_ID,
@@ -464,16 +514,62 @@ export const laserTagApi = {
         players_json: undefined,
         slotLabel: getSlot(b.slot)?.label || `Slot ${b.slot}`
       })),
+      unexhaustablePromos: unexhaustableCodes.map(c => promoStatsMap[c]),
       promoCodes: [...PROMO_CODES].sort().map(code => {
+        const isUnex = UNEXHAUSTABLE_PROMO_CODES.has(code);
+        if (isUnex) {
+          const stat = promoStatsMap[code];
+          return {
+            code,
+            isUnexhaustable: true,
+            status: stat && stat.totalUses > 0 ? 'ACTIVE' : 'UNUSED',
+            totalUses: stat?.totalUses || 0,
+            paidCount: stat?.paidCount || 0,
+            pendingCount: stat?.pendingCount || 0,
+            heldCount: stat?.heldCount || 0,
+            revenue: stat?.revenue || 0,
+            bookings: stat?.bookings || []
+          };
+        }
         const b = byCode.get(code);
         return {
           code,
+          isUnexhaustable: false,
           status: !b ? 'UNUSED' : b.status === 'PAID' ? 'USED' : 'HELD',
           bookingId: b?.id || null,
           leadName: b?.lead_name || null
         };
       })
     };
+  },
+
+  async getPromoStats(token) {
+    if (token) await requireAdmin(token);
+    await ensureTables();
+    const { rows } = await db.execute(`SELECT * FROM lt_bookings`);
+    const normalized = rows.map(normalizeRow);
+    const result = {};
+    for (const code of ['DHAIRYA', 'TAKSHH', 'TESTME2211']) {
+      const match = normalized.filter(b => b.promo_code && normalizeCode(b.promo_code) === code);
+      const paid = match.filter(b => b.status === 'PAID');
+      const pending = match.filter(b => b.status === 'PENDING');
+      result[code] = {
+        code,
+        totalUses: paid.length + pending.length,
+        paidCount: paid.length,
+        pendingCount: pending.length,
+        revenue: [...paid, ...pending].reduce((sum, b) => sum + (b.amount || 0), 0),
+        bookings: match.map(b => ({
+          id: b.id,
+          leadName: b.lead_name,
+          phone: b.lead_phone,
+          status: b.status,
+          amount: b.amount,
+          slot: b.slot
+        }))
+      };
+    }
+    return result;
   },
 
   async adminProof(token, bookingId) {
