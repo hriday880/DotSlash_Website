@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import QRCode from 'qrcode';
 import {
   CalendarDays, Clock, MapPin, Users, User, Loader2, AlertCircle, CheckCircle2,
-  Search, X, Ticket, Copy, Smartphone, Upload, Hourglass, XCircle
+  Search, X, Ticket, Copy, Smartphone, Upload, Hourglass, XCircle, Megaphone, Sparkles
 } from 'lucide-react';
 import { laserTagApi, SUPPORT, safeStorage, compressScreenshot } from '../lib/laserTagApi';
 
@@ -306,6 +306,13 @@ export default function LaserTag() {
   const [error, setError] = useState('');
   const [hold, setHold] = useState(null); // booking awaiting UPI payment
   const [results, setResults] = useState(null); // PENDING / PAID / REJECTED bookings to show
+  const [broadcast, setBroadcast] = useState(null);
+
+  useEffect(() => {
+    laserTagApi.getAnnouncement().then(msg => {
+      if (msg) setBroadcast(msg);
+    }).catch(() => {});
+  }, []);
 
   const loadEvent = useCallback(async () => {
     try {
@@ -456,6 +463,28 @@ export default function LaserTag() {
   return (
     <div className="min-h-screen bg-[#F3F4F6] pt-28 pb-20 px-4">
       <div className="max-w-3xl mx-auto space-y-6">
+        {/* Broadcast Announcement */}
+        {broadcast && (
+          <div className="bg-gradient-to-r from-[#3300FF]/10 via-[#00D4FF]/10 to-[#3300FF]/10 border-2 border-[#3300FF] rounded-xl p-4 sm:p-5 flex items-start gap-3 sm:gap-4 shadow-[0_0_20px_rgba(51,0,255,0.12)]">
+            <div className="w-10 h-10 rounded-full bg-[#3300FF] text-white flex items-center justify-center shrink-0 mt-0.5 shadow-md">
+              <Megaphone className="w-5 h-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-mono text-[10px] tracking-widest uppercase bg-[#3300FF] text-white px-2 py-0.5 font-bold rounded">
+                  Campus Broadcast
+                </span>
+                <span className="font-mono text-xs text-[#52525B] flex items-center gap-1">
+                  <Sparkles className="w-3.5 h-3.5 text-[#3300FF]" /> Special Notice
+                </span>
+              </div>
+              <p className="font-sans text-sm sm:text-base font-bold text-[#030303] mt-1.5 leading-snug">
+                {broadcast}
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Event card */}
         <div className={`${card} p-6 sm:p-8`}>
           <p className="font-mono text-xs tracking-widest uppercase text-[#52525B] mb-2">DotSlash × Glitch</p>

@@ -24,7 +24,6 @@ gsap.registerPlugin(ScrollTrigger);
 function HomePage() {
  return (
  <>
-  <Announcement />
   <Hero />
   <Footer />
  </>
@@ -67,6 +66,7 @@ function App() {
 
  return (
   <>
+   <Announcement />
    <Navbar />
 
   <Routes>
@@ -80,7 +80,9 @@ function App() {
   <Route path="/admin" element={<AdminDashboard />} />
   <Route path="/admin/laser-tag" element={<LaserTagAdmin />} />
   <Route path="/laser-tag" element={<LaserTag />} />
+  <Route path="/lasertag" element={<LaserTag />} />
   <Route path="/laser-tag/admin" element={<LaserTagAdmin />} />
+  <Route path="/lasertag/admin" element={<LaserTagAdmin />} />
   </Routes>
  </>
  );

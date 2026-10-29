@@ -231,6 +231,16 @@ async function requireAdmin(token) {
 }
 
 export const laserTagApi = {
+  async getAnnouncement() {
+    try {
+      if (!db) return null;
+      const res = await db.execute('SELECT content FROM announcements WHERE is_active = 1 ORDER BY created_at DESC LIMIT 1');
+      return res.rows?.[0]?.content || null;
+    } catch {
+      return null;
+    }
+  },
+
   async getEvent() {
     const slotMap = bySlot(await liveBookings());
     const now = Date.now();
