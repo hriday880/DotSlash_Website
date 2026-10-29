@@ -2,7 +2,7 @@
 // No separate backend server or Render web service required.
 import { db } from './db.js';
 import {
-  EVENT, MODES, SLOTS, HOLD_MINUTES,
+  EVENT, MODES, SLOTS, HOLD_SECONDS, HOLD_MINUTES,
   getSlot, assignTeam, slotAvailability, price, normalizeCode, parseBookingRequest
 } from './laserTagEvent.js';
 
@@ -329,7 +329,7 @@ export const laserTagApi = {
       amount: cost.total,
       promo_code: promoCode || null,
       status: 'HOLD',
-      hold_expires_at: now + HOLD_MINUTES * 60 * 1000,
+      hold_expires_at: now + HOLD_SECONDS * 1000,
       created_at: now
     });
 
@@ -377,7 +377,7 @@ export const laserTagApi = {
       const seat = assignTeam(bySlot(others).get(b.slot) || [], b.mode);
       if (seat) {
         team = seat;
-        notes.push('Submitted after the 15-min hold expired.');
+        notes.push('Submitted after the 60-second hold expired.');
       } else {
         notes.push('Submitted after the hold expired and the slot has since filled — move or refund.');
       }

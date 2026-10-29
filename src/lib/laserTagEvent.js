@@ -18,7 +18,8 @@ export const MODES = {
 
 export const SEATS_PER_TEAM = 4;
 export const TEAMS = ['A', 'B'];
-export const HOLD_MINUTES = 15;
+export const HOLD_SECONDS = 60;
+export const HOLD_MINUTES = 1;
 
 // 8:00 PM IST on 2 Nov 2026 = 14:30 UTC
 const FIRST_SLOT_UTC = Date.UTC(2026, 10, 2, 14, 30);

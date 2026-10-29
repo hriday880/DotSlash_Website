@@ -189,7 +189,9 @@ function PaymentStep({ booking, onSubmitted }) {
     <section className={`${card} overflow-hidden`}>
       <div className="px-6 py-4 border-b border-[#E4E4E7] flex flex-wrap items-center justify-between gap-2">
         <h2 className={label}><span className="text-[#3300FF]">05</span> · Pay ₹{payment.amount} by UPI</h2>
-        <span className="font-mono text-xs text-[#D97706]">{lapsed ? 'Hold expired' : `Seats held for ${left}`}</span>
+        <span className={`font-mono text-xs font-semibold ${lapsed ? 'text-[#DC2626] flex items-center gap-1' : 'text-[#D97706]'}`}>
+          {lapsed ? <><AlertCircle className="w-3.5 h-3.5" /> Hold expired (0:00)</> : `Seats held for ${left}`}
+        </span>
       </div>
 
       <div className="p-6 grid sm:grid-cols-[auto,1fr] gap-6 items-start">
@@ -218,10 +220,19 @@ function PaymentStep({ booking, onSubmitted }) {
       <form onSubmit={submit} className="px-6 pb-6 space-y-4 border-t border-[#E4E4E7] pt-5">
         <p className={label}>After paying</p>
         {lapsed && (
-          <p className="font-mono text-xs text-[#B91C1C]">
-            Your 15-minute hold ran out. If you’ve already paid, submit anyway and we’ll seat you if there’s room, or refund you.
-            If you haven’t paid yet, don’t pay. Start a new booking instead.
-          </p>
+          <div className="flex items-start gap-2.5 p-3.5 border border-[#FCA5A5] bg-[#FEF2F2] font-mono text-xs text-[#B91C1C] rounded">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <p className="font-bold tracking-wide uppercase text-[#991B1B]">Hold expired (60-second limit reached)</p>
+              <p>
+                Your 60-second seat hold ran out, and these seats have been released back to other players.
+              </p>
+              <p className="text-[11px] leading-relaxed text-[#7F1D1D]">
+                • If you <strong>already completed the UPI payment</strong>, submit your UTR and screenshot anyway — we will seat you if there is room, or refund you.<br />
+                • If you <strong>haven’t paid yet</strong>, please do not pay now. Start a new booking instead.
+              </p>
+            </div>
+          </div>
         )}
         <div className="space-y-1.5">
           <label className="font-mono text-xs text-[#52525B]" htmlFor="utr">12-digit UTR / UPI reference no. *</label>
@@ -337,7 +348,7 @@ export default function LaserTag() {
     setHold(null);
     if (booking.status === 'EXPIRED') {
       storage.remove(ACTIVE_KEY);
-      setError(`Your 15-minute hold on booking ${booking.id} ran out, so the seats were released. If you already paid, contact us with the booking ID.`);
+      setError(`Your 60-second hold on booking ${booking.id} ran out, so the seats were released. If you already completed payment, please contact us with your booking ID.`);
       loadEvent();
       return;
     }
@@ -502,6 +513,12 @@ export default function LaserTag() {
         {loadError && (
           <div className="flex items-start gap-2 p-4 border border-[#FCA5A5] bg-[#FEF2F2] rounded-xl font-mono text-sm text-[#B91C1C]">
             <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" /> {loadError}
+          </div>
+        )}
+
+        {error && !hold && (
+          <div className="flex items-start gap-2 p-4 border border-[#FCA5A5] bg-[#FEF2F2] rounded-xl font-mono text-sm text-[#B91C1C]">
+            <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" /> {error}
           </div>
         )}
 
@@ -672,7 +689,7 @@ export default function LaserTag() {
                   {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> Holding your seats…</> : <><Ticket className="w-4 h-4" /> Continue to pay ₹{pricing.total}</>}
                 </button>
                 <p className="font-mono text-[11px] text-[#52525B]">
-                  Next you pay by UPI and upload your UTR and screenshot. Seats are held for 15 minutes while you do.
+                  Next you pay by UPI and upload your UTR and screenshot. Seats are held for 60 seconds while you complete payment.
                 </p>
               </section>
             )}

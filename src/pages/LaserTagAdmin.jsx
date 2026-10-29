@@ -24,7 +24,7 @@ function BookingRow({ b, onCheckin, busy, highlight }) {
           <p className="font-mono text-xs text-[#52525B]">Slot {b.slot} · {b.slotLabel} · ₹{b.amount}{b.promo_code ? ` (${b.promo_code})` : ''}</p>
         </div>
         {b.status === 'HOLD' ? (
-          <span className="font-mono text-xs text-[#D97706]">Paying now (15-min hold)</span>
+          <span className="font-mono text-xs text-[#D97706]">Paying now (60s hold)</span>
         ) : b.status === 'PENDING' ? (
           <span className="font-mono text-xs text-[#D97706]">Awaiting verification · UTR {b.utr}</span>
         ) : b.status === 'REJECTED' ? (
