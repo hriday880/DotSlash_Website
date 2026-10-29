@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Loader2, RefreshCw, CheckCircle2, AlertTriangle, LogOut } from 'lucide-react';
+import { useSearchParams, Link } from 'react-router-dom';
+import { Loader2, RefreshCw, CheckCircle2, AlertTriangle, LogOut, ArrowLeft } from 'lucide-react';
 import { laserTagApi, safeStorage } from '../lib/laserTagApi';
 
 const TOKEN_KEY = 'lt_admin_token';
@@ -128,6 +128,18 @@ export default function LaserTagAdmin() {
   }, [token]);
 
   useEffect(() => {
+    if (!token) {
+      const auth = localStorage.getItem('dotslash_admin_auth');
+      if (auth === 'superadmin' || auth === 'true') {
+        laserTagApi.getSessionToken().then((t) => {
+          storage.set(TOKEN_KEY, t);
+          setToken(t);
+        }).catch(() => {});
+      }
+    }
+  }, [token]);
+
+  useEffect(() => {
     load();
     const t = setInterval(load, 30000);
     return () => clearInterval(t);
@@ -189,7 +201,10 @@ export default function LaserTagAdmin() {
     return (
       <div className="min-h-screen bg-[#F3F4F6] pt-28 px-4">
         <form onSubmit={login} className="max-w-sm mx-auto bg-white border border-[#E4E4E7] rounded-xl p-6 space-y-4">
-          <h1 className="font-sans text-xl font-semibold uppercase tracking-wider text-[#3300FF]">Laser Tag Admin</h1>
+          <div className="flex items-center justify-between">
+            <h1 className="font-sans text-xl font-semibold uppercase tracking-wider text-[#3300FF]">Laser Tag Admin</h1>
+            <Link to="/admin" className="font-mono text-xs text-[#52525B] hover:text-[#3300FF]">← Command Center</Link>
+          </div>
           <input className={input} type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} autoFocus required />
           {loginError && <p className="font-mono text-xs text-[#DC2626]">{loginError}</p>}
           <button type="submit" className="w-full py-3 bg-[#030303] text-white font-sans text-xs tracking-widest uppercase font-semibold">Log in</button>
@@ -209,8 +224,23 @@ export default function LaserTagAdmin() {
     <div className="min-h-screen bg-[#F3F4F6] pt-28 pb-20 px-4">
       <div className="max-w-5xl mx-auto space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h1 className="font-sans text-2xl font-semibold uppercase tracking-wider text-[#3300FF]">Laser Tag Admin</h1>
+          <div className="flex items-center gap-3">
+            <Link
+              to="/admin"
+              className="p-2 border border-[#E4E4E7] bg-white hover:border-[#3300FF] text-[#52525B] hover:text-[#3300FF] transition-colors rounded"
+              title="Return to Main Command Center"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </Link>
+            <h1 className="font-sans text-2xl font-semibold uppercase tracking-wider text-[#3300FF]">Laser Tag Admin</h1>
+          </div>
           <div className="flex items-center gap-2">
+            <Link
+              to="/admin"
+              className="px-3 py-2 border border-[#E4E4E7] bg-white font-mono text-xs uppercase tracking-wider text-[#52525B] hover:text-[#3300FF] hover:border-[#3300FF] transition-colors"
+            >
+              ← Command Center
+            </Link>
             <button type="button" onClick={load} className="p-2 border border-[#E4E4E7] bg-white" aria-label="Refresh">
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
             </button>

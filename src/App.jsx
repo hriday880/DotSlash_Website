@@ -78,6 +78,7 @@ function App() {
   <Route path="/blog/:slug" element={<Blog />} />
   <Route path="/login" element={<Login />} />
   <Route path="/admin" element={<AdminDashboard />} />
+  <Route path="/admin/laser-tag" element={<LaserTagAdmin />} />
   <Route path="/laser-tag" element={<LaserTag />} />
   <Route path="/laser-tag/admin" element={<LaserTagAdmin />} />
   </Routes>

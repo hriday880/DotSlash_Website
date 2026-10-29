@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate, Link } from 'react-router-dom';
 import { db } from '../lib/db';
 import { publishNewsletter, updateNewsletter, listNewsletters, deleteNewsletter } from '../lib/newsletters';
-import { LogOut, Upload, Trash2, Megaphone, Users, FileText, Edit2, Calendar } from 'lucide-react';
+import { LogOut, Upload, Trash2, Megaphone, Users, FileText, Edit2, Calendar, Crosshair } from 'lucide-react';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -368,15 +368,29 @@ export default function AdminDashboard() {
             <h1 className="font-headline-display text-4xl text-[#3300FF] uppercase tracking-tighter">Command Center</h1>
             <p className="font-mono text-xs text-[#A0A0A0] tracking-widest mt-2 uppercase">Role: {role}</p>
           </div>
-          <button onClick={handleLogout} className="flex items-center gap-2 text-[#A0A0A0] hover:text-[#FF3366] transition-colors font-mono text-xs uppercase">
-            <LogOut size={16} /> Disconnect
-          </button>
+          <div className="flex items-center gap-3">
+            <Link
+              to="/laser-tag/admin"
+              className="flex items-center gap-2 px-4 py-2 font-mono text-xs uppercase tracking-widest bg-[#3300FF] hover:bg-[#2900CC] text-white transition-colors shadow-[0_0_12px_rgba(51,0,255,0.4)]"
+            >
+              <Crosshair size={14} /> Laser Tag Console
+            </Link>
+            <button onClick={handleLogout} className="flex items-center gap-2 text-[#A0A0A0] hover:text-[#FF3366] transition-colors font-mono text-xs uppercase">
+              <LogOut size={16} /> Disconnect
+            </button>
+          </div>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           
           <div className="lg:col-span-4 flex flex-col gap-8">
             <div className="flex flex-wrap gap-2">
+              <Link
+                to="/laser-tag/admin"
+                className="flex items-center gap-2 px-4 py-2 font-mono text-xs uppercase tracking-widest bg-[#3300FF]/20 text-[#00D4FF] border border-[#3300FF] hover:bg-[#3300FF] hover:text-white transition-colors"
+              >
+                <Crosshair size={14} /> Laser Tag Admin ↗
+              </Link>
               {isSuperAdmin && (
                 <>
                   <button onClick={() => {setActiveTab('personnel'); setEditMemberId(null); setMemberForm({ name: '', role: '', department: 'executive', imageFile: null })}} className={`flex items-center gap-2 px-4 py-2 font-mono text-xs uppercase tracking-widest transition-colors ${activeTab === 'personnel' ? 'bg-[#3300FF] text-white' : 'border border-[#353535] text-[#A0A0A0] hover:border-[#3300FF]'}`}>
