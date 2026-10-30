@@ -83,7 +83,7 @@ export default function Announcement() {
             onClick={handleClose}
             className="absolute bottom-12 left-1/2 -translate-x-1/2 border border-[#3300FF] hover:bg-[#3300FF] text-[#3300FF] hover:text-white px-10 py-4 font-mono text-xs uppercase tracking-[0.2em] transition-all duration-300 font-bold z-50 bg-[#FFF8E7]"
           >
-            {isLaserTag ? "Proceed to Arena" : "Acknowledge"}
+            {isLaserTag ? "Book Your Tickets" : "Acknowledge"}
           </button>
         </motion.div>
       )}
