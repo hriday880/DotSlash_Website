@@ -7,7 +7,38 @@ import {
 } from './laserTagEvent.js';
 
 const env = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env : (typeof process !== 'undefined' ? process.env : {});
-const UPI_ID = env.VITE_LASER_TAG_UPI_ID || env.VITE_UPI_ID || 'hridaygoyal2000@oksbi';
+
+export const UPI_ACCOUNTS = {
+  SRISHTI: {
+    id: 'srishti',
+    name: 'Srishti Sarkar',
+    upiId: env.VITE_SRISHTI_UPI_ID || 'srishti.sarkar007@okhdfcbank',
+    slots: 'Slots 1–8',
+    label: 'Srishti Sarkar'
+  },
+  TANVEE: {
+    id: 'tanvee',
+    name: 'Tanvee Goenka',
+    upiId: env.VITE_TANVEE_UPI_ID || 'goenka.tanvee@okaxis',
+    slots: 'Slots 9–15',
+    label: 'Tanvee Goenka'
+  },
+  HRIDAY: {
+    id: 'hriday',
+    name: 'Hriday Goyal',
+    upiId: env.VITE_LASER_TAG_UPI_ID || env.VITE_UPI_ID || 'hridaygoyal2000@oksbi',
+    slots: 'Exhausted',
+    label: 'Hriday Goyal (Exhausted)'
+  }
+};
+
+export function getUpiAccountForSlot(slotNumber) {
+  const num = Number(slotNumber);
+  if (num >= 9) return UPI_ACCOUNTS.TANVEE;
+  return UPI_ACCOUNTS.SRISHTI;
+}
+
+const UPI_ID = env.VITE_LASER_TAG_UPI_ID || env.VITE_UPI_ID || UPI_ACCOUNTS.SRISHTI.upiId;
 const UPI_NAME = env.VITE_LASER_TAG_UPI_NAME || env.VITE_UPI_NAME || 'DotSlash';
 const BOOKINGS_OPEN = env.VITE_BOOKINGS_OPEN !== 'false';
 const ADMIN_PASSWORD_HASH =
@@ -82,7 +113,29 @@ function normalizeRow(raw) {
   for (const col of INT_COLS) {
     row[col] = row[col] === null || row[col] === undefined ? null : Number(row[col]);
   }
+  const payeeAcc = extractPayee(row);
+  row.payee = payeeAcc.name;
+  row.payeeUpi = payeeAcc.upiId;
   return row;
+}
+
+export function extractPayee(b) {
+  if (b?.payee) {
+    const p = String(b.payee).toLowerCase();
+    if (p.includes('tanvee')) return UPI_ACCOUNTS.TANVEE;
+    if (p.includes('srishti')) return UPI_ACCOUNTS.SRISHTI;
+    if (p.includes('hriday')) return UPI_ACCOUNTS.HRIDAY;
+  }
+  if (b?.note) {
+    const match = b.note.match(/Paid to:\s*([^|(]+)/i);
+    if (match) {
+      const n = match[1].toLowerCase();
+      if (n.includes('tanvee')) return UPI_ACCOUNTS.TANVEE;
+      if (n.includes('srishti')) return UPI_ACCOUNTS.SRISHTI;
+      if (n.includes('hriday')) return UPI_ACCOUNTS.HRIDAY;
+    }
+  }
+  return getUpiAccountForSlot(b?.slot || 1);
 }
 
 let tablesReady = null;
@@ -184,14 +237,17 @@ function promoFree(code, live) {
   return PROMO_CODES.has(norm) && !live.some(b => b.promo_code === norm);
 }
 
-function upiLink(b) {
-  const q = new URLSearchParams({ pa: UPI_ID, pn: UPI_NAME, am: Number(b.amount).toFixed(2), cu: 'INR', tn: b.id });
+function upiLink(b, account = getUpiAccountForSlot(b.slot)) {
+  const pa = account?.upiId || UPI_ACCOUNTS.SRISHTI.upiId;
+  const pn = account?.name || UPI_ACCOUNTS.SRISHTI.name;
+  const q = new URLSearchParams({ pa, pn, am: Number(b.amount).toFixed(2), cu: 'INR', tn: b.id });
   return `upi://pay?${q.toString().replace(/\+/g, '%20')}`;
 }
 
 function publicTicket(b) {
   const slot = getSlot(b.slot);
   const players = JSON.parse(b.players_json || '[]');
+  const payeeAcc = extractPayee(b);
   return {
     id: b.id,
     status: b.status,
@@ -207,7 +263,20 @@ function publicTicket(b) {
     amount: b.amount,
     promoApplied: Boolean(b.promo_code),
     holdExpiresAt: b.status === 'HOLD' ? b.hold_expires_at : null,
-    payment: b.status === 'HOLD' ? { upiId: UPI_ID, payee: UPI_NAME, amount: b.amount, note: b.id, link: upiLink(b) } : null,
+    payee: payeeAcc.name,
+    payeeUpi: payeeAcc.upiId,
+    payment: b.status === 'HOLD' ? {
+      upiId: payeeAcc.upiId,
+      payee: payeeAcc.name,
+      amount: b.amount,
+      note: b.id,
+      link: upiLink(b, payeeAcc),
+      accounts: [
+        UPI_ACCOUNTS.SRISHTI,
+        UPI_ACCOUNTS.TANVEE
+      ],
+      selectedAccount: payeeAcc.id
+    } : null,
     rejectionReason: b.status === 'REJECTED' ? b.note : null,
     checkedIn: Boolean(b.checked_in_at),
     event: { name: EVENT.name, date: EVENT.dateLabel, venue: EVENT.venue }
@@ -350,7 +419,7 @@ export const laserTagApi = {
     return publicTicket(b);
   },
 
-  async submitPayment(id, utr, screenshot) {
+  async submitPayment(id, utr, screenshot, selectedPayeeId) {
     const cleanUtr = String(utr || '').replace(/\s/g, '');
     if (!/^\d{12}$/.test(cleanUtr)) {
       throw appError('Enter the 12-digit UTR / UPI reference number from your payment app.', 400);
@@ -376,6 +445,8 @@ export const laserTagApi = {
     }
 
     const notes = [];
+    if (b.note) notes.push(b.note);
+
     let { team, promo_code: promo } = b;
     if (!isLive(b)) {
       const seat = assignTeam(bySlot(others).get(b.slot) || [], b.mode);
@@ -390,6 +461,9 @@ export const laserTagApi = {
         promo = null;
       }
     }
+
+    const payeeAcc = (selectedPayeeId && (UPI_ACCOUNTS[String(selectedPayeeId).toUpperCase()] || Object.values(UPI_ACCOUNTS).find(a => a.id === selectedPayeeId))) || extractPayee(b);
+    notes.push(`Paid to: ${payeeAcc.name} (${payeeAcc.upiId}).`);
 
     const now = Date.now();
     await db.execute(
@@ -500,7 +574,12 @@ export const laserTagApi = {
     }
 
     return {
-      upiId: UPI_ID,
+      upiId: UPI_ACCOUNTS.SRISHTI.upiId,
+      upiAccounts: {
+        srishti: UPI_ACCOUNTS.SRISHTI,
+        tanvee: UPI_ACCOUNTS.TANVEE,
+        hriday: UPI_ACCOUNTS.HRIDAY
+      },
       tamperedRows: [],
       slots: SLOTS.map(s => ({
         number: s.number,

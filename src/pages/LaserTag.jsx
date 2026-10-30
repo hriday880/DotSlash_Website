@@ -152,6 +152,32 @@ function PaymentStep({ booking, onSubmitted }) {
   const [copied, setCopied] = useState(false);
   const { payment } = booking;
 
+  const [selectedAccountId, setSelectedAccountId] = useState(
+    payment?.selectedAccount || (booking.slot >= 9 ? 'tanvee' : 'srishti')
+  );
+
+  const activeAccount = useMemo(() => {
+    if (!payment) return null;
+    if (!payment.accounts || !payment.accounts.length) {
+      return { upiId: payment.upiId, payee: payment.payee, link: payment.link, id: 'default' };
+    }
+    const found = payment.accounts.find(a => a.id === selectedAccountId) || payment.accounts[0];
+    const q = new URLSearchParams({
+      pa: found.upiId,
+      pn: found.name,
+      am: Number(payment.amount).toFixed(2),
+      cu: 'INR',
+      tn: payment.note
+    });
+    return {
+      id: found.id,
+      upiId: found.upiId,
+      payee: found.name,
+      slots: found.slots,
+      link: `upi://pay?${q.toString().replace(/\+/g, '%20')}`
+    };
+  }, [payment, selectedAccountId]);
+
   const lapsed = left === '0:00';
 
   useEffect(() => {
@@ -162,8 +188,9 @@ function PaymentStep({ booking, onSubmitted }) {
   }, [file]);
 
   async function copyUpi() {
+    if (!activeAccount) return;
     try {
-      await navigator.clipboard.writeText(payment.upiId);
+      await navigator.clipboard.writeText(activeAccount.upiId);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch { /* clipboard blocked */ }
@@ -177,7 +204,7 @@ function PaymentStep({ booking, onSubmitted }) {
     setBusy(true);
     try {
       const screenshot = await compressScreenshot(file);
-      onSubmitted(await laserTagApi.submitPayment(booking.id, utr, screenshot));
+      onSubmitted(await laserTagApi.submitPayment(booking.id, utr, screenshot, activeAccount?.id));
     } catch (err) {
       setError(err.message);
     } finally {
@@ -194,20 +221,48 @@ function PaymentStep({ booking, onSubmitted }) {
         </span>
       </div>
 
+      {payment.accounts && payment.accounts.length > 1 && (
+        <div className="px-6 py-3 bg-[#FAFAFA] border-b border-[#E4E4E7] flex flex-wrap items-center justify-between gap-2.5 text-xs">
+          <div className="flex items-center gap-1.5 font-mono text-[#52525B]">
+            <span>Payment QR:</span>
+            <strong className="text-[#030303]">{activeAccount?.payee}</strong>
+          </div>
+          <div className="flex items-center gap-2">
+            {payment.accounts.map(acc => {
+              const active = activeAccount?.id === acc.id;
+              return (
+                <button
+                  key={acc.id}
+                  type="button"
+                  onClick={() => setSelectedAccountId(acc.id)}
+                  className={`px-3 py-1 font-mono text-xs font-semibold rounded border transition-all ${
+                    active
+                      ? 'bg-[#3300FF] text-white border-[#3300FF] shadow-sm'
+                      : 'bg-white text-[#52525B] hover:text-[#030303] border-[#E4E4E7]'
+                  }`}
+                >
+                  {acc.name.split(' ')[0]} ({acc.slots})
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       <div className="p-6 grid sm:grid-cols-[auto,1fr] gap-6 items-start">
         <div className="flex flex-col items-center gap-2">
-          <Qr value={payment.link} size="w-48 h-48" />
+          <Qr value={activeAccount?.link || payment.link} size="w-48 h-48" />
           <p className="font-mono text-[11px] text-[#52525B]">Scan with any UPI app</p>
         </div>
         <div className="space-y-3 font-mono text-sm text-[#030303]">
-          <a href={payment.link} className="sm:hidden flex items-center justify-center gap-2 w-full py-3 bg-[#030303] text-white font-sans text-xs tracking-widest uppercase font-semibold">
+          <a href={activeAccount?.link || payment.link} className="sm:hidden flex items-center justify-center gap-2 w-full py-3 bg-[#030303] text-white font-sans text-xs tracking-widest uppercase font-semibold">
             <Smartphone className="w-4 h-4" /> Open UPI app
           </a>
-          <div className="flex justify-between gap-3"><span className="text-[#52525B]">Pay to</span><span className="text-right">{payment.payee}</span></div>
+          <div className="flex justify-between gap-3"><span className="text-[#52525B]">Pay to</span><span className="text-right font-bold">{activeAccount?.payee || payment.payee}</span></div>
           <div className="flex justify-between gap-3 items-center">
             <span className="text-[#52525B]">UPI ID</span>
-            <button type="button" onClick={copyUpi} className="flex items-center gap-1.5 font-bold break-all text-right">
-              {payment.upiId} <Copy className="w-3.5 h-3.5 shrink-0 text-[#3300FF]" />
+            <button type="button" onClick={copyUpi} className="flex items-center gap-1.5 font-bold break-all text-right text-[#3300FF]">
+              {activeAccount?.upiId || payment.upiId} <Copy className="w-3.5 h-3.5 shrink-0" />
             </button>
           </div>
           {copied && <p className="text-right text-[11px] text-[#059669]">Copied</p>}

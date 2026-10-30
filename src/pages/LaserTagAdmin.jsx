@@ -14,6 +14,7 @@ const tabBtn = active =>
   }`;
 
 function BookingRow({ b, onCheckin, busy, highlight }) {
+  const payeeName = b.payee || (b.slot >= 9 ? 'Tanvee' : 'Srishti');
   return (
     <div className={`p-4 bg-white border rounded-lg ${highlight ? 'border-[#3300FF] ring-2 ring-[#3300FF]' : 'border-[#E4E4E7]'}`}>
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -21,7 +22,9 @@ function BookingRow({ b, onCheckin, busy, highlight }) {
           <p className="font-mono text-sm font-bold text-[#030303]">
             {b.id} · Team {b.team} · {b.mode} {b.squad_name && b.mode !== 'SOLO' ? `· ${b.squad_name}` : ''}
           </p>
-          <p className="font-mono text-xs text-[#52525B]">Slot {b.slot} · {b.slotLabel} · ₹{b.amount}{b.promo_code ? ` (${b.promo_code})` : ''}</p>
+          <p className="font-mono text-xs text-[#52525B]">
+            Slot {b.slot} · {b.slotLabel} · ₹{b.amount}{b.promo_code ? ` (${b.promo_code})` : ''} · <span className="text-[#3300FF] font-semibold">Payee: {payeeName}</span>
+          </p>
         </div>
         {b.status === 'HOLD' ? (
           <span className="font-mono text-xs text-[#D97706]">Paying now (3-min hold)</span>
@@ -74,6 +77,14 @@ function VerifyCard({ b, token, onReview, busy }) {
           <p className="text-xs text-[#52525B]">
             {b.lead_name} · {b.lead_phone} · Slot {b.slot} ({b.slotLabel}) · Team {b.team} · {b.mode}
           </p>
+          <div className="pt-1 flex items-center gap-2">
+            <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded bg-[#EEF2FF] text-[#3300FF] border border-[#C7D2FE]">
+              Payee: {b.payee || (b.slot >= 9 ? 'Tanvee Goenka' : 'Srishti Sarkar')}
+            </span>
+            <span className="font-mono text-[11px] text-[#52525B]">
+              {b.payeeUpi || (b.slot >= 9 ? 'goenka.tanvee@okaxis' : 'srishti.sarkar007@okhdfcbank')}
+            </span>
+          </div>
           <p className="text-xs text-[#52525B]">Submitted {new Date(b.utr_submitted_at).toLocaleString('en-IN')}</p>
           {b.note && <p className="flex items-center gap-1.5 text-xs text-[#B91C1C]"><AlertTriangle className="w-3.5 h-3.5" /> {b.note}</p>}
         </div>
@@ -109,6 +120,7 @@ export default function LaserTagAdmin() {
   const [busyId, setBusyId] = useState(null);
   const [tab, setTab] = useState(checkinId ? 'checkin' : 'verify');
   const [query, setQuery] = useState(checkinId);
+  const [verifyPayeeFilter, setVerifyPayeeFilter] = useState('all');
 
   const load = useCallback(async () => {
     if (!token) return;
@@ -187,6 +199,25 @@ export default function LaserTagAdmin() {
     () => (data?.bookings || []).filter(b => b.status === 'PENDING').sort((a, b) => a.utr_submitted_at - b.utr_submitted_at),
     [data]
   );
+  const srishtiPendingCount = useMemo(() => {
+    return pendingReview.filter(b => {
+      const p = (b.payee || b.note || (b.slot >= 9 ? 'tanvee' : 'srishti')).toLowerCase();
+      return p.includes('srishti');
+    }).length;
+  }, [pendingReview]);
+  const tanveePendingCount = useMemo(() => {
+    return pendingReview.filter(b => {
+      const p = (b.payee || b.note || (b.slot >= 9 ? 'tanvee' : 'srishti')).toLowerCase();
+      return p.includes('tanvee');
+    }).length;
+  }, [pendingReview]);
+  const filteredPendingReview = useMemo(() => {
+    if (verifyPayeeFilter === 'all') return pendingReview;
+    return pendingReview.filter(b => {
+      const p = (b.payee || b.note || (b.slot >= 9 ? 'tanvee' : 'srishti')).toLowerCase();
+      return p.includes(verifyPayeeFilter);
+    });
+  }, [pendingReview, verifyPayeeFilter]);
   const matches = useMemo(() => {
     const q = query.trim().toUpperCase();
     if (!q) return [];
@@ -339,12 +370,63 @@ export default function LaserTagAdmin() {
         </div>
 
         {tab === 'verify' && data && (
-          <div className="space-y-3">
-            <p className="font-mono text-xs text-[#52525B]">
-              Open your UPI / bank app for <strong>{data.upiId}</strong>, find a credit with the same UTR and amount, then approve. Oldest first.
-            </p>
-            {!pendingReview.length && <p className="font-mono text-sm text-[#52525B]">Nothing waiting. 🎯</p>}
-            {pendingReview.map(b => (
+          <div className="space-y-4">
+            <div className="p-4 bg-white border border-[#E4E4E7] rounded-lg space-y-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="font-mono text-xs text-[#52525B]">
+                  Active Accounts: <strong>Srishti Sarkar</strong> (Slots 1–8 · <span className="text-[#3300FF] font-bold">{data.upiAccounts?.srishti?.upiId || 'srishti.sarkar007@okhdfcbank'}</span>) · <strong>Tanvee Goenka</strong> (Slots 9–15 · <span className="text-[#3300FF] font-bold">{data.upiAccounts?.tanvee?.upiId || 'goenka.tanvee@okaxis'}</span>)
+                </p>
+                <span className="font-mono text-[11px] text-[#DC2626] font-semibold bg-[#FEF2F2] px-2 py-0.5 rounded border border-[#FCA5A5]">
+                  Hriday QR: Exhausted
+                </span>
+              </div>
+              <p className="font-mono text-[11px] text-[#71717A]">
+                Check credits in bank/UPI app matching the booking’s designated payee, find credit with same UTR and amount, then approve.
+              </p>
+            </div>
+
+            <div className="flex gap-2 items-center flex-wrap">
+              <button
+                type="button"
+                onClick={() => setVerifyPayeeFilter('all')}
+                className={`px-3 py-1.5 font-mono text-xs rounded border transition-colors ${
+                  verifyPayeeFilter === 'all'
+                    ? 'bg-[#030303] text-white border-[#030303] font-bold'
+                    : 'bg-white text-[#52525B] border-[#E4E4E7] hover:border-[#3300FF]'
+                }`}
+              >
+                All ({pendingReview.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setVerifyPayeeFilter('srishti')}
+                className={`px-3 py-1.5 font-mono text-xs rounded border transition-colors ${
+                  verifyPayeeFilter === 'srishti'
+                    ? 'bg-[#3300FF] text-white border-[#3300FF] font-bold'
+                    : 'bg-white text-[#52525B] border-[#E4E4E7] hover:border-[#3300FF]'
+                }`}
+              >
+                Srishti's ({srishtiPendingCount})
+              </button>
+              <button
+                type="button"
+                onClick={() => setVerifyPayeeFilter('tanvee')}
+                className={`px-3 py-1.5 font-mono text-xs rounded border transition-colors ${
+                  verifyPayeeFilter === 'tanvee'
+                    ? 'bg-[#3300FF] text-white border-[#3300FF] font-bold'
+                    : 'bg-white text-[#52525B] border-[#E4E4E7] hover:border-[#3300FF]'
+                }`}
+              >
+                Tanvee's ({tanveePendingCount})
+              </button>
+            </div>
+
+            {!filteredPendingReview.length && (
+              <p className="font-mono text-sm text-[#52525B] p-4 bg-white border border-[#E4E4E7] rounded-lg">
+                No payments waiting for this filter. 🎯
+              </p>
+            )}
+            {filteredPendingReview.map(b => (
               <VerifyCard key={b.id} b={b} token={token} onReview={review} busy={busyId === b.id} />
             ))}
           </div>
