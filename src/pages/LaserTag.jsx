@@ -556,7 +556,7 @@ export default function LaserTag() {
           <p className="font-mono text-xs tracking-widest uppercase text-[#52525B] mb-2">DotSlash × Glitch</p>
           <h1 className="font-sans text-4xl sm:text-5xl font-semibold uppercase tracking-wider text-[#3300FF] mb-5">Laser Tag</h1>
           <div className="grid sm:grid-cols-3 gap-3 font-mono text-sm text-[#030303]">
-            <span className="flex items-center gap-2"><CalendarDays className="w-4 h-4 text-[#3300FF]" /> {ev?.dateLabel || 'Sunday, 2 November 2026'}</span>
+            <span className="flex items-center gap-2"><CalendarDays className="w-4 h-4 text-[#3300FF]" /> {ev?.dateLabel || 'Monday, 2 November 2026'}</span>
             <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-[#3300FF]" /> {ev?.timeLabel || '8:00 PM – 1:00 AM'}</span>
             <span className="flex items-center gap-2"><MapPin className="w-4 h-4 text-[#3300FF]" /> {ev?.venue || 'Learning Commons A&B'}</span>
           </div>

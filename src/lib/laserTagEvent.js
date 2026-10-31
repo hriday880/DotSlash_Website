@@ -2,7 +2,7 @@
 
 export const EVENT = {
   name: 'DotSlash × Glitch · Laser Tag',
-  dateLabel: 'Sunday, 2 November 2026',
+  dateLabel: 'Monday, 2 November 2026',
   timeLabel: '8:00 PM – 1:00 AM',
   venue: 'Learning Commons A&B',
   slotMinutes: 20,
